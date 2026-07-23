@@ -17,7 +17,7 @@ export function AdvanceJourney() {
   const messages = [
     "Good things take time...",
     "Anticipation is a gift in itself.",
-    "Advance Happy Birthday, Thani."
+    "Advance Happy Birthday, Kutty."
   ];
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export function AdvanceJourney() {
       
       {/* Blurry Background Reveal for the Countdown Page */}
       <motion.img 
-        src="/images/solo-photos/thani1.jpg" 
+        src="/images/solo-photos/kutty1.jpeg" 
         alt="Background"
         initial={false}
         animate={
@@ -82,7 +82,7 @@ export function AdvanceJourney() {
                 transition={{ delay: 2, duration: 2 }}
               >
                 <Typography variant="body" className="text-white/70 max-w-md mx-auto italic">
-                  See you on August 3rd, Thanisha.
+                  See you on August 3rd, Keerthana.
                 </Typography>
               </motion.div>
             </motion.div>

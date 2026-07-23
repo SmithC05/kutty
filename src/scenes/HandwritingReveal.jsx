@@ -13,7 +13,7 @@ export function HandwritingReveal() {
   const { next } = useScene();
   const containerRef = useRef(null);
   const dearRef = useRef(null);
-  const thaniRef = useRef(null);
+  const kuttyRef = useRef(null);
 
   useEffect(() => {
     // Use gsap.context to ensure cleanup and scoping in React Strict Mode
@@ -42,16 +42,16 @@ export function HandwritingReveal() {
       // Quick Pause
       tl.to({}, { duration: 0.2 });
 
-      // 3. "Thani" written in ink
-      tl.fromTo(thaniRef.current, 
+      // 3. "Kutty" written in ink
+      tl.fromTo(kuttyRef.current, 
         { opacity: 0, clipPath: 'inset(0 100% 0 0)' }, 
         { opacity: 1, clipPath: 'inset(0 0% 0 0)', duration: 1.5, ease: 'power2.inOut' }
       );
       
-      // Hold "Thani"
+      // Hold "Kutty"
       tl.to({}, { duration: 1.2 });
       
-      // Fade out "Thani"
+      // Fade out "Kutty"
       tl.to(containerRef.current, { opacity: 0, duration: 1 });
     }, containerRef);
 
@@ -70,11 +70,11 @@ export function HandwritingReveal() {
         </Typography>
         
         <Typography 
-          ref={thaniRef}
+          ref={kuttyRef}
           variant="h1" 
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 text-gold-light"
         >
-          Thani
+          Kutty
         </Typography>
       </div>
     </div>

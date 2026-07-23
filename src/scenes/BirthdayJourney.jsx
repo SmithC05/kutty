@@ -89,8 +89,8 @@ export function BirthdayJourney() {
       
       {/* Background Image Reveal */}
       <img 
-        src="/images/solo-photos/thani5.jpg" 
-        alt="Thani" 
+        src="/images/solo-photos/kutty5.jpg" 
+        alt="Kutty" 
         className="bg-reveal-image absolute inset-0 w-full h-full object-cover opacity-0 pointer-events-none z-0"
       />
 
@@ -115,7 +115,7 @@ export function BirthdayJourney() {
             className="text-glow text-center leading-tight"
             style={{ fontFamily: '"Alex Brush", "Dancing Script", cursive' }}
           >
-            Happy Birthday<br/>Thani ❤️
+            Happy Birthday<br/>Kutty ❤️
           </Typography>
           <Typography variant="body" className="text-white/60 tracking-widest uppercase text-sm">
             Have a wonderful day
