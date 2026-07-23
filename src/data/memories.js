@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Memory Journey Data — uses real local photos
 //
-// Solo photos:   /images/solo-photos/kutty1.jpg  → kutty12.jpg
+// Solo photos:   /images/solo-photos/kutty1.jpeg
 // Shared photos: /images/shared-photos/together1.jpg → together7.jpg
 //
 // Motion options: 'zoom-in' | 'zoom-out' | 'pan-right' | 'pan-left' | 'breathe'
@@ -16,18 +16,18 @@ export const memoryChapters = [
     emoji: '✨',
     backgroundTint: 'rgba(234, 179, 8, 0.06)',
     memories: [
-      { id: 's1',  url: '/images/solo-photos/kutty1.jpg',  caption: 'That smile.',       motion: 'zoom-in'   },
-      { id: 's2',  url: '/images/solo-photos/kutty2.jpg',  caption: 'Radiant.',           motion: 'pan-right' },
-      { id: 's3',  url: '/images/solo-photos/kutty3.jpg',  caption: 'My favorite.',       motion: 'zoom-out'  },
-      { id: 's4',  url: '/images/solo-photos/kutty4.jpg',  caption: 'Always stunning.',   motion: 'breathe'   },
-      { id: 's5',  url: '/images/solo-photos/kutty5.jpg',  caption: 'Keep shining.',      motion: 'zoom-in'   },
-      { id: 's6',  url: '/images/solo-photos/kutty6.jpg',  caption: 'Beautiful.',         motion: 'pan-left'  },
-      { id: 's7',  url: '/images/solo-photos/kutty7.jpg',  caption: 'Effortlessly you.',  motion: 'zoom-out'  },
-      { id: 's8',  url: '/images/solo-photos/kutty8.jpg',  caption: 'Glowing.',           motion: 'breathe'   },
-      { id: 's9',  url: '/images/solo-photos/kutty9.jpg',  caption: 'Iconic.',            motion: 'zoom-in'   },
-      { id: 's10', url: '/images/solo-photos/kutty10.jpg', caption: 'Pure light.',        motion: 'pan-right' },
-      { id: 's11', url: '/images/solo-photos/kutty11.jpg', caption: 'Still laughing.',    motion: 'zoom-out'  },
-      { id: 's12', url: '/images/solo-photos/kutty12.jpg', caption: 'Never change.',      motion: 'breathe'   },
+      { id: 's1',  url: '/images/solo-photos/kutty1.jpeg', caption: 'That smile.',       motion: 'zoom-in'   },
+      { id: 's2',  url: '/images/solo-photos/kutty1.jpeg', caption: 'Radiant.',           motion: 'pan-right' },
+      { id: 's3',  url: '/images/solo-photos/kutty1.jpeg', caption: 'My favorite.',       motion: 'zoom-out'  },
+      { id: 's4',  url: '/images/solo-photos/kutty1.jpeg', caption: 'Always stunning.',   motion: 'breathe'   },
+      { id: 's5',  url: '/images/solo-photos/kutty1.jpeg', caption: 'Keep shining.',      motion: 'zoom-in'   },
+      { id: 's6',  url: '/images/solo-photos/kutty1.jpeg', caption: 'Beautiful.',         motion: 'pan-left'  },
+      { id: 's7',  url: '/images/solo-photos/kutty1.jpeg', caption: 'Effortlessly you.',  motion: 'zoom-out'  },
+      { id: 's8',  url: '/images/solo-photos/kutty1.jpeg', caption: 'Glowing.',           motion: 'breathe'   },
+      { id: 's9',  url: '/images/solo-photos/kutty1.jpeg', caption: 'Iconic.',            motion: 'zoom-in'   },
+      { id: 's10', url: '/images/solo-photos/kutty1.jpeg', caption: 'Pure light.',        motion: 'pan-right' },
+      { id: 's11', url: '/images/solo-photos/kutty1.jpeg', caption: 'Still laughing.',    motion: 'zoom-out'  },
+      { id: 's12', url: '/images/solo-photos/kutty1.jpeg', caption: 'Never change.',      motion: 'breathe'   },
     ],
   },
 

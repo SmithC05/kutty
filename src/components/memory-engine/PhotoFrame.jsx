@@ -13,11 +13,18 @@ export function PhotoFrame({ photo, className, index }) {
       exit={{ opacity: 0, y: -20, filter: 'blur(8px)' }}
       transition={{ duration: 1.2, delay, ease: [0.22, 1, 0.36, 1] }}
     >
-      {/* The Image */}
+      {/* Blurred background layer to fill empty spaces */}
+      <img
+        src={photo.url}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover blur-xl opacity-40 scale-110"
+        loading="lazy"
+      />
+      {/* The sharp foreground image */}
       <img
         src={photo.url}
         alt="Memory"
-        className="w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-contain"
         loading="lazy"
       />
 

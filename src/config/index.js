@@ -5,14 +5,14 @@ export const siteConfig = {
 };
 
 export const birthdayConfig = {
-  targetDate: "2026-08-03T00:00:00Z",
+  targetDate: "2026-10-30T00:00:00Z",
   nickname: "Kutty",
 };
 
 // The secret PIN for the birthday lock screen.
-// 0308 = August 3rd (her birthday 🎂)
+// 3010 = October 30th (her birthday 🎂)
 export const vaultConfig = {
-  secretPin: "0308",
+  secretPin: "3010",
 };
 
 export const animationTimings = {
@@ -32,5 +32,5 @@ export const themeConfig = {
 export const devMode = {
   enabled: true, // Master switch for dev features
   startScene: null, // e.g., 'MEMORY_JOURNEY_SOLO' (null to start from beginning)
-  bypassDate: true, // If true, treats the date as after August 3rd
+  bypassDate: false, // If true, treats the date as after October 30th
 };

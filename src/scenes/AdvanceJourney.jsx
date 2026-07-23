@@ -34,9 +34,7 @@ export function AdvanceJourney() {
     <Screen className="bg-transparent overflow-hidden">
       
       {/* Blurry Background Reveal for the Countdown Page */}
-      <motion.img 
-        src="/images/solo-photos/kutty1.jpeg" 
-        alt="Background"
+      <motion.div 
         initial={false}
         animate={
           step >= messages.length 
@@ -44,8 +42,19 @@ export function AdvanceJourney() {
             : { opacity: 0, scale: 1.1, filter: 'blur(20px)' }
         }
         transition={{ duration: 3, ease: 'easeOut' }}
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0"
-      />
+        className="absolute inset-0 w-full h-full pointer-events-none z-0"
+      >
+        <img 
+          src="/images/solo-photos/kutty1.jpeg" 
+          alt="" 
+          className="absolute inset-0 w-full h-full object-cover blur-xl opacity-40 scale-110"
+        />
+        <img 
+          src="/images/solo-photos/kutty1.jpeg" 
+          alt="Background" 
+          className="absolute inset-0 w-full h-full object-contain"
+        />
+      </motion.div>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
         <AnimatePresence mode="wait">
@@ -82,7 +91,7 @@ export function AdvanceJourney() {
                 transition={{ delay: 2, duration: 2 }}
               >
                 <Typography variant="body" className="text-white/70 max-w-md mx-auto italic">
-                  See you on August 3rd, Keerthana.
+                  See you on October 30th, Keerthana.
                 </Typography>
               </motion.div>
             </motion.div>

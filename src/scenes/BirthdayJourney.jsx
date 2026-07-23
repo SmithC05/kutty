@@ -62,7 +62,7 @@ export function BirthdayJourney() {
       // Blurry background reveal
       tl.fromTo('.bg-reveal-image', 
         { opacity: 0, scale: 1.1, filter: 'blur(20px)' }, 
-        { opacity: 0.8, scale: 1, filter: 'blur(10px)', duration: 2.5, ease: 'power2.out' },
+        { opacity: 0.8, scale: 1, filter: 'blur(0px)', duration: 2.5, ease: 'power2.out' },
         "-=0.5"
       );
 
@@ -88,11 +88,18 @@ export function BirthdayJourney() {
     <Screen ref={sceneRef} className="bg-transparent transition-colors overflow-hidden">
       
       {/* Background Image Reveal */}
-      <img 
-        src="/images/solo-photos/kutty5.jpg" 
-        alt="Kutty" 
-        className="bg-reveal-image absolute inset-0 w-full h-full object-cover opacity-0 pointer-events-none z-0"
-      />
+      <div className="bg-reveal-image absolute inset-0 w-full h-full opacity-0 pointer-events-none z-0">
+        <img 
+          src="/images/solo-photos/kutty1.jpeg" 
+          alt="" 
+          className="absolute inset-0 w-full h-full object-cover blur-xl opacity-40 scale-110"
+        />
+        <img 
+          src="/images/solo-photos/kutty1.jpeg" 
+          alt="Kutty" 
+          className="absolute inset-0 w-full h-full object-contain"
+        />
+      </div>
 
       <div ref={containerRef} className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
         
