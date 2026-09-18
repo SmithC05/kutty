@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { analyzeImages } from './ImageAnalyzer';
 import { generatePages } from './LayoutEngine';
@@ -11,16 +11,12 @@ export function MemoryBook({ photos, onComplete, initialChapterData }) {
   const [canTap, setCanTap] = useState(false);
   const [showDissolve, setShowDissolve] = useState(false);
 
-  // Analyze images on mount
   useEffect(() => {
     let isMounted = true;
     
     async function load() {
       setIsAnalyzing(true);
-      // Analyze photos to determine width, height, and orientation
       const analyzed = await analyzeImages(photos);
-      
-      // Generate intelligent layout pages
       const layoutPages = generatePages(analyzed);
       
       if (isMounted) {
@@ -34,12 +30,10 @@ export function MemoryBook({ photos, onComplete, initialChapterData }) {
     return () => { isMounted = false; };
   }, [photos]);
 
-  // Tap cooldown logic
   useEffect(() => {
     if (isAnalyzing) return;
     
     setCanTap(false);
-    // She must spend at least 4 seconds taking in each page
     const t = setTimeout(() => {
       setCanTap(true);
     }, 4000);
@@ -50,7 +44,6 @@ export function MemoryBook({ photos, onComplete, initialChapterData }) {
   const advance = () => {
     if (!canTap || isAnalyzing) return;
     
-    // Tap visual feedback
     setShowDissolve(true);
     setTimeout(() => setShowDissolve(false), 700);
 
@@ -61,13 +54,9 @@ export function MemoryBook({ photos, onComplete, initialChapterData }) {
       return;
     }
 
-    // Soft dissolve transition
     setTimeout(() => setCurrentIndex(prev => prev + 1), 500);
   };
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // Loading State
-  // ─────────────────────────────────────────────────────────────────────────────
   if (isAnalyzing) {
     return (
       <motion.div 
@@ -106,14 +95,12 @@ export function MemoryBook({ photos, onComplete, initialChapterData }) {
       transition={{ duration: 2 }}
       onClick={advance}
     >
-      {/* Dynamic background tint based on chapter (if provided) */}
       <motion.div
         className="absolute inset-0 z-0 pointer-events-none"
         animate={{ background: currentChapterTint }}
         transition={{ duration: 3 }}
       />
 
-      {/* Pages Container */}
       <div className="absolute inset-0 z-10">
         {pages.map((page, idx) => (
           <MemoryPage
@@ -124,7 +111,6 @@ export function MemoryBook({ photos, onComplete, initialChapterData }) {
         ))}
       </div>
 
-      {/* Tap hint */}
       <AnimatePresence>
         {canTap && (
           <motion.p
@@ -139,7 +125,7 @@ export function MemoryBook({ photos, onComplete, initialChapterData }) {
         )}
       </AnimatePresence>
 
-      {/* Golden particle visual feedback on tap */}
+      {/* Blue particle visual feedback on tap */}
       <AnimatePresence>
         {showDissolve && (
           <motion.div 
@@ -149,7 +135,7 @@ export function MemoryBook({ photos, onComplete, initialChapterData }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.7 }}
             style={{
-              background: 'radial-gradient(circle at center, rgba(234,179,8,0.1) 0%, transparent 60%)'
+              background: 'radial-gradient(circle at center, rgba(59,130,246,0.12) 0%, transparent 60%)'
             }}
           />
         )}
