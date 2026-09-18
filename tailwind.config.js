@@ -7,17 +7,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0a0a0a',
-        surface: '#111111',
+        background: '#070b14',
+        surface: '#0d1424',
+        // Keep the existing token names so every scene stays compatible,
+        // but shift the visual system from warm gold to cinematic blue.
         primary: {
-          light: '#fde68a', // amber-200
-          DEFAULT: '#d97706', // amber-600
-          dark: '#92400e', // amber-800
+          light: '#bfdbfe', // blue-200
+          DEFAULT: '#2563eb', // blue-600
+          dark: '#1d4ed8', // blue-700
         },
         gold: {
-          light: '#fef08a', // yellow-200
-          DEFAULT: '#eab308', // yellow-500
-          dark: '#a16207', // yellow-800
+          light: '#dbeafe', // blue-100
+          DEFAULT: '#3b82f6', // blue-500
+          dark: '#1e40af', // blue-800
         },
         aurora: {
           green: '#10b981', // emerald-500
