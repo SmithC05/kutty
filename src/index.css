@@ -11,7 +11,7 @@
 
 @layer utilities {
   .glow-text {
-    text-shadow: 0 0 10px rgba(253, 230, 138, 0.3);
+    text-shadow: 0 0 10px rgba(191, 219, 254, 0.35);
   }
 }
 
