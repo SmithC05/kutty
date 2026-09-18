@@ -15,6 +15,20 @@
   }
 }
 
+/* Desktop cinematic cursor: the native pointer is replaced by MagicCursor. */
+@media (hover: hover) and (pointer: fine) {
+  html,
+  body,
+  button,
+  a,
+  input,
+  textarea,
+  select,
+  [role="button"] {
+    cursor: none !important;
+  }
+}
+
 /* Lenis Recommended CSS */
 html.lenis, html.lenis body {
   height: auto;
