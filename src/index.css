@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-background text-white antialiased selection:bg-gold-dark/30;
+    @apply bg-background text-white antialiased selection:bg-blue-700/30;
     overflow-x: hidden;
   }
 }

@@ -68,8 +68,14 @@ export function AdvanceJourney() {
               className="max-w-xl"
             >
               <Typography 
-                variant={step === 2 ? "h1" : "h3"} 
-                className={step === 2 ? "text-glow leading-tight" : "text-white/90"}
+                variant={step === 2 ? "h1" : "h2"} 
+                className={
+                  step === 2
+                    ? "text-glow leading-tight"
+                    : step === 1
+                    ? "text-white/80 leading-snug"
+                    : "text-white/70 leading-snug"
+                }
                 style={{ fontFamily: '"Alex Brush", "Dancing Script", cursive' }}
               >
                 {messages[step]}

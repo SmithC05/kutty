@@ -72,7 +72,7 @@ export function HandwritingReveal() {
         <Typography 
           ref={kuttyRef}
           variant="h1" 
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 text-gold-light"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 text-blue-200"
         >
           Kutty
         </Typography>

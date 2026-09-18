@@ -12,7 +12,7 @@ export function Loader({ progress = 0, className }) {
       {/* 
         Future: Add Framer Motion to fade this out smoothly when progress hits 100 
       */}
-      <div className="w-12 h-12 rounded-full border-t-2 border-primary-light animate-spin mb-8"></div>
+      <div className="w-12 h-12 rounded-full border-t-2 border-blue-200 animate-spin mb-8"></div>
       <Typography variant="caption" className="animate-pulse">
         Magic loading... {Math.round(progress)}%
       </Typography>

@@ -44,7 +44,7 @@ export function Countdown({ timeState }) {
               delay: idx * 0.2
             }}
           >
-            <div className="relative overflow-hidden w-20 h-24 md:w-28 md:h-36 rounded-xl backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex items-center justify-center">
+            <div className="relative overflow-hidden w-20 h-24 md:w-28 md:h-36 rounded-xl backdrop-blur-xl bg-white/5 border border-blue-400/20 shadow-[0_8px_32px_0_rgba(37,99,235,0.2)] flex items-center justify-center">
               <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-30" />
               
               <div className="relative flex items-center justify-center w-full h-full pb-4">
@@ -57,7 +57,7 @@ export function Countdown({ timeState }) {
                     transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                     className="absolute"
                   >
-                    <Typography variant="countdown" className="drop-shadow-lg text-4xl md:text-6xl text-gold-light">
+                    <Typography variant="countdown" className="drop-shadow-lg text-4xl md:text-6xl text-blue-200">
                       {padTime(block.value)}
                     </Typography>
                   </motion.div>
