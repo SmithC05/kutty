@@ -9,8 +9,6 @@ export const birthdayConfig = {
   nickname: "Kutty",
 };
 
-// The secret PIN for the birthday lock screen.
-// 3010 = October 30th (her birthday 🎂)
 export const vaultConfig = {
   secretPin: "3010",
 };
@@ -24,13 +22,13 @@ export const animationTimings = {
 
 export const themeConfig = {
   colors: {
-    background: '#0a0a0a',
-    gold: '#eab308',
+    background: '#070b14',
+    blue: '#3b82f6',
   }
 };
 
 export const devMode = {
-  enabled: true, // Master switch for dev features
-  startScene: null, // e.g., 'MEMORY_JOURNEY_SOLO' (null to start from beginning)
-  bypassDate: false, // If true, treats the date as after October 30th
+  enabled: true,
+  startScene: null,
+  bypassDate: false,
 };

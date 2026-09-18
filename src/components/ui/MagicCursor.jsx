@@ -9,7 +9,6 @@ export function MagicCursor() {
   const canvasRef = useRef(null);
   
   useEffect(() => {
-    // Only enable on non-touch devices (desktop)
     if (window.matchMedia("(hover: none)").matches) return;
 
     const canvas = canvasRef.current;
@@ -32,18 +31,18 @@ export function MagicCursor() {
         this.y = y;
         this.size = Math.random() * 2 + 0.5;
         this.speedX = Math.random() * 1 - 0.5;
-        this.speedY = Math.random() * 1 + 0.5; // Float upwards slightly
+        this.speedY = Math.random() * 1 + 0.5;
         this.life = 1.0;
       }
       
       update() {
         this.x += this.speedX;
-        this.y -= this.speedY; // Move up
-        this.life -= 0.02; // Fade out
+        this.y -= this.speedY;
+        this.life -= 0.02;
       }
       
       draw() {
-        ctx.fillStyle = `rgba(253, 230, 138, ${this.life})`; // Gold color
+        ctx.fillStyle = `rgba(191, 219, 254, ${this.life})`; // Blue trail
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -51,7 +50,6 @@ export function MagicCursor() {
     }
 
     const handleMouseMove = (e) => {
-      // Add 2 particles per mouse move event
       particles.push(new Particle(e.clientX, e.clientY));
       particles.push(new Particle(e.clientX, e.clientY));
     };

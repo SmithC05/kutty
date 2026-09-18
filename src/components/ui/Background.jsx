@@ -48,7 +48,7 @@ export function Background({ className, showParticles = true, isPaused = false }
         if (this.x > canvas.width) this.x = 0;
       }
       draw() {
-        ctx.fillStyle = `rgba(253, 230, 138, ${this.opacity})`; // gold-light
+        ctx.fillStyle = `rgba(191, 219, 254, ${this.opacity})`; // blue-light
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -81,19 +81,16 @@ export function Background({ className, showParticles = true, isPaused = false }
 
   return (
     <div className={cn("fixed inset-0 pointer-events-none -z-10", className)}>
-      
-      {/* Deep Space Base */}
       <div className="absolute inset-0 bg-background" />
 
-      {/* Volumetric Fog / Aurora Gradient */}
       <motion.div 
         className="absolute inset-0 opacity-40 mix-blend-screen"
         animate={{
           background: [
-            "radial-gradient(circle at 20% 30%, rgba(217, 119, 6, 0.15) 0%, transparent 50%)",
-            "radial-gradient(circle at 80% 70%, rgba(217, 119, 6, 0.2) 0%, transparent 60%)",
-            "radial-gradient(circle at 50% 50%, rgba(253, 230, 138, 0.1) 0%, transparent 70%)",
-            "radial-gradient(circle at 20% 30%, rgba(217, 119, 6, 0.15) 0%, transparent 50%)"
+            "radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.15) 0%, transparent 50%)",
+            "radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.2) 0%, transparent 60%)",
+            "radial-gradient(circle at 50% 50%, rgba(191, 219, 254, 0.1) 0%, transparent 70%)",
+            "radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.15) 0%, transparent 50%)"
           ]
         }}
         transition={{
@@ -103,15 +100,12 @@ export function Background({ className, showParticles = true, isPaused = false }
         }}
       />
 
-      {/* Subtle depth shadow mask to darken edges */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)]" />
 
-      {/* Canvas Particle System (Stars/Dust) */}
       <canvas 
         ref={canvasRef} 
         className="absolute inset-0 w-full h-full opacity-60 mix-blend-screen" 
       />
-      
     </div>
   );
 }

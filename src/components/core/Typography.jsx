@@ -22,7 +22,6 @@ export function Typography({
   children,
   ...props
 }) {
-  // Determine the semantic HTML tag based on variant if 'as' is not provided
   const Component = as || (
     variant === 'h1' ? 'h1' :
     variant === 'h2' ? 'h2' :
