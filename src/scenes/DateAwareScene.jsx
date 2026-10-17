@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useDateLock } from '../hooks/useDateLock';
+import { useTime } from '../context';
 import { AdvanceJourney } from './AdvanceJourney';
 import { BirthdayJourney } from './BirthdayJourney';
 
@@ -12,7 +12,7 @@ import { devMode } from '../config';
  * Listens for the secret 'developer-unlock' event to bypass time restrictions.
  */
 export function DateAwareScene() {
-  const timeState = useDateLock();
+  const timeState = useTime();
   const [isDevUnlocked, setIsDevUnlocked] = useState(false);
 
   useEffect(() => {

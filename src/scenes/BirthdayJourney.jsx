@@ -2,15 +2,14 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { Typography } from '../components/core/Typography';
 import { Screen } from '../components/core/Screen';
-import { useAudioController } from '../hooks/useAudioController';
-import { useScene } from '../context/SceneContext';
+import { useAudio, useScene } from '../context';
 
 /**
  * Birthday Journey (The Reveal)
  * The cinematic 3-2-1 countdown that explodes into the Birthday Greeting.
  */
 export function BirthdayJourney() {
-  const { playSfx, playTrack } = useAudioController();
+  const { playSfx, playTrack } = useAudio();
   const { next } = useScene();
   
   const sceneRef = useRef(null);

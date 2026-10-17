@@ -1,9 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { Typography } from '../components/core/Typography';
 import { useScene } from '../context/SceneContext';
-import { SCENES } from '../constants';
 
 /**
  * Handwritten Cinematic Reveal

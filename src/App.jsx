@@ -14,19 +14,17 @@ import { MagicCursor } from './components/ui/MagicCursor';
 
 // Memory data is now managed internally by MemoryJourney
 
+// Critical assets to preload before starting (procedural 3D gift requires no pre-rendered image assets)
+const INITIAL_ASSETS = [];
+
 function App() {
-  const { currentScene } = useScene();
-  
-  // Note: Later we will read this array from config/gallery.json
-  const initialAssetsToLoad = [
-    '/images/gift-assets/gift-box.png'
-  ];
-  const { progress, isLoaded } = useMediaLoading(initialAssetsToLoad);
+  const { currentScene, isBackgroundPaused } = useScene();
+  const { progress, isLoaded } = useMediaLoading(INITIAL_ASSETS);
 
   return (
     <>
       <MagicCursor />
-      <Background />
+      <Background isPaused={isBackgroundPaused} />
       
       <AnimatePresence mode="wait">
         {!isLoaded && (
@@ -36,7 +34,6 @@ function App() {
 
       <AnimatePresence mode="wait">
         {isLoaded && currentScene === SCENES.LOADING && (
-          // We map SCENES.LOADING to OpeningScene for now as the entry point
           <OpeningScene key="opening" />
         )}
         
@@ -49,14 +46,19 @@ function App() {
           <DateAwareScene key="date-aware" />
         )}
 
-        {/* Phase 9.1: Secret Vault */}
+        {/* Secret Vault */}
         {isLoaded && currentScene === SCENES.SECRET_VAULT && (
           <SecretVault key="secret-vault" />
         )}
 
-        {/* Phase 10: Memory Journey — all chapters in one self-contained component */}
-        {isLoaded && (currentScene === SCENES.MEMORY_JOURNEY_SOLO || currentScene === SCENES.MEMORY_JOURNEY_TOGETHER) && (
-          <MemoryJourney key="memory-journey" />
+        {/* Memory Journey — Chapter 1: Solo */}
+        {isLoaded && currentScene === SCENES.MEMORY_JOURNEY_SOLO && (
+          <MemoryJourney key="memory-solo" chapterIndex={0} />
+        )}
+
+        {/* Memory Journey — Chapter 2: Together */}
+        {isLoaded && currentScene === SCENES.MEMORY_JOURNEY_TOGETHER && (
+          <MemoryJourney key="memory-together" chapterIndex={1} />
         )}
       </AnimatePresence>
     </>

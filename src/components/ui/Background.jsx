@@ -9,10 +9,15 @@ import { cn } from '../../utils/cn';
 export function Background({ className, showParticles = true, isPaused = false }) {
   const canvasRef = useRef(null);
   const isPausedRef = useRef(isPaused);
+  const showParticlesRef = useRef(showParticles);
 
   useEffect(() => {
     isPausedRef.current = isPaused;
   }, [isPaused]);
+
+  useEffect(() => {
+    showParticlesRef.current = showParticles;
+  }, [showParticles]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -63,10 +68,12 @@ export function Background({ className, showParticles = true, isPaused = false }
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        if (!isPausedRef.current) p.update();
-        p.draw();
-      });
+      if (showParticlesRef.current) {
+        particles.forEach(p => {
+          if (!isPausedRef.current) p.update();
+          p.draw();
+        });
+      }
       animationFrameId = requestAnimationFrame(animate);
     };
 

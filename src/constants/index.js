@@ -12,8 +12,10 @@ export const SCENES = {
   FINAL_MESSAGE: 'FINAL_MESSAGE', // Phase 12: Grand Finale
 };
 
-// Target date for the birthday (Set to mock date for dev if needed, or actual date)
-export const BIRTHDAY_DATE = "2026-08-01T00:00:00Z";
+import { birthdayConfig } from '../config';
+
+// Target date for the birthday - authoritative date from birthdayConfig
+export const BIRTHDAY_DATE = birthdayConfig.targetDate;
 
 // Animation Timings (in seconds, mapped from the design system)
 export const TIMING = {

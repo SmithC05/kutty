@@ -5,28 +5,41 @@ export function PhotoFrame({ photo, className, index }) {
   // Stagger the entrance animation based on the index in the chunk
   const delay = index * 0.3;
 
-  return (
-    <motion.div
-      className={`relative overflow-hidden rounded-xl bg-[#0a0a0a] shadow-[0_10px_30px_rgba(0,0,0,0.5),0_0_10px_rgba(255,255,255,0.05)] ${className}`}
-      initial={{ opacity: 0, y: 30, scale: 0.95, rotate: (Math.random() - 0.5) * 4 }}
-      animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
-      exit={{ opacity: 0, y: -20, filter: 'blur(8px)' }}
-      transition={{ duration: 1.2, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {/* Blurred background layer to fill empty spaces */}
-      <img
-        src={photo.url}
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover blur-xl opacity-40 scale-110"
-        loading="lazy"
-      />
-      {/* The sharp foreground image */}
-      <img
-        src={photo.url}
-        alt="Memory"
-        className="absolute inset-0 w-full h-full object-contain"
-        loading="lazy"
-      />
+    const [imgError, setImgError] = React.useState(false);
+
+    return (
+      <motion.div
+        className={`relative overflow-hidden rounded-xl bg-[#0a0a0a] shadow-[0_10px_30px_rgba(0,0,0,0.5),0_0_10px_rgba(255,255,255,0.05)] ${className}`}
+        initial={{ opacity: 0, y: 30, scale: 0.95, rotate: (Math.random() - 0.5) * 4 }}
+        animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
+        exit={{ opacity: 0, y: -20, filter: 'blur(8px)' }}
+        transition={{ duration: 1.2, delay, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {!imgError ? (
+          <>
+            {/* Blurred background layer to fill empty spaces */}
+            <img
+              src={photo.url}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover blur-xl opacity-40 scale-110"
+              loading="lazy"
+              onError={() => setImgError(true)}
+            />
+            {/* The sharp foreground image */}
+            <img
+              src={photo.url}
+              alt="Memory"
+              className="absolute inset-0 w-full h-full object-contain"
+              loading="lazy"
+              onError={() => setImgError(true)}
+            />
+          </>
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-950/40 via-purple-950/20 to-black/80 p-6 text-center">
+            <span className="text-3xl mb-2 opacity-60">📷</span>
+            <span className="text-xs uppercase tracking-widest text-white/40 font-mono">Shared Moment</span>
+          </div>
+        )}
 
       {/* Cinematic Vignette */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none" />
