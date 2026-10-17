@@ -2,12 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAudio, useScene } from '../context';
 import { GiftBox } from '../components/ui/GiftBox';
 import { Typography } from '../components/core/Typography';
-import { Screen } from '../components/core/Screen';
 
 /**
  * Opening Scene
  * The cinematic entrance to the birthday experience.
- * Features the procedural 3D gift assembly, idle "Alive" breathing,
+ * Features a full-screen procedural 3D gift assembly, continuous 21s rotation,
  * background freeze on interaction, and cinematic unwrapping into the handwriting reveal.
  */
 export function OpeningScene() {
@@ -55,24 +54,23 @@ export function OpeningScene() {
   };
 
   return (
-    <Screen ref={sceneRef} className="bg-transparent transition-colors">
-      <div className="z-10 flex flex-col items-center justify-center space-y-8 mt-6">
-        <GiftBox 
-          isIdleAnimating={isAliveState} 
-          isOpening={isOpening}
-          onOpenStart={handleOpenStart}
-          onFreezeStart={handleFreezeStart}
-          onFreezeEnd={handleFreezeEnd}
-          onOpenComplete={handleOpenComplete}
-        />
-        
-        {/* Subtle hint text that fades out upon interaction */}
-        <div className={`transition-opacity duration-1000 ${isOpening ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-          <Typography variant="caption" className="animate-pulse opacity-50 tracking-[0.3em] uppercase">
-            Awaits
-          </Typography>
-        </div>
+    <div ref={sceneRef} className="fixed inset-0 w-full h-[100dvh] overflow-hidden select-none z-10">
+      {/* Genuinely Full-Screen 3D Gift Canvas */}
+      <GiftBox 
+        isIdleAnimating={isAliveState} 
+        isOpening={isOpening}
+        onOpenStart={handleOpenStart}
+        onFreezeStart={handleFreezeStart}
+        onFreezeEnd={handleFreezeEnd}
+        onOpenComplete={handleOpenComplete}
+      />
+      
+      {/* Subtle hint text positioned cleanly at the bottom */}
+      <div className={`absolute bottom-10 sm:bottom-14 left-0 right-0 flex justify-center pointer-events-none z-20 transition-opacity duration-1000 ${isOpening ? 'opacity-0' : 'opacity-100'}`}>
+        <Typography variant="caption" className="animate-pulse opacity-60 tracking-[0.4em] uppercase text-xs sm:text-sm text-blue-200/80">
+          Awaits
+        </Typography>
       </div>
-    </Screen>
+    </div>
   );
 }

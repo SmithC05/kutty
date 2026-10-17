@@ -20,8 +20,9 @@ function checkWebGLSupport() {
 
 /**
  * GiftCanvas
- * The high-level canvas wrapper for the procedural 3D gift experience.
- * Manages WebGL support fallback, responsiveness, accessibility, and scene transition.
+ * Genuinely full-screen WebGL canvas wrapper for the procedural 3D gift experience.
+ * Fills the full browser viewport, supports mouse/touch/keyboard, responsive camera,
+ * and seamless full-screen cinematic transition to HandwritingReveal.
  */
 export function GiftCanvas({
   isOpening = false,
@@ -48,19 +49,18 @@ export function GiftCanvas({
   }, []);
 
   const handleOpenCompleteInternal = () => {
-    // Ramp up golden transition glow to smoothly transition to HandwritingReveal
+    // Ramp up radiant full-screen golden wash to lead seamlessly into HandwritingReveal
     setTransitionGlow(1);
     setTimeout(() => {
       if (onOpenComplete) onOpenComplete();
-    }, 400);
+    }, 450);
   };
 
-  // Keyboard accessibility
+  // Keyboard accessibility (Space or Enter opens gift)
   const handleKeyDown = (e) => {
     if (isOpening) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      // Dispatch click to trigger opening
       const canvasEl = canvasContainerRef.current?.querySelector('canvas');
       if (canvasEl) {
         canvasEl.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -70,12 +70,14 @@ export function GiftCanvas({
 
   if (!hasWebGL) {
     return (
-      <CSSGiftFallback
-        isOpening={isOpening}
-        isIdleAnimating={isIdleAnimating}
-        onOpenStart={onOpenStart}
-        onOpenComplete={onOpenComplete}
-      />
+      <div className="fixed inset-0 w-full h-[100dvh] flex items-center justify-center">
+        <CSSGiftFallback
+          isOpening={isOpening}
+          isIdleAnimating={isIdleAnimating}
+          onOpenStart={onOpenStart}
+          onOpenComplete={onOpenComplete}
+        />
+      </div>
     );
   }
 
@@ -86,10 +88,10 @@ export function GiftCanvas({
       role="button"
       aria-label="Birthday gift for Kutty - click or press Enter to open"
       onKeyDown={handleKeyDown}
-      className={`relative w-80 h-80 sm:w-96 sm:h-96 md:w-[420px] md:h-[420px] cursor-pointer select-none focus:outline-none ${className}`}
+      className={`fixed inset-0 w-full h-[100dvh] cursor-pointer select-none focus:outline-none overflow-hidden ${className}`}
     >
       <Canvas
-        camera={{ position: [0, 0.4, 5.2], fov: 42 }}
+        camera={{ position: [0, 1.25, 5.6], fov: 42 }}
         dpr={[1, Math.min(window.devicePixelRatio || 1, 2)]}
         shadows
         gl={{
@@ -97,6 +99,7 @@ export function GiftCanvas({
           alpha: true,
           powerPreference: 'high-performance',
         }}
+        className="w-full h-full block"
       >
         <GiftScene3D
           isOpening={isOpening}
@@ -109,12 +112,12 @@ export function GiftCanvas({
         />
       </Canvas>
 
-      {/* Warm Golden Glow Flash during scene transition */}
+      {/* Screen-Wide Warm Golden Glow Veil during scene transition */}
       <div
-        className="absolute inset-0 pointer-events-none rounded-full transition-opacity duration-700 blur-3xl"
+        className="fixed inset-0 pointer-events-none transition-opacity duration-700 z-30"
         style={{
           opacity: transitionGlow,
-          background: 'radial-gradient(circle, rgba(254,240,138,0.7) 0%, rgba(217,119,6,0.3) 50%, transparent 80%)',
+          background: 'radial-gradient(circle at center, rgba(254,240,138,0.92) 0%, rgba(217,119,6,0.55) 50%, rgba(13,27,51,0.95) 100%)',
         }}
       />
     </div>

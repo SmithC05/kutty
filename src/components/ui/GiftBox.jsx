@@ -3,9 +3,8 @@ import { GiftCanvas } from '../gift3d';
 
 /**
  * GiftBox Component
- * Procedural real-time 3D interactive gift box built directly in Three.js / React Three Fiber.
- * Complies with strict asset rule: 0% image/texture dependency.
- * Fully animated assembly, floating idle, and multi-stage unwrapping sequence.
+ * Luxury procedural 3D real-time presentation built directly in Three.js / React Three Fiber.
+ * Fills the full viewport for a truly cinematic motion-design opening sequence.
  */
 export const GiftBox = forwardRef(({
   className = '',
@@ -17,7 +16,7 @@ export const GiftBox = forwardRef(({
   onOpenComplete
 }, ref) => {
   return (
-    <div ref={ref} className="relative flex items-center justify-center">
+    <div ref={ref} className="fixed inset-0 w-full h-full">
       <GiftCanvas
         className={className}
         isOpening={isOpening}
