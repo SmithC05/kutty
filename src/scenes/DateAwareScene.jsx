@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useTime } from '../context';
 import { AdvanceJourney } from './AdvanceJourney';
 import { BirthdayJourney } from './BirthdayJourney';
@@ -24,30 +23,12 @@ export function DateAwareScene() {
   const showBirthday = timeState.isUnlocked || isDevUnlocked || (devMode.enabled && devMode.bypassDate);
 
   return (
-    <AnimatePresence mode="wait">
+    <div className="absolute inset-0">
       {showBirthday ? (
-        <motion.div
-          key="birthday-journey"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1.5 }}
-          className="absolute inset-0"
-        >
-          <BirthdayJourney />
-        </motion.div>
+        <BirthdayJourney />
       ) : (
-        <motion.div
-          key="advance-journey"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1.5 }}
-          className="absolute inset-0"
-        >
-          <AdvanceJourney />
-        </motion.div>
+        <AdvanceJourney />
       )}
-    </AnimatePresence>
+    </div>
   );
 }
