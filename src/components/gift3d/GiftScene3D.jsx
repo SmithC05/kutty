@@ -7,6 +7,7 @@ import { BoxLid } from './BoxLid';
 import { WrappingPanels } from './WrappingPanels';
 import { BoxRibbons, LidRibbons } from './Ribbons';
 import { DecorativeBow } from './DecorativeBow';
+import { BirthdayGiftTag } from './BirthdayGiftTag';
 import { InnerLightAndSparkles } from './InnerLightAndSparkles';
 import { EnvironmentAtmosphere } from './EnvironmentAtmosphere';
 import { ContactShadow } from './ContactShadow';
@@ -34,6 +35,7 @@ export function GiftScene3D({
   const boxRibbonsRef = useRef(null);
   const lidRibbonsRef = useRef(null);
   const bowRef = useRef(null);
+  const tagRef = useRef(null);
   const innerLightRef = useRef(null);
   const atmosphereRef = useRef(null);
 
@@ -61,6 +63,7 @@ export function GiftScene3D({
     const gift = giftGroupRef.current;
     const lid = lidGroupRef.current;
     const bow = bowRef.current;
+    const tag = tagRef.current;
     const panels = panelsRef.current;
     const boxRibbons = boxRibbonsRef.current;
 
@@ -70,6 +73,7 @@ export function GiftScene3D({
       gift.scale.set(1, 1, 1);
       gift.position.set(0, 0, 0);
       gift.rotation.set(0.2, 0.35, 0);
+      if (tag) tag.scale.set(1, 1, 1);
       isAssembled.current = true;
       return;
     }
@@ -109,9 +113,12 @@ export function GiftScene3D({
       }
     }, 0.35);
 
-    // c. Satin ribbons wrap cleanly around box
+    // c. Satin ribbons wrap cleanly around box & birthday tag appears
     if (boxRibbons?.group) {
       tl.to(boxRibbons.group.scale, { x: 1, y: 1, z: 1, duration: 1.1, ease: 'back.out(1.2)' }, 0.7);
+    }
+    if (tag) {
+      tl.fromTo(tag.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 0.9, ease: 'back.out(1.3)' }, 0.85);
     }
 
     // d. Lid settles onto box with soft bounce
@@ -254,6 +261,17 @@ export function GiftScene3D({
           tl.to(boxRibbons.front.position, { z: 2.6, y: -1.2, x: -0.8, duration: 1.2, ease: 'power2.out' }, 0.2);
           tl.to(boxRibbons.front.rotation, { x: 0.8, z: -0.4, duration: 1.2, ease: 'power2.out' }, 0.2);
         }
+        // Attached birthday gift tag follows front ribbon and fades gracefully
+        if (tagRef.current) {
+          tl.to(tagRef.current.position, { z: 2.8, y: -1.0, x: -0.4, duration: 1.2, ease: 'power2.out' }, 0.2);
+          tl.to(tagRef.current.rotation, { x: 0.8, z: -0.5, duration: 1.2, ease: 'power2.out' }, 0.2);
+          tagRef.current.traverse((child) => {
+            if (child.isMesh && child.material) {
+              child.material.transparent = true;
+              tl.to(child.material, { opacity: 0, duration: 0.7 }, 0.6);
+            }
+          });
+        }
         // Right ribbon peels towards right screen edge
         if (boxRibbons.right) {
           tl.to(boxRibbons.right.position, { x: 3.2, y: 0.4, z: 0.8, duration: 1.2, ease: 'power2.out' }, 0.25);
@@ -375,40 +393,47 @@ export function GiftScene3D({
 
   return (
     <>
-      {/* Cinematic Studio Lighting */}
-      <ambientLight color="#102244" intensity={1.1} />
+      {/* Cinematic Studio Lighting: Refined celebratory balance */}
+      <ambientLight color="#162a4d" intensity={1.0} />
 
-      {/* Main Key Light: Warm golden highlight with crisp speculars */}
+      {/* Main Key Light: Warm champagne highlight with soft diffusion */}
       <directionalLight
-        position={[5, 8, 5]}
-        intensity={2.8}
-        color="#fffbeb"
+        position={[4.5, 7.0, 4.5]}
+        intensity={1.9}
+        color="#fff6df"
         castShadow
         shadow-mapSize={[1024, 1024]}
         shadow-bias={-0.0001}
       />
 
-      {/* Front Fill Light: Soft face illumination */}
+      {/* Front Fill Light: Gentle soft sky blue face illumination */}
       <directionalLight
         position={[-3, 2, 4]}
-        intensity={1.2}
-        color="#bfdbfe"
+        intensity={1.1}
+        color="#c7ddff"
       />
 
       {/* Cool Sapphire Rim Light: Coherent blue theme accent */}
       <pointLight
-        position={[-5, 4, -4]}
-        intensity={2.2}
+        position={[-4.5, 3.5, -3.5]}
+        intensity={1.8}
         color="#38bdf8"
         distance={16}
       />
 
-      {/* Warm Champagne Rim Light */}
+      {/* Warm Champagne Rim Light: Separates gift from dark background with soft golden halo */}
       <pointLight
-        position={[4, -2, -3]}
-        intensity={1.8}
+        position={[3.5, 1.5, -4]}
+        intensity={2.0}
         color="#fde047"
-        distance={14}
+        distance={15}
+      />
+
+      {/* Top Soft Downlight: Gentle illumination on bow loops */}
+      <directionalLight
+        position={[0, 6, 0]}
+        intensity={0.45}
+        color="#faeed1"
       />
 
       {/* Multi-layer Cinematic Atmosphere (Starfield, dust, aura, shockwave, light shafts) */}
@@ -433,6 +458,9 @@ export function GiftScene3D({
 
         {/* Broad Satin Base Ribbons */}
         <BoxRibbons ref={boxRibbonsRef} />
+
+        {/* Handcrafted Birthday Gift Tag ("For Kutty") */}
+        <BirthdayGiftTag ref={tagRef} />
 
         {/* Radiant Inner Light & Screen-Wide Sparkle Burst */}
         <InnerLightAndSparkles ref={innerLightRef} isOpening={isOpening} />

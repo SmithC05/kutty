@@ -31,44 +31,38 @@ export const BoxRibbons = forwardRef((props, ref) => {
     <group ref={groupRef} {...props}>
       {/* Front Vertical Ribbon */}
       <group ref={frontRibbonRef} position={[0, 0, (boxW / 2) + (ribbonThick / 2)]}>
-        <mesh castShadow receiveShadow>
+        <mesh material={ribbonMat} castShadow receiveShadow>
           <boxGeometry args={[ribbonWidth, boxH, ribbonThick]} />
-          <primitive object={ribbonMat} attach="material" />
         </mesh>
       </group>
 
       {/* Back Vertical Ribbon */}
       <group ref={backRibbonRef} position={[0, 0, -(boxW / 2) - (ribbonThick / 2)]}>
-        <mesh castShadow receiveShadow>
+        <mesh material={ribbonMat} castShadow receiveShadow>
           <boxGeometry args={[ribbonWidth, boxH, ribbonThick]} />
-          <primitive object={ribbonMat} attach="material" />
         </mesh>
       </group>
 
       {/* Left Vertical Ribbon */}
       <group ref={leftRibbonRef} position={[-(boxW / 2) - (ribbonThick / 2), 0, 0]}>
-        <mesh castShadow receiveShadow>
+        <mesh material={ribbonMat} castShadow receiveShadow>
           <boxGeometry args={[ribbonThick, boxH, ribbonWidth]} />
-          <primitive object={ribbonMat} attach="material" />
         </mesh>
       </group>
 
       {/* Right Vertical Ribbon */}
       <group ref={rightRibbonRef} position={[(boxW / 2) + (ribbonThick / 2), 0, 0]}>
-        <mesh castShadow receiveShadow>
+        <mesh material={ribbonMat} castShadow receiveShadow>
           <boxGeometry args={[ribbonThick, boxH, ribbonWidth]} />
-          <primitive object={ribbonMat} attach="material" />
         </mesh>
       </group>
 
       {/* Bottom Horizontal Ribbon crossing */}
-      <mesh position={[0, -(boxH / 2) - (ribbonThick / 2), 0]}>
+      <mesh position={[0, -(boxH / 2) - (ribbonThick / 2), 0]} material={ribbonMat}>
         <boxGeometry args={[ribbonWidth, ribbonThick, boxW]} />
-        <primitive object={ribbonMat} attach="material" />
       </mesh>
-      <mesh position={[0, -(boxH / 2) - (ribbonThick / 2), 0]}>
+      <mesh position={[0, -(boxH / 2) - (ribbonThick / 2), 0]} material={ribbonMat}>
         <boxGeometry args={[boxW, ribbonThick, ribbonWidth]} />
-        <primitive object={ribbonMat} attach="material" />
       </mesh>
     </group>
   );
@@ -86,33 +80,27 @@ export const LidRibbons = forwardRef((props, ref) => {
   return (
     <group ref={ref} {...props}>
       {/* Top Cross X-band */}
-      <mesh position={[0, (lidH / 2) + (ribbonThick / 2), 0]} castShadow receiveShadow>
+      <mesh position={[0, (lidH / 2) + (ribbonThick / 2), 0]} material={ribbonMat} castShadow receiveShadow>
         <boxGeometry args={[lidW, ribbonThick, ribbonWidth]} />
-        <primitive object={ribbonMat} attach="material" />
       </mesh>
 
       {/* Top Cross Z-band */}
-      <mesh position={[0, (lidH / 2) + (ribbonThick / 2), 0]} castShadow receiveShadow>
+      <mesh position={[0, (lidH / 2) + (ribbonThick / 2), 0]} material={ribbonMat} castShadow receiveShadow>
         <boxGeometry args={[ribbonWidth, ribbonThick, lidW]} />
-        <primitive object={ribbonMat} attach="material" />
       </mesh>
 
       {/* Lid Edge Drops (Front, Back, Left, Right) */}
-      <mesh position={[0, 0, (lidW / 2) + (ribbonThick / 2)]}>
+      <mesh position={[0, 0, (lidW / 2) + (ribbonThick / 2)]} material={ribbonMat}>
         <boxGeometry args={[ribbonWidth, lidH, ribbonThick]} />
-        <primitive object={ribbonMat} attach="material" />
       </mesh>
-      <mesh position={[0, 0, -(lidW / 2) - (ribbonThick / 2)]}>
+      <mesh position={[0, 0, -(lidW / 2) - (ribbonThick / 2)]} material={ribbonMat}>
         <boxGeometry args={[ribbonWidth, lidH, ribbonThick]} />
-        <primitive object={ribbonMat} attach="material" />
       </mesh>
-      <mesh position={[-(lidW / 2) - (ribbonThick / 2), 0, 0]}>
+      <mesh position={[-(lidW / 2) - (ribbonThick / 2), 0, 0]} material={ribbonMat}>
         <boxGeometry args={[ribbonThick, lidH, ribbonWidth]} />
-        <primitive object={ribbonMat} attach="material" />
       </mesh>
-      <mesh position={[(lidW / 2) + (ribbonThick / 2), 0, 0]}>
+      <mesh position={[(lidW / 2) + (ribbonThick / 2), 0, 0]} material={ribbonMat}>
         <boxGeometry args={[ribbonThick, lidH, ribbonWidth]} />
-        <primitive object={ribbonMat} attach="material" />
       </mesh>
     </group>
   );

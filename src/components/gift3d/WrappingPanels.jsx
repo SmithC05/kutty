@@ -39,57 +39,48 @@ export const WrappingPanels = forwardRef((props, ref) => {
   return (
     <group ref={groupRef} {...props}>
       {/* Bottom base wrapping sheet */}
-      <mesh position={[0, -0.808, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, -0.808, 0]} rotation={[-Math.PI / 2, 0, 0]} material={paperMat}>
         <planeGeometry args={[panelWidth, panelWidth]} />
-        <primitive object={paperMat} attach="material" />
       </mesh>
 
       {/* Front Panel (hinge at y = -0.8, z = 1.01) */}
       <group ref={frontPivot} position={[0, -0.8, 1.01]}>
-        <mesh position={[0, panelHeight / 2, 0]} castShadow receiveShadow>
+        <mesh position={[0, panelHeight / 2, 0]} material={paperMat} castShadow receiveShadow>
           <boxGeometry args={[panelWidth, panelHeight, panelThickness]} />
-          <primitive object={paperMat} attach="material" />
         </mesh>
         {/* Subtle gold foil edge line at top of panel */}
-        <mesh position={[0, panelHeight, 0]}>
+        <mesh position={[0, panelHeight, 0]} material={goldTrimMat}>
           <boxGeometry args={[panelWidth, 0.02, panelThickness * 1.5]} />
-          <primitive object={goldTrimMat} attach="material" />
         </mesh>
       </group>
 
       {/* Back Panel (hinge at y = -0.8, z = -1.01) */}
       <group ref={backPivot} position={[0, -0.8, -1.01]}>
-        <mesh position={[0, panelHeight / 2, 0]} castShadow receiveShadow>
+        <mesh position={[0, panelHeight / 2, 0]} material={paperMat} castShadow receiveShadow>
           <boxGeometry args={[panelWidth, panelHeight, panelThickness]} />
-          <primitive object={paperMat} attach="material" />
         </mesh>
-        <mesh position={[0, panelHeight, 0]}>
+        <mesh position={[0, panelHeight, 0]} material={goldTrimMat}>
           <boxGeometry args={[panelWidth, 0.02, panelThickness * 1.5]} />
-          <primitive object={goldTrimMat} attach="material" />
         </mesh>
       </group>
 
       {/* Left Panel (hinge at x = -1.01, y = -0.8) */}
       <group ref={leftPivot} position={[-1.01, -0.8, 0]}>
-        <mesh position={[0, panelHeight / 2, 0]} rotation={[0, Math.PI / 2, 0]} castShadow receiveShadow>
+        <mesh position={[0, panelHeight / 2, 0]} rotation={[0, Math.PI / 2, 0]} material={paperMat} castShadow receiveShadow>
           <boxGeometry args={[panelWidth, panelHeight, panelThickness]} />
-          <primitive object={paperMat} attach="material" />
         </mesh>
-        <mesh position={[0, panelHeight, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <mesh position={[0, panelHeight, 0]} rotation={[0, Math.PI / 2, 0]} material={goldTrimMat}>
           <boxGeometry args={[panelWidth, 0.02, panelThickness * 1.5]} />
-          <primitive object={goldTrimMat} attach="material" />
         </mesh>
       </group>
 
       {/* Right Panel (hinge at x = 1.01, y = -0.8) */}
       <group ref={rightPivot} position={[1.01, -0.8, 0]}>
-        <mesh position={[0, panelHeight / 2, 0]} rotation={[0, Math.PI / 2, 0]} castShadow receiveShadow>
+        <mesh position={[0, panelHeight / 2, 0]} rotation={[0, Math.PI / 2, 0]} material={paperMat} castShadow receiveShadow>
           <boxGeometry args={[panelWidth, panelHeight, panelThickness]} />
-          <primitive object={paperMat} attach="material" />
         </mesh>
-        <mesh position={[0, panelHeight, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <mesh position={[0, panelHeight, 0]} rotation={[0, Math.PI / 2, 0]} material={goldTrimMat}>
           <boxGeometry args={[panelWidth, 0.02, panelThickness * 1.5]} />
-          <primitive object={goldTrimMat} attach="material" />
         </mesh>
       </group>
     </group>

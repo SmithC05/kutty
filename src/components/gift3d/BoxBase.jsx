@@ -25,15 +25,13 @@ export const BoxBase = forwardRef((props, ref) => {
       />
 
       {/* Gold Trim Lip along the upper rim */}
-      <mesh position={[0, 0.805, 0]}>
+      <mesh position={[0, 0.805, 0]} material={trimMat}>
         <ringGeometry args={[0.92, 0.99, 32]} />
-        <primitive object={trimMat} attach="material" />
       </mesh>
 
       {/* Inner Recess / Cavity Floor where golden light shines */}
-      <mesh position={[0, 0.79, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0.79, 0]} rotation={[-Math.PI / 2, 0, 0]} material={interiorMat}>
         <planeGeometry args={[1.82, 1.82]} />
-        <primitive object={interiorMat} attach="material" />
       </mesh>
     </group>
   );

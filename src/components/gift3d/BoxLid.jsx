@@ -24,9 +24,8 @@ export const BoxLid = forwardRef(({ children, ...props }, ref) => {
       />
 
       {/* Gold Trim Accent Band around the lid's bottom lip */}
-      <mesh position={[0, -0.155, 0]}>
+      <mesh position={[0, -0.155, 0]} material={trimMat}>
         <boxGeometry args={[2.12, 0.03, 2.12]} />
-        <primitive object={trimMat} attach="material" />
       </mesh>
 
       {/* Child components mounted on lid (e.g. lid ribbons, bow) */}

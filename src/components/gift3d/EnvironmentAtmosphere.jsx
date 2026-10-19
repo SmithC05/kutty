@@ -67,6 +67,7 @@ export const EnvironmentAtmosphere = forwardRef((_props, ref) => {
   const bgStarsRef = useRef(null);
   const goldDustRef = useRef(null);
   const foregroundBokehRef = useRef(null);
+  const confettiRef = useRef(null);
 
   const glowTexture = useMemo(() => createRadialGlowTexture(), []);
   const sparkleTexture = useMemo(() => createSparkleTexture(), []);
@@ -121,6 +122,25 @@ export const EnvironmentAtmosphere = forwardRef((_props, ref) => {
       speeds[i] = 0.2 + Math.random() * 0.3;
     }
     return { positions: pos, initsY, speeds, count };
+  }, []);
+
+  // 4. Delicate Celebratory Micro-Confetti & Glitter (22 subtle floating motes)
+  const confettiData = useMemo(() => {
+    const count = 22;
+    const pos = new Float32Array(count * 3);
+    const initsY = new Float32Array(count);
+    const speeds = new Float32Array(count);
+    const sways = new Float32Array(count);
+    for (let i = 0; i < count; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 5.0;
+      pos[i * 3 + 1] = -1.2 + Math.random() * 3.5;
+      pos[i * 3 + 2] = -0.5 + Math.random() * 2.5;
+
+      initsY[i] = pos[i * 3 + 1];
+      speeds[i] = 0.25 + Math.random() * 0.35;
+      sways[i] = Math.random() * Math.PI * 2;
+    }
+    return { positions: pos, initsY, speeds, sways, count };
   }, []);
 
   // 4. Orbital Ring Curves (Delicate golden light trails)
@@ -187,6 +207,16 @@ export const EnvironmentAtmosphere = forwardRef((_props, ref) => {
       const pos = geo.attributes.position.array;
       for (let i = 0; i < fgBokehData.count; i++) {
         pos[i * 3 + 1] = fgBokehData.initsY[i] + Math.sin(time * fgBokehData.speeds[i] + i) * 0.2;
+      }
+      geo.attributes.position.needsUpdate = true;
+    }
+
+    // Celebratory micro-confetti gentle floating and swaying
+    if (confettiRef.current) {
+      const geo = confettiRef.current.geometry;
+      const pos = geo.attributes.position.array;
+      for (let i = 0; i < confettiData.count; i++) {
+        pos[i * 3 + 1] = confettiData.initsY[i] + Math.sin(time * confettiData.speeds[i] + confettiData.sways[i]) * 0.28;
       }
       geo.attributes.position.needsUpdate = true;
     }
@@ -308,6 +338,25 @@ export const EnvironmentAtmosphere = forwardRef((_props, ref) => {
           color="#fef08a"
           transparent
           opacity={0.4}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </points>
+
+      {/* 8. Delicate Celebratory Micro-Confetti & Glitter */}
+      <points ref={confettiRef}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            args={[confettiData.positions, 3]}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.08}
+          map={sparkleTexture}
+          color="#fef3c7"
+          transparent
+          opacity={0.6}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
