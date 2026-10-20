@@ -29,6 +29,7 @@ export function useSceneManager() {
       SCENES.MEMORY_JOURNEY_SOLO,
       SCENES.MEMORY_JOURNEY_TOGETHER,
       SCENES.ARTIST_CHAPTER,
+      SCENES.LORD_SHIVA_BLESSING,
       SCENES.FINAL_MESSAGE
     ];
     const currentIndex = order.indexOf(currentScene);
@@ -42,6 +43,7 @@ export function useSceneManager() {
         SCENES.MEMORY_JOURNEY_SOLO,
         SCENES.MEMORY_JOURNEY_TOGETHER,
         SCENES.ARTIST_CHAPTER,
+        SCENES.LORD_SHIVA_BLESSING,
       ];
       if (implementedScenes.includes(nextScene)) {
         preloadNext();

@@ -7,8 +7,8 @@ export const SCENES = {
   SECRET_VAULT: 'SECRET_VAULT', // Phase 9.1: Memory Unlock
   MEMORY_JOURNEY_SOLO: 'MEMORY_JOURNEY_SOLO', // Phase 9.2: Cinematic photo storytelling (Solo)
   MEMORY_JOURNEY_TOGETHER: 'MEMORY_JOURNEY_TOGETHER', // Phase 9.3: Cinematic photo storytelling (Together)
-  INTERACTIVE_WISHES: 'INTERACTIVE_WISHES', // Phase 10: Hidden Magic
-  ARTIST_CHAPTER: 'ARTIST_CHAPTER', // Phase 11: The climax
+  ARTIST_CHAPTER: 'ARTIST_CHAPTER', // Phase 10: The Artist's Hand pencil reveal
+  LORD_SHIVA_BLESSING: 'LORD_SHIVA_BLESSING', // Phase 11: Sacred Himalayan Blessings
   FINAL_MESSAGE: 'FINAL_MESSAGE', // Phase 12: Grand Finale
 };
 

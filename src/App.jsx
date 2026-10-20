@@ -8,6 +8,7 @@ import { DateAwareScene } from './scenes/DateAwareScene';
 import { SecretVault } from './scenes/SecretVault';
 import { MemoryJourney } from './scenes/MemoryJourney';
 import { ArtistChapter } from './scenes/ArtistChapter';
+import { LordShivaBlessing } from './scenes/LordShivaBlessing';
 import { Loader } from './components/ui/Loader';
 import { Background } from './components/ui/Background';
 import { useMediaLoading } from './hooks/useMediaLoading';
@@ -65,6 +66,11 @@ function App() {
         {/* Phase 10: The Artist's Hand — Pencil Portrait Reveal */}
         {isLoaded && currentScene === SCENES.ARTIST_CHAPTER && (
           <ArtistChapter key="artist-chapter" />
+        )}
+
+        {/* Phase 11: Lord Shiva's Blessings — Cinematic Devotional Experience */}
+        {isLoaded && currentScene === SCENES.LORD_SHIVA_BLESSING && (
+          <LordShivaBlessing key="lord-shiva-blessing" />
         )}
       </AnimatePresence>
     </>
