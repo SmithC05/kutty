@@ -13,8 +13,8 @@ import { motion } from 'framer-motion';
  *   - Captions placed cleanly outside the image area in a dedicated footer.
  *
  * Scrapbook (Chapter 2 — Us):
- *   - Authentic Polaroid instant-print with washi tape and handwritten script.
- *   - Preserved exactly as-is for Chapter Two.
+ *   - Cinematic friendship keepsake with landscape-aware framing and washi tape accents.
+ *   - Supports both landscape and portrait photography with clean paper borders and Dancing Script captioning.
  */
 export function PhotoFrame({
   photo,
@@ -25,11 +25,13 @@ export function PhotoFrame({
   tilt = 0,
   showStagePill = false,
   hideCaption = false,
+  layout = photo?.orientation || 'portrait',
 }) {
   const [imgError, setImgError] = useState(false);
   const delay = Math.min(index * 0.15, 0.45);
 
   const isScrapbook = variant === 'scrapbook';
+  const isLandscape = layout === 'landscape' || photo?.orientation === 'landscape';
 
   return (
     <motion.div
@@ -43,7 +45,9 @@ export function PhotoFrame({
       {/* ── Scrapbook: Washi Tape Accent ── */}
       {isScrapbook && (
         <div
-          className="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-6 z-30 pointer-events-none rounded-sm shadow-sm"
+          className={`absolute -top-3 left-1/2 -translate-x-1/2 z-30 pointer-events-none rounded-sm shadow-sm ${
+            isLandscape ? 'w-24 sm:w-28 h-6 sm:h-7' : 'w-20 h-6'
+          }`}
           style={{
             background: tapeColor,
             backdropFilter: 'blur(2px)',
@@ -59,7 +63,9 @@ export function PhotoFrame({
         className={`
           relative w-full h-full overflow-hidden flex flex-col
           ${isScrapbook
-            ? 'bg-[#FFFDF9] p-3 pb-8 rounded-sm shadow-[0_10px_26px_rgba(30,41,59,0.14),0_2px_6px_rgba(0,0,0,0.04)] border border-[#E2E8F0]/50'
+            ? isLandscape
+              ? 'bg-[#FFFDF9] p-2 sm:p-3 pb-2 sm:pb-3 rounded-lg sm:rounded-xl shadow-[0_14px_36px_rgba(30,41,59,0.12),0_2px_8px_rgba(0,0,0,0.03)] border border-[#93C5FD]/35'
+              : 'bg-[#FFFDF9] p-3 pb-8 rounded-sm shadow-[0_10px_26px_rgba(30,41,59,0.14),0_2px_6px_rgba(0,0,0,0.04)] border border-[#E2E8F0]/50'
             : 'bg-[#FFFDF9] rounded-lg sm:rounded-xl border border-[#F5B8A8]/28 shadow-[0_12px_32px_-6px_rgba(69,21,45,0.08),0_2px_8px_rgba(0,0,0,0.02)]'
           }
         `}
@@ -84,7 +90,11 @@ export function PhotoFrame({
         {/* ── Photo container ── */}
         <div
           className={`relative flex-1 min-h-0 overflow-hidden flex items-center justify-center ${
-            isScrapbook ? '' : 'p-2 sm:p-2.5 lg:p-3 bg-[#FAF7F2]/45'
+            isScrapbook
+              ? isLandscape
+                ? 'p-1.5 sm:p-2 bg-[#F0F6FC]/40 rounded-md'
+                : ''
+              : 'p-2 sm:p-2.5 lg:p-3 bg-[#FAF7F2]/45'
           }`}
         >
           {!imgError ? (
@@ -117,7 +127,9 @@ export function PhotoFrame({
             className={`
               shrink-0 text-center overflow-hidden
               ${isScrapbook
-                ? 'px-2 py-1.5'
+                ? isLandscape
+                  ? 'px-3 py-1.5 sm:py-2 border-t border-[#93C5FD]/20 bg-[#FFFDF9]'
+                  : 'px-2 py-1.5'
                 : 'px-3 sm:px-4 py-2 sm:py-2.5 border-t border-[#F5B8A8]/14 bg-[#FFFDF9]'
               }
             `}

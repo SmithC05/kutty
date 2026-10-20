@@ -1,69 +1,69 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
-import { PhotoFrame } from './PhotoFrame';
 
 /**
  * ScrapbookExperience Component — Chapter Two: "Us"
  *
  * Visual Identity:
  * - Soft sky blue (#EBF3FA), warm paper cream (#FFFDF9), muted butter yellow (#FEF3C7),
- *   restrained coral accents (#E94B70), deep slate navy text (#1E293B).
- * - Instant-photo prints (Polaroids), washi tape accents, handwritten typography (Dancing Script).
+ *   restrained coral accents (#E94B70), deep slate navy text (#1E293B), sky-blue accent (#93C5FD).
+ * - Cinematic landscape-oriented friendship gallery.
  * - Tells the story of the one in-person meeting between Keerthana and her long-distance best friend.
  *
- * Page sequence (all optional media checked dynamically):
- *   0 — Introduction card
- *   1 — Hero shared photograph  (requires photos.length >= 1)
- *   2 — Video memory page       (requires chapterData.video)
- *   3 — Collection spread       (requires photos.length >= 2; shows photos.slice(1))
- *   4 — Personal keepsake letter
- *
- * Pages for absent optional media are simply omitted; page count and
- * navigation stay correct automatically.
+ * Page Sequence:
+ *   Page A (0) — Chapter Introduction: "Different places. One day in the same frame."
+ *   Page B (1) — Hero Landscape Photograph (4:3 wide landscape)
+ *   Page C (2) — Dedicated Video Memory (HTML5 landscape video stage)
+ *   Page D (3) — Shared Photograph Gallery (All remaining landscape photos)
+ *   Page E (4) — Personal Keepsake Letter (Warm stationery letter)
  */
 
-// ─── VideoPage ────────────────────────────────────────────────────────────────
-// Native HTML5 video rendered inside the scrapbook aesthetic.
-// Does NOT advance the scrapbook page; stopPropagation is applied on all
-// interactive events that would otherwise bubble to the outer onClick handler.
+// ─── Sub-Component: VideoPage (Page C) ────────────────────────────────────────
 function VideoPage({ video }) {
   const [hasError, setHasError] = useState(false);
+  const videoRef = useRef(null);
 
-  const stopBubble = (e) => e.stopPropagation();
+  const stopBubble = (e) => {
+    e.stopPropagation();
+  };
 
   return (
     <div
-      className="relative w-full max-w-lg bg-[#FFFDF9] rounded-sm shadow-[0_14px_32px_rgba(30,41,59,0.16),0_2px_6px_rgba(0,0,0,0.05)] border border-[#E2E8F0]/60 flex flex-col overflow-hidden"
-      style={{ maxHeight: '64vh' }}
+      className="relative w-full max-w-3xl lg:max-w-4xl bg-[#FFFDF9] rounded-xl sm:rounded-2xl shadow-[0_18px_44px_rgba(30,41,59,0.14),0_2px_8px_rgba(0,0,0,0.04)] border border-[#93C5FD]/35 flex flex-col overflow-hidden"
+      style={{ maxHeight: '66vh' }}
+      onClick={stopBubble}
+      onPointerDown={stopBubble}
     >
-      {/* Washi tape accent */}
+      {/* Delicate washi tape accent */}
       <div
-        className="absolute -top-3 left-1/2 z-10 w-24 h-7 pointer-events-none rounded-sm shadow-sm"
+        className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-28 h-7 pointer-events-none rounded-sm shadow-sm"
         style={{
           background: 'rgba(251, 207, 232, 0.88)',
-          borderLeft: '1px dashed rgba(0,0,0,0.13)',
-          borderRight: '1px dashed rgba(0,0,0,0.13)',
-          transform: 'translateX(-50%) rotate(1deg)',
+          borderLeft: '1px dashed rgba(0,0,0,0.12)',
+          borderRight: '1px dashed rgba(0,0,0,0.12)',
+          transform: 'translateX(-50%) rotate(0.8deg)',
         }}
       />
 
-      {/* Video area */}
-      <div className="relative flex-1 bg-[#0F172A] overflow-hidden" style={{ minHeight: 0 }}>
+      {/* Video display stage */}
+      <div
+        className="relative flex-1 min-h-0 bg-[#0F172A] overflow-hidden flex items-center justify-center"
+        style={{ maxHeight: '52vh' }}
+      >
         {hasError ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
+          <div className="flex flex-col items-center justify-center gap-3 p-8 text-center bg-[#0F172A]">
             <span className="text-3xl opacity-60">🎞️</span>
             <p
-              className="text-xs text-[#94A3B8] tracking-wider uppercase"
+              className="text-xs text-[#94A3B8] tracking-widest uppercase font-medium"
               style={{ fontFamily: "'Manrope', sans-serif" }}
             >
-              Video unavailable
+              Video memory currently unavailable
             </p>
           </div>
         ) : (
-          /* stopPropagation on all video interaction events so clicks/touches
-             inside the <video> element never bubble to the page-advance handler */
           <video
+            ref={videoRef}
             src={video.src}
             poster={video.poster}
             controls
@@ -73,109 +73,219 @@ function VideoPage({ video }) {
             style={{ maxHeight: '52vh', display: 'block' }}
             onError={() => setHasError(true)}
             onClick={stopBubble}
+            onPointerDown={stopBubble}
             onTouchStart={stopBubble}
             onTouchEnd={stopBubble}
-            onPointerDown={stopBubble}
+            onKeyDown={stopBubble}
           />
         )}
       </div>
 
-      {/* Caption */}
-      {video.caption && (
-        <div className="px-4 py-3 text-center shrink-0">
-          <p
-            className="text-[#1E293B] text-base tracking-wide leading-tight"
-            style={{ fontFamily: "'Dancing Script', cursive", fontWeight: 600 }}
-          >
-            {video.caption}
-          </p>
-        </div>
-      )}
+      {/* Video caption footer */}
+      <div className="px-4 py-2.5 sm:py-3 bg-[#FFFDF9] border-t border-[#93C5FD]/20 flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left shrink-0">
+        <p
+          className="text-[#1E293B] text-sm sm:text-base font-semibold tracking-wide"
+          style={{ fontFamily: "'Dancing Script', cursive" }}
+        >
+          {video.caption || 'A moment worth replaying.'}
+        </p>
+        <span
+          className="text-[10px] tracking-[0.2em] uppercase text-[#64748B] font-medium"
+          style={{ fontFamily: "'Manrope', sans-serif" }}
+        >
+          Shared Video Memory · Press Play
+        </span>
+      </div>
     </div>
   );
 }
 
-// ─── CollectionSpread ─────────────────────────────────────────────────────────
-// Lays out all photos after the hero (photos.slice(1)) in a simple stacked
-// or side-by-side composition that fits 1–3 items equally well.
-function CollectionSpread({ photos }) {
-  const items = photos.slice(1); // never include the hero image
+// ─── Sub-Component: GallerySpread (Page D) ───────────────────────────────────
+// Displays every remaining unique shared photograph after the hero image.
+// On desktop: Balanced landscape layout (wide panoramic top + 2 balanced landscapes bottom).
+// On mobile: An intuitive single-photo landscape slide view with dot pagination.
+function GallerySpread({ photos }) {
+  const items = photos.slice(1); // all photos after hero photo
+  const [mobileIndex, setMobileIndex] = useState(0);
 
   if (items.length === 0) return null;
 
-  if (items.length === 1) {
-    return (
-      <div className="w-full max-w-sm sm:max-w-md h-[60vh] flex items-center justify-center">
-        <PhotoFrame
-          photo={items[0]}
-          variant="scrapbook"
-          tilt={-1.5}
-          className="w-full h-full max-h-[56vh]"
-          index={0}
-        />
-      </div>
-    );
-  }
+  // Mobile navigation handlers
+  const handleMobilePrev = (e) => {
+    e.stopPropagation();
+    setMobileIndex((prev) => (prev > 0 ? prev - 1 : items.length - 1));
+  };
 
-  if (items.length === 2) {
-    return (
-      <div className="relative w-full max-w-xl h-[64vh] flex items-center justify-center">
-        {items.map((p, i) => (
-          <PhotoFrame
-            key={p.id || i}
-            photo={p}
-            variant="scrapbook"
-            tilt={i === 0 ? -2.5 : 2.0}
-            className={`absolute w-[68%] sm:w-[58%] h-[50vh] ${
-              i === 0
-                ? '-translate-x-10 -translate-y-4 z-10'
-                : 'translate-x-10 translate-y-4 z-20'
-            }`}
-            index={i}
-          />
-        ))}
-      </div>
-    );
-  }
+  const handleMobileNext = (e) => {
+    e.stopPropagation();
+    setMobileIndex((prev) => (prev < items.length - 1 ? prev + 1 : 0));
+  };
 
-  // 3 or more photos: one on top centred, two below side-by-side
-  const [top, ...rest] = items;
   return (
-    <div className="relative w-full max-w-xl h-[68vh] flex flex-col items-center justify-center gap-2">
-      {/* Top photo */}
-      <div className="w-[58%] sm:w-[50%] h-[34vh]">
-        <PhotoFrame
-          photo={top}
-          variant="scrapbook"
-          tilt={-1.5}
-          className="w-full h-full"
-          index={0}
-        />
-      </div>
-      {/* Bottom row */}
-      <div className="flex gap-3 w-full justify-center">
-        {rest.slice(0, 2).map((p, i) => (
-          <div key={p.id || i} className="w-[44%] sm:w-[38%] h-[26vh]">
-            <PhotoFrame
-              photo={p}
-              variant="scrapbook"
-              tilt={i === 0 ? -2.0 : 2.0}
-              className="w-full h-full"
-              index={i + 1}
-            />
+    <div className="w-full h-full max-w-5xl flex items-center justify-center">
+
+      {/* ── Desktop Composition (lg:flex) ── */}
+      {/* Balanced landscape layout: Wide panoramic photo on top + two 16:9 photos below */}
+      <div className="hidden lg:flex flex-col items-center justify-center gap-3.5 xl:gap-4 w-full">
+        {/* Top: Panoramic wide photo (items[0]) */}
+        {items[0] && (
+          <div className="w-full max-w-4xl bg-[#FFFDF9] rounded-xl shadow-[0_12px_32px_rgba(30,41,59,0.10),0_2px_8px_rgba(0,0,0,0.03)] border border-[#93C5FD]/35 p-2.5 flex flex-col overflow-hidden">
+            <div className="relative w-full h-[26vh] xl:h-[28vh] max-h-[300px] bg-[#F0F6FC]/50 rounded-lg overflow-hidden flex items-center justify-center">
+              <img
+                src={items[0].url}
+                alt={items[0].caption || 'Shared memory'}
+                className="w-full h-full object-contain pointer-events-none select-none"
+                loading="lazy"
+              />
+            </div>
+            {items[0].caption && (
+              <div className="pt-2 px-2 flex items-center justify-between">
+                <p
+                  className="text-[#1E293B] text-sm font-semibold tracking-wide"
+                  style={{ fontFamily: "'Dancing Script', cursive" }}
+                >
+                  {items[0].caption}
+                </p>
+                <span
+                  className="text-[9px] uppercase tracking-[0.25em] text-[#64748B] font-medium"
+                  style={{ fontFamily: "'Manrope', sans-serif" }}
+                >
+                  Panoramic Memory · 01 of 03
+                </span>
+              </div>
+            )}
           </div>
-        ))}
+        )}
+
+        {/* Bottom: Two 16:9 landscape photos side-by-side (items[1] & items[2]) */}
+        <div className="flex flex-row items-center justify-center gap-4 w-full max-w-4xl">
+          {items.slice(1, 3).map((item, idx) => (
+            <div
+              key={item.id || idx}
+              className="w-[49%] bg-[#FFFDF9] rounded-xl shadow-[0_12px_32px_rgba(30,41,59,0.10),0_2px_8px_rgba(0,0,0,0.03)] border border-[#93C5FD]/35 p-2.5 flex flex-col overflow-hidden"
+            >
+              <div className="relative w-full h-[22vh] xl:h-[24vh] max-h-[240px] bg-[#F0F6FC]/50 rounded-lg overflow-hidden flex items-center justify-center">
+                <img
+                  src={item.url}
+                  alt={item.caption || 'Shared memory'}
+                  className="w-full h-full object-contain pointer-events-none select-none"
+                  loading="lazy"
+                />
+              </div>
+              {item.caption && (
+                <div className="pt-2 px-2 flex items-center justify-between">
+                  <p
+                    className="text-[#1E293B] text-sm font-semibold tracking-wide"
+                    style={{ fontFamily: "'Dancing Script', cursive" }}
+                  >
+                    {item.caption}
+                  </p>
+                  <span
+                    className="text-[9px] uppercase tracking-[0.25em] text-[#64748B] font-medium"
+                    style={{ fontFamily: "'Manrope', sans-serif" }}
+                  >
+                    {`Memory 0${idx + 2} of 03`}
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* ── Mobile Composition (lg:hidden) ── */}
+      {/* Dedicated single-photo slide view — generous landscape size with intuitive controls */}
+      <div className="flex lg:hidden flex-col items-center justify-center w-full max-w-sm px-2">
+        <div className="relative w-full bg-[#FFFDF9] rounded-xl shadow-[0_14px_36px_rgba(30,41,59,0.12),0_2px_8px_rgba(0,0,0,0.03)] border border-[#93C5FD]/35 p-2.5 flex flex-col overflow-hidden">
+          {/* Top washi tape */}
+          <div
+            className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-24 h-6 pointer-events-none rounded-sm shadow-sm"
+            style={{
+              background: 'rgba(254, 243, 199, 0.85)',
+              transform: 'translateX(-50%) rotate(-1deg)',
+            }}
+          />
+
+          {/* Active landscape image */}
+          <div className="relative w-full h-[36vh] sm:h-[40vh] bg-[#F0F6FC]/50 rounded-lg overflow-hidden flex items-center justify-center">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={items[mobileIndex]?.id || mobileIndex}
+                src={items[mobileIndex]?.url}
+                alt={items[mobileIndex]?.caption || ''}
+                className="w-full h-full object-contain select-none"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.4 }}
+                loading="lazy"
+              />
+            </AnimatePresence>
+          </div>
+
+          {/* Caption */}
+          <div className="pt-2.5 pb-1 px-2 text-center">
+            <p
+              className="text-[#1E293B] text-base font-semibold tracking-wide"
+              style={{ fontFamily: "'Dancing Script', cursive" }}
+            >
+              {items[mobileIndex]?.caption}
+            </p>
+          </div>
+        </div>
+
+        {/* Mobile Gallery Controls (Prev / Dots / Next) */}
+        <div className="flex items-center justify-between w-full mt-3 px-2">
+          <button
+            type="button"
+            onClick={handleMobilePrev}
+            className="px-3 py-1.5 rounded-full text-xs font-medium bg-white/90 border border-[#CBD5E1]/70 text-[#1E293B] shadow-sm active:scale-95 transition-all"
+            style={{ fontFamily: "'Manrope', sans-serif" }}
+          >
+            ← Prev Photo
+          </button>
+
+          {/* Dots Indicator */}
+          <div className="flex items-center gap-1.5">
+            {items.map((_, dotIdx) => (
+              <button
+                key={dotIdx}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMobileIndex(dotIdx);
+                }}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  mobileIndex === dotIdx
+                    ? 'bg-[#E94B70] scale-110'
+                    : 'bg-[#CBD5E1] hover:bg-[#94A3B8]'
+                }`}
+                aria-label={`View photograph ${dotIdx + 1}`}
+              />
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleMobileNext}
+            className="px-3 py-1.5 rounded-full text-xs font-medium bg-white/90 border border-[#CBD5E1]/70 text-[#1E293B] shadow-sm active:scale-95 transition-all"
+            style={{ fontFamily: "'Manrope', sans-serif" }}
+          >
+            Next Photo →
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 }
 
-// ─── ScrapbookExperience ──────────────────────────────────────────────────────
+// ─── Main ScrapbookExperience Component ───────────────────────────────────────
 export function ScrapbookExperience({ chapterData, onComplete }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [canTap, setCanTap] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const completedRef = useRef(false); // guard: onComplete fires exactly once
+  const completedRef = useRef(false);
   const tapTimerRef = useRef(null);
   const transitionTimerRef = useRef(null);
   const reducedMotion = useReducedMotion();
@@ -184,7 +294,8 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
   const video = chapterData?.video || null;
   const hasPhotos = photos.length > 0;
   const hasVideo = Boolean(video);
-  const hasCollection = photos.length > 1; // need at least 2 photos to show a collection
+  const hasGallery = photos.length > 1;
+
   const note = chapterData?.personalNote || {
     salutation: 'To Kutty —',
     body: "Miles apart across different cities, college routines, and busy days. But that one day we shared in person proved that real friendship doesn't need constant proximity—it just picks up right where it left off without skipping a beat.\n\nEvery memory from that meeting is something I treasure. Thank you for being such an extraordinary friend.",
@@ -192,27 +303,26 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
     sender: 'Your Best Friend',
   };
 
-  // Build the ordered list of pages that actually exist given available media.
-  // Each entry has a stable key used by AnimatePresence.
+  // Build the ordered pages array
   const pages = [
-    { key: 'intro', type: 'intro' },
-    ...(hasPhotos ? [{ key: 'hero', type: 'hero' }] : []),
-    ...(hasVideo ? [{ key: 'video', type: 'video' }] : []),
-    ...(hasCollection ? [{ key: 'collection', type: 'collection' }] : []),
-    { key: 'letter', type: 'letter' },
+    { key: 'intro', type: 'intro', label: 'Our Story' },
+    ...(hasPhotos ? [{ key: 'hero', type: 'hero', label: 'Hero Memory' }] : []),
+    ...(hasVideo ? [{ key: 'video', type: 'video', label: 'Video Memory' }] : []),
+    ...(hasGallery ? [{ key: 'gallery', type: 'gallery', label: 'Shared Moments' }] : []),
+    { key: 'letter', type: 'letter', label: 'Keepsake Letter' },
   ];
   const totalPages = pages.length;
   const currentPageDef = pages[currentPage] || pages[0];
 
-  // Pace interaction: block taps while entrance animation settles
+  // Pace interaction: block taps while page transition settles
   useEffect(() => {
     setCanTap(false);
     clearTimeout(tapTimerRef.current);
-    tapTimerRef.current = setTimeout(() => setCanTap(true), 1400);
+    tapTimerRef.current = setTimeout(() => setCanTap(true), 1200);
     return () => clearTimeout(tapTimerRef.current);
   }, [currentPage]);
 
-  // Cleanup transition timers on unmount
+  // Cleanup timers on unmount
   useEffect(() => {
     return () => {
       clearTimeout(tapTimerRef.current);
@@ -224,7 +334,6 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
     if (!canTap || isTransitioning) return;
 
     if (currentPage >= totalPages - 1) {
-      // Final page: fire onComplete exactly once
       if (!completedRef.current) {
         completedRef.current = true;
         if (onComplete) onComplete();
@@ -237,7 +346,7 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
     transitionTimerRef.current = setTimeout(() => {
       setCurrentPage((prev) => prev + 1);
       setIsTransitioning(false);
-    }, 450);
+    }, 400);
   }, [canTap, isTransitioning, currentPage, totalPages, onComplete]);
 
   const goBack = useCallback(
@@ -250,16 +359,15 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
       transitionTimerRef.current = setTimeout(() => {
         setCurrentPage((prev) => prev - 1);
         setIsTransitioning(false);
-      }, 450);
+      }, 400);
     },
     [isTransitioning, currentPage]
   );
 
-  // Keyboard navigation — skip if focus is inside a media or interactive element
+  // Keyboard navigation — ignore if video or interactive element has focus
   useEffect(() => {
     const handleKeyDown = (e) => {
       const tag = document.activeElement?.tagName?.toLowerCase();
-      // Do not intercept keyboard while video controls or other interactive elements have focus
       if (tag === 'video' || tag === 'input' || tag === 'textarea' || tag === 'select') return;
 
       if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
@@ -274,10 +382,9 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [advance, goBack]);
 
-  // Page-turn handler on the outer container — stop propagation from nav buttons
+  // Outer container click handler — ignore clicks originating from buttons, links, or video
   const handleContainerClick = useCallback(
     (e) => {
-      // Ignore clicks that came from within a <video>, <button>, or <a>
       const tag = e.target?.tagName?.toLowerCase();
       if (tag === 'video' || tag === 'button' || tag === 'a') return;
       if (e.target?.closest('video') || e.target?.closest('button') || e.target?.closest('a')) return;
@@ -288,136 +395,208 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
 
   return (
     <motion.div
-      className="fixed inset-0 w-full h-full overflow-hidden select-none flex flex-col items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 w-full h-full overflow-hidden select-none flex flex-col"
       style={{
         background:
-          'radial-gradient(ellipse at 50% 15%, #F4F8FC 0%, #EBF3FA 55%, #FAF7EE 100%)',
+          'radial-gradient(ellipse 110% 90% at 50% 18%, #F8FBFE 0%, #EBF3FA 55%, #F0F6FC 100%)',
+        paddingBottom: '68px', /* reserved space for bottom navigation bar */
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.8 }}
+      transition={{ duration: 0.7 }}
       onClick={handleContainerClick}
     >
-      {/* Scrapbook paper grain */}
+      {/* Paper grain texture */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.035] mix-blend-multiply"
+        className="absolute inset-0 pointer-events-none opacity-[0.032] mix-blend-multiply"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }}
       />
 
-      {/* Decorative Washi Tape elements in background */}
+      {/* Atmospheric ambient sky-blue / champagne background lighting */}
       <div
-        className="absolute top-4 left-6 w-24 h-6 pointer-events-none rounded-sm shadow-sm"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'rgba(254, 243, 199, 0.75)',
-          transform: 'rotate(-4deg)',
-        }}
-      />
-      <div
-        className="absolute bottom-6 right-8 w-28 h-6 pointer-events-none rounded-sm shadow-sm"
-        style={{
-          background: 'rgba(251, 207, 232, 0.65)',
-          transform: 'rotate(3deg)',
+          background:
+            'radial-gradient(ellipse 80% 60% at 50% 35%, rgba(147,197,253,0.12) 0%, rgba(254,243,199,0.06) 50%, transparent 80%)',
         }}
       />
 
+      {/* ── Top Chapter Header ── */}
+      <header className="shrink-0 flex items-center justify-between px-5 sm:px-8 lg:px-14 xl:px-20 pt-3.5 sm:pt-4 pb-2 sm:pb-2.5 z-20">
+        <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+          <span className="block w-5 sm:w-8 h-px bg-[#93C5FD]/70 shrink-0" />
+          <span
+            className="text-[10px] sm:text-[11px] uppercase tracking-[0.32em] text-[#1E293B]/75 font-semibold truncate"
+            style={{ fontFamily: "'Manrope', sans-serif" }}
+          >
+            Chapter Two · Us
+          </span>
+          <span className="hidden sm:inline-block text-[#94A3B8] text-[10px] tracking-widest uppercase">
+            · {currentPageDef.label}
+          </span>
+        </div>
+
+        {/* Page counter */}
+        <span
+          className="text-[10px] sm:text-xs tracking-[0.22em] text-[#1E293B]/50 font-medium tabular-nums shrink-0 ml-3"
+          style={{ fontFamily: "'Manrope', sans-serif" }}
+        >
+          {String(currentPage + 1).padStart(2, '0')}{' '}
+          <span className="opacity-40">/</span>{' '}
+          {String(totalPages).padStart(2, '0')}
+        </span>
+      </header>
+
+      {/* Hairline separator */}
+      <div className="shrink-0 mx-5 sm:mx-8 lg:mx-14 xl:px-20 h-px bg-[#93C5FD]/25 z-20" />
+
       {/* ── Dynamic Page Views ── */}
-      <div className="relative z-10 w-full max-w-2xl h-[76vh] md:h-[80vh] flex items-center justify-center">
+      <div className="flex-1 min-h-0 flex items-center justify-center w-full px-3 sm:px-6 lg:px-12 xl:px-16 overflow-hidden">
         <AnimatePresence mode="wait">
 
           {/* ─────────────────────────────────────────────────────────────────
-              PAGE: Introduction
+              PAGE A (0): Chapter Introduction ("Different places...")
               ───────────────────────────────────────────────────────────────── */}
           {currentPageDef.type === 'intro' && (
             <motion.div
               key="scrapbook-intro"
-              className="relative w-full max-w-md bg-[#FFFDF9] rounded-2xl p-7 sm:p-9 shadow-[0_16px_40px_rgba(30,41,59,0.12),0_2px_8px_rgba(0,0,0,0.04)] border border-[#E2E8F0]/70 text-center flex flex-col items-center justify-center overflow-hidden"
-              initial={{ opacity: 0, scale: 0.94, y: 20 }}
+              className="relative w-full max-w-lg bg-[#FFFDF9] rounded-2xl p-7 sm:p-10 shadow-[0_20px_50px_rgba(30,41,59,0.12),0_2px_8px_rgba(0,0,0,0.04)] border border-[#93C5FD]/40 text-center flex flex-col items-center justify-center overflow-hidden"
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 1.02, y: -16 }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ opacity: 0, scale: 1.01, y: -12 }}
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
             >
-              {/* Washi tape on top edge */}
+              {/* Washi tape accent on top edge */}
               <div
-                className="absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-7 pointer-events-none rounded-sm shadow-sm"
+                className="absolute -top-3 left-1/2 -translate-x-1/2 w-32 h-7 pointer-events-none rounded-sm shadow-sm"
                 style={{
                   background: 'rgba(254, 243, 199, 0.9)',
-                  borderLeft: '1px dashed rgba(0,0,0,0.15)',
-                  borderRight: '1px dashed rgba(0,0,0,0.15)',
+                  borderLeft: '1px dashed rgba(0,0,0,0.14)',
+                  borderRight: '1px dashed rgba(0,0,0,0.14)',
                   transform: 'rotate(-1deg)',
                 }}
               />
 
-              {/* Postal stamp / friendship crest accent */}
-              <div className="mb-4 w-12 h-12 rounded-full bg-[#EBF3FA] flex items-center justify-center text-xl shadow-inner border border-[#93C5FD]/40">
+              {/* Friendship crest icon */}
+              <div className="mb-4 w-12 h-12 rounded-full bg-[#EBF3FA] flex items-center justify-center text-xl shadow-inner border border-[#93C5FD]/50">
                 ✨
               </div>
 
-              <p
-                className="text-[11px] uppercase tracking-[0.3em] text-[#E94B70] font-semibold mb-2"
+              <span
+                className="text-[10px] sm:text-[11px] uppercase tracking-[0.35em] text-[#E94B70] font-semibold mb-3 block"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
               >
                 Chapter Two · Us
-              </p>
+              </span>
 
-              <h2
-                className="text-2xl sm:text-3xl text-[#1E293B] font-semibold tracking-tight leading-snug mb-4"
+              {/* Display Title */}
+              <h1
+                className="text-2xl sm:text-3xl md:text-4xl text-[#1E293B] font-normal leading-snug tracking-tight mb-4"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
                 Different places.
-                <br />
-                <span className="italic font-normal text-[#E94B70]">
+                <span
+                  className="block italic font-normal text-[#E94B70] mt-1"
+                  style={{ fontFamily: "'Dancing Script', cursive", fontSize: '1.15em' }}
+                >
                   One day in the same frame.
                 </span>
-              </h2>
+              </h1>
 
-              <div className="w-12 h-px bg-[#E2E8F0] my-2" />
+              <div className="w-14 h-px bg-[#CBD5E1] my-2" />
 
               <p
                 className="text-sm sm:text-base text-[#475569] leading-relaxed max-w-sm"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
               >
-                A thousand miles apart, across different routines and distance.
-                Yet for one meaningful day, our worlds were in the exact same room.
+                Miles apart across different cities and busy routines, yet for one special day, our worlds were in the exact same frame.
               </p>
 
-              <p
-                className="mt-6 text-xs text-[#94A3B8] tracking-widest uppercase font-medium"
+              {/* Media summary tag */}
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+                <span
+                  className="px-2.5 py-1 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium bg-[#EBF3FA] text-[#1E293B]/70 border border-[#93C5FD]/40"
+                  style={{ fontFamily: "'Manrope', sans-serif" }}
+                >
+                  4 Photographs · 1 Video Memory · 1 Keepsake Letter
+                </span>
+              </div>
+
+              {/* Enter Our Story Button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  advance();
+                }}
+                className="mt-7 px-8 py-3 rounded-full bg-[#1E293B] text-[#FFFDF9] text-xs uppercase tracking-[0.22em] font-medium shadow-md hover:bg-[#334155] active:scale-95 transition-all flex items-center gap-2"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
               >
-                Tap anywhere to explore our memories →
-              </p>
+                Enter Our Story →
+              </button>
             </motion.div>
           )}
 
           {/* ─────────────────────────────────────────────────────────────────
-              PAGE: Hero photograph
+              PAGE B (1): Hero Landscape Photograph (4:3 wide landscape)
               ───────────────────────────────────────────────────────────────── */}
           {currentPageDef.type === 'hero' && (
             <motion.div
               key="scrapbook-hero"
-              className="w-full h-full flex flex-col items-center justify-center"
+              className="w-full h-full flex items-center justify-center"
               initial={{ opacity: 0, scale: 0.96, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 1.02, y: -16 }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ opacity: 0, scale: 1.01, y: -12 }}
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="w-full max-w-sm sm:max-w-md h-[68vh] flex items-center justify-center">
-                <PhotoFrame
-                  photo={photos[0]}
-                  variant="scrapbook"
-                  tilt={-1.5}
-                  className="w-full h-full max-h-[62vh]"
-                  index={0}
+              <div className="w-full max-w-4xl lg:max-w-5xl bg-[#FFFDF9] rounded-xl sm:rounded-2xl shadow-[0_18px_44px_rgba(30,41,59,0.12),0_2px_8px_rgba(0,0,0,0.03)] border border-[#93C5FD]/35 p-2.5 sm:p-3.5 flex flex-col overflow-hidden relative">
+                {/* Washi tape accent */}
+                <div
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-32 h-7 pointer-events-none rounded-sm shadow-sm"
+                  style={{
+                    background: 'rgba(254, 243, 199, 0.88)',
+                    borderLeft: '1px dashed rgba(0,0,0,0.12)',
+                    borderRight: '1px dashed rgba(0,0,0,0.12)',
+                    transform: 'translateX(-50%) rotate(-1deg)',
+                  }}
                 />
+
+                {/* Hero image container */}
+                <div
+                  className="relative w-full h-[52vh] sm:h-[58vh] lg:h-[64vh] max-h-[660px] bg-[#F0F6FC]/50 rounded-lg sm:rounded-xl overflow-hidden flex items-center justify-center p-1.5"
+                >
+                  <img
+                    src={photos[0].url}
+                    alt={photos[0].caption || 'Hero memory'}
+                    className="w-full h-full object-contain pointer-events-none select-none"
+                    loading="eager"
+                  />
+                </div>
+
+                {/* Caption footer */}
+                <div className="pt-3 pb-1 px-3 flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
+                  <p
+                    className="text-[#1E293B] text-base sm:text-lg font-semibold tracking-wide"
+                    style={{ fontFamily: "'Dancing Script', cursive" }}
+                  >
+                    {photos[0].caption || 'In the same frame at last.'}
+                  </p>
+                  <span
+                    className="text-[10px] uppercase tracking-[0.25em] text-[#64748B] font-medium"
+                    style={{ fontFamily: "'Manrope', sans-serif" }}
+                  >
+                    October In-Person Meeting · Kutty & Best Friend
+                  </span>
+                </div>
               </div>
             </motion.div>
           )}
 
           {/* ─────────────────────────────────────────────────────────────────
-              PAGE: Video memory
+              PAGE C (2): Dedicated Video Memory
               ───────────────────────────────────────────────────────────────── */}
           {currentPageDef.type === 'video' && (
             <motion.div
@@ -425,48 +604,42 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
               className="w-full h-full flex flex-col items-center justify-center"
               initial={{ opacity: 0, scale: 0.96, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 1.02, y: -16 }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ opacity: 0, scale: 1.01, y: -12 }}
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
             >
               <VideoPage video={video} />
-              <p
-                className="mt-4 text-[11px] text-[#94A3B8] tracking-widest uppercase"
-                style={{ fontFamily: "'Manrope', sans-serif" }}
-              >
-                Tap outside the video to continue →
-              </p>
             </motion.div>
           )}
 
           {/* ─────────────────────────────────────────────────────────────────
-              PAGE: Collection spread — all photos after the hero
+              PAGE D (3): Shared Photograph Gallery (All remaining photos)
               ───────────────────────────────────────────────────────────────── */}
-          {currentPageDef.type === 'collection' && (
+          {currentPageDef.type === 'gallery' && (
             <motion.div
-              key="scrapbook-collection"
+              key="scrapbook-gallery"
               className="w-full h-full flex items-center justify-center"
               initial={{ opacity: 0, scale: 0.96, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 1.02, y: -16 }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ opacity: 0, scale: 1.01, y: -12 }}
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
             >
-              <CollectionSpread photos={photos} />
+              <GallerySpread photos={photos} />
             </motion.div>
           )}
 
           {/* ─────────────────────────────────────────────────────────────────
-              PAGE: Personal keepsake letter
+              PAGE E (4): Personal Keepsake Letter
               ───────────────────────────────────────────────────────────────── */}
           {currentPageDef.type === 'letter' && (
             <motion.div
               key="scrapbook-letter"
-              className="relative w-full max-w-lg bg-[#FFFDF9] rounded-2xl p-6 sm:p-9 shadow-[0_18px_44px_rgba(30,41,59,0.14)] border border-[#E2E8F0]/80 flex flex-col justify-between max-h-[74vh] overflow-y-auto"
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-xl bg-[#FFFDF9] rounded-2xl p-7 sm:p-10 shadow-[0_20px_50px_rgba(30,41,59,0.14),0_2px_8px_rgba(0,0,0,0.04)] border border-[#E2E8F0] flex flex-col justify-between max-h-[68vh] overflow-y-auto"
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 1.02, y: -16 }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ opacity: 0, scale: 1.01, y: -12 }}
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
             >
-              {/* Top Washi Tape */}
+              {/* Top Washi Tape strips */}
               <div
                 className="absolute -top-3 left-8 w-24 h-6 pointer-events-none rounded-sm shadow-sm"
                 style={{
@@ -482,9 +655,10 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
                 }}
               />
 
+              {/* Letter content */}
               <div>
                 <p
-                  className="text-[#E94B70] text-xl sm:text-2xl font-bold mb-3"
+                  className="text-[#E94B70] text-2xl sm:text-3xl font-bold mb-4"
                   style={{ fontFamily: "'Dancing Script', cursive" }}
                 >
                   {note.salutation}
@@ -498,19 +672,29 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
                 </p>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-[#F1F5F9] flex flex-col items-end text-right">
-                <p
-                  className="text-[#64748B] text-xs uppercase tracking-wider mb-1"
+              {/* Sign-off */}
+              <div className="mt-8 pt-4 border-t border-[#F1F5F9] flex flex-col sm:flex-row items-center justify-between gap-4">
+                <span
+                  className="text-[10px] uppercase tracking-[0.25em] text-[#94A3B8] font-medium"
                   style={{ fontFamily: "'Manrope', sans-serif" }}
                 >
-                  {note.signoff}
-                </p>
-                <p
-                  className="text-[#1E293B] text-xl font-bold text-rose-700"
-                  style={{ fontFamily: "'Dancing Script', cursive" }}
-                >
-                  {note.sender}
-                </p>
+                  Friendship Keepsake · 2026
+                </span>
+
+                <div className="text-right">
+                  <p
+                    className="text-[#64748B] text-xs uppercase tracking-wider mb-0.5"
+                    style={{ fontFamily: "'Manrope', sans-serif" }}
+                  >
+                    {note.signoff}
+                  </p>
+                  <p
+                    className="text-[#1E293B] text-2xl font-bold"
+                    style={{ fontFamily: "'Dancing Script', cursive" }}
+                  >
+                    {note.sender}
+                  </p>
+                </div>
               </div>
             </motion.div>
           )}
@@ -518,24 +702,34 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
         </AnimatePresence>
       </div>
 
-      {/* ── Discreet Scrapbook Navigation Controls ── */}
-      <div className="absolute bottom-4 sm:bottom-6 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-8 pointer-events-none">
+      {/* ── Discreet Bottom Navigation Bar ── */}
+      <div
+        className="absolute bottom-0 left-0 right-0 z-30 flex items-center justify-between px-5 sm:px-8 lg:px-14 xl:px-20 py-3 sm:py-3.5 pointer-events-none"
+        style={{
+          background: 'linear-gradient(to top, rgba(235,243,250,0.95) 0%, transparent 100%)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
+        }}
+      >
+        {/* Previous Button */}
         {currentPage > 0 ? (
           <button
             type="button"
             onClick={goBack}
-            className="pointer-events-auto px-3 py-1.5 rounded-full text-xs tracking-wider uppercase backdrop-blur-sm transition-all flex items-center gap-1.5 bg-white/80 text-[#1E293B]/70 hover:bg-white border border-[#CBD5E1]/60 shadow-sm"
+            className="pointer-events-auto px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full text-[11px] sm:text-xs tracking-[0.18em] uppercase font-medium bg-white/80 text-[#1E293B]/75 hover:bg-white border border-[#CBD5E1]/60 shadow-sm active:scale-95 transition-all flex items-center gap-1.5"
             style={{ fontFamily: "'Manrope', sans-serif" }}
           >
             ← Back
           </button>
         ) : (
-          <div className="w-16" />
+          <div className="w-20 sm:w-24" aria-hidden />
         )}
 
-        <div className="flex flex-col items-center pointer-events-none select-none">
+        {/* Center Indicator + Turn Hint */}
+        <div className="flex flex-col items-center gap-0.5 select-none pointer-events-none">
           <span
-            className="text-[11px] tracking-[0.25em] uppercase font-medium text-[#1E293B]/50"
+            className="text-[11px] sm:text-xs tracking-[0.22em] uppercase font-medium text-[#1E293B]/50 tabular-nums"
             style={{ fontFamily: "'Manrope', sans-serif" }}
           >
             {currentPage + 1} of {totalPages}
@@ -544,7 +738,7 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
           <AnimatePresence>
             {canTap && (
               <motion.span
-                className="mt-0.5 text-[11px] tracking-[0.2em] uppercase font-semibold text-[#E94B70] flex items-center gap-1"
+                className="text-[10px] sm:text-[11px] tracking-[0.2em] uppercase font-semibold text-[#E94B70]"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
                 initial={{ opacity: 0, y: 3 }}
                 animate={
@@ -561,24 +755,34 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
           </AnimatePresence>
         </div>
 
-        <div className="w-16 flex justify-end">
+        {/* Next Button */}
+        <div className="w-20 sm:w-24 flex justify-end">
           {currentPage < totalPages - 1 ? (
             <button
               type="button"
               onClick={(e) => {
-                // Stop propagation so the outer container click handler does not
-                // also fire advance(), which would schedule two transitions.
                 e.stopPropagation();
                 advance();
               }}
               disabled={!canTap || isTransitioning}
-              className="pointer-events-auto px-3 py-1.5 rounded-full text-xs tracking-wider uppercase backdrop-blur-sm transition-all flex items-center gap-1.5 bg-white/80 text-[#1E293B]/70 hover:bg-white border border-[#CBD5E1]/60 shadow-sm disabled:opacity-40"
+              className="pointer-events-auto px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full text-[11px] sm:text-xs tracking-[0.18em] uppercase font-medium bg-white/80 text-[#1E293B]/75 hover:bg-white border border-[#CBD5E1]/60 shadow-sm active:scale-95 transition-all flex items-center gap-1.5 disabled:opacity-40"
               style={{ fontFamily: "'Manrope', sans-serif" }}
             >
               Next →
             </button>
           ) : (
-            <div className="w-16" />
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                advance();
+              }}
+              disabled={!canTap || isTransitioning}
+              className="pointer-events-auto px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full text-[11px] sm:text-xs tracking-[0.18em] uppercase font-semibold bg-[#1E293B] text-white hover:bg-[#334155] shadow-md active:scale-95 transition-all flex items-center gap-1.5 disabled:opacity-40"
+              style={{ fontFamily: "'Manrope', sans-serif" }}
+            >
+              Finish ✨
+            </button>
           )}
         </div>
       </div>

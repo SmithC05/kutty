@@ -202,7 +202,7 @@ export const chapter2Data = {
   },
   transitionQuote: 'Before our story, there was you. Now, a little piece of our story.',
   introTitle: 'Different places. One day in the same frame.',
-  introSubtitle: 'A thousand miles of distance, but for one day, our worlds were in the exact same room.',
+  introSubtitle: 'Miles apart across different cities and busy routines, yet for one special day, our worlds were in the exact same frame.',
   personalNote: {
     salutation: 'To Kutty —',
     body: "Miles apart across different cities, college routines, and busy days. But that one day we shared in person proved that real friendship doesn't need constant proximity—it just picks up right where it left off without skipping a beat.\n\nEvery memory from that meeting is something I treasure. Thank you for being such an extraordinary friend.",
@@ -211,39 +211,43 @@ export const chapter2Data = {
   },
   // ── Shared photographs from the in-person meeting ──────────────────────────
   // All four files verified present in public/images/shared-photos/
-  // photos[0] is always treated as the hero memory by ScrapbookExperience.
+  // All verified landscape-oriented (4:3, panoramic 2.22, and 16:9).
   photos: [
     {
       id: 'shared-hero',
       url: encodeURI('/images/shared-photos/WhatsApp Image 2026-10-19 at 1.37.54 PM.jpeg'),
       caption: 'In the same frame at last.',
       stage: 'hero',
-      orientation: 'portrait',
-      emphasis: 'hero-polaroid',
+      aspectRatio: 1.33,
+      orientation: 'landscape',
+      emphasis: 'hero-landscape',
     },
     {
       id: 'shared-2',
       url: encodeURI('/images/shared-photos/WhatsApp Image 2026-10-19 at 1.37.59 PM.jpeg'),
       caption: 'Side by side.',
       stage: 'collection',
-      orientation: 'portrait',
-      emphasis: 'collection',
+      aspectRatio: 2.22,
+      orientation: 'landscape',
+      emphasis: 'panoramic-landscape',
     },
     {
       id: 'shared-3',
       url: encodeURI('/images/shared-photos/WhatsApp Image 2026-10-20 at 9.55.00 AM.jpeg'),
       caption: 'The moments that matter.',
       stage: 'collection',
-      orientation: 'portrait',
-      emphasis: 'collection',
+      aspectRatio: 1.78,
+      orientation: 'landscape',
+      emphasis: 'landscape',
     },
     {
       id: 'shared-4',
       url: encodeURI('/images/shared-photos/WhatsApp Image 2026-10-20 at 9.55.09 AM.jpeg'),
       caption: 'One unforgettable day.',
       stage: 'collection',
-      orientation: 'portrait',
-      emphasis: 'collection',
+      aspectRatio: 1.78,
+      orientation: 'landscape',
+      emphasis: 'landscape',
     },
   ],
   // ── Shared video memory ────────────────────────────────────────────────────
