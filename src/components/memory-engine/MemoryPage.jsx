@@ -2,93 +2,302 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PhotoFrame } from './PhotoFrame';
 
+/**
+ * MemoryPage — renders a single page of the Just You portrait journal.
+ *
+ * Portrait-First Editorial Photography Experience:
+ *   - Explicit three-row layout: header / full-viewport content / reserved nav space.
+ *   - Single photo: large vertical portrait alongside dedicated editorial typography column.
+ *   - Two photos: large vertical portraits side-by-side with subtle asymmetry.
+ *   - Three photos: featured landscape with editorial copy alongside paired vertical portraits.
+ *   - Finale: signature portrait given primary scale priority with companion photo alongside.
+ *   - Photo clarity: clean ivory surrounds, pale blush borders, soft shadows, no obscuring vignettes.
+ */
+
+// Shared page-enter / exit animation variants
+const pageVariants = {
+  initial: { opacity: 0, y: 14, scale: 0.99 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit:    { opacity: 0, y: -10, scale: 1.005 },
+};
+const pageTransition = { duration: 0.75, ease: [0.22, 1, 0.36, 1] };
+
 export function MemoryPage({ pageData, isVisible }) {
   if (!pageData) return null;
 
-  const { photos, template, theme = 'journal', stageTitle } = pageData;
-  const containerStyle = template.getContainerStyle
-    ? template.getContainerStyle()
-    : 'flex flex-wrap items-center justify-center w-full h-full p-4';
-  const styles = template.getStyles ? template.getStyles(photos) : [];
-  const tilts = template.getTilts ? template.getTilts(photos) : [];
+  const { photos = [], template, theme = 'journal', stageTitle, pageNumber, pageTotal } = pageData;
 
-  // Determine if this is a mixed trio layout that benefits from a bottom sub-row
-  const isTrio = template.isTrioLayout && photos.length === 3;
-  const landscapeIdx = isTrio
-    ? photos.findIndex((p) => p.orientation === 'landscape')
-    : -1;
-  const topIdx = landscapeIdx >= 0 ? landscapeIdx : 0;
-  const bottomIndices = isTrio ? [0, 1, 2].filter((i) => i !== topIdx) : [];
+  // Only render for journal theme (scrapbook has its own dedicated renderer)
+  if (theme !== 'journal') return null;
+
+  const isSingle = photos.length === 1 || template.id === 'HeroSingle';
+  const isDuo    = photos.length === 2 && template.id !== 'EditorialFinale';
+  const isFinale = template.id === 'EditorialFinale' || (photos.length === 2 && photos.some(p => p.emphasis === 'collage-hero'));
+  const isTrio   = photos.length === 3 || template.id === 'MixedTrio';
+
+  // Identify landscape vs portrait in trio
+  const landscapeIdx  = isTrio ? photos.findIndex((p) => p.orientation === 'landscape') : -1;
+  const topLandscapeIdx = landscapeIdx >= 0 ? landscapeIdx : 0;
+  const bottomPortraitIndices = isTrio ? [0, 1, 2].filter((i) => i !== topLandscapeIdx) : [];
 
   return (
     <AnimatePresence mode="wait">
       {isVisible && (
         <motion.div
-          className="absolute inset-0 z-10 flex flex-col items-center justify-center px-2 py-4 select-none overflow-hidden"
-          initial={{ opacity: 0, scale: 0.98, y: 16 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 1.01, y: -12 }}
-          transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+          key={pageData.id}
+          className="absolute inset-0 flex flex-col overflow-hidden select-none"
+          style={{ paddingBottom: '68px' /* reserved space for bottom navigation bar */ }}
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={pageTransition}
         >
-          {/* Subtle Stage Header for Editorial Journal */}
-          {theme === 'journal' && stageTitle && (
-            <motion.div
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.8 }}
-              className="mb-2 md:mb-3 flex items-center gap-2 pointer-events-none"
-            >
-              <span className="w-4 h-px bg-[#F5B8A8]/60" />
+          {/* ── Atmospheric Ambient Warmth Behind Frames (Never Over Photos) ── */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(ellipse 75% 60% at 50% 45%, rgba(245,184,168,0.08) 0%, rgba(243,217,162,0.04) 50%, transparent 80%)',
+            }}
+          />
+
+          {/* ── Stage / Chapter Header ─────────────────────────────────────── */}
+          <motion.header
+            className="shrink-0 flex items-center justify-between px-5 sm:px-8 lg:px-14 xl:px-20 pt-3.5 sm:pt-4 pb-2 sm:pb-2.5 z-20"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {/* Left: Chapter + stage label */}
+            <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+              <span className="block w-5 sm:w-8 h-px bg-[#F5B8A8]/65 shrink-0" />
               <span
-                className="text-[10px] md:text-xs uppercase tracking-[0.3em] text-[#8B4860] font-medium"
+                className="text-[10px] sm:text-[11px] uppercase tracking-[0.32em] text-[#8B4860]/85 font-medium truncate"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
               >
-                {stageTitle}
+                Chapter One · {stageTitle || 'Just You'}
               </span>
-              <span className="w-4 h-px bg-[#F5B8A8]/60" />
-            </motion.div>
-          )}
+            </div>
 
-          {/* Layout Container */}
-          <div className={containerStyle}>
-            {isTrio ? (
-              <>
-                {/* Top Landscape Photo */}
-                <PhotoFrame
-                  key={photos[topIdx].id || topIdx}
-                  photo={photos[topIdx]}
-                  className={styles[topIdx] || 'w-full'}
-                  index={0}
-                  variant={theme}
-                  tilt={tilts[topIdx] || 0}
-                />
-                {/* Bottom Row of 2 Portraits */}
-                <div className="flex flex-row items-center justify-center w-full max-w-lg md:max-w-2xl gap-2 sm:gap-3">
-                  {bottomIndices.map((bIdx, subI) => (
-                    <PhotoFrame
-                      key={photos[bIdx].id || bIdx}
-                      photo={photos[bIdx]}
-                      className={styles[bIdx] || 'w-1/2'}
-                      index={subI + 1}
-                      variant={theme}
-                      tilt={tilts[bIdx] || 0}
-                    />
-                  ))}
-                </div>
-              </>
-            ) : (
-              photos.map((photo, i) => (
-                <PhotoFrame
-                  key={photo.id || i}
-                  photo={photo}
-                  className={styles[i] || 'w-full'}
-                  index={i}
-                  variant={theme}
-                  tilt={tilts[i] || 0}
-                  showStagePill={false}
-                />
-              ))
+            {/* Right: Page counter */}
+            {pageNumber != null && pageTotal != null && (
+              <span
+                className="text-[10px] sm:text-xs tracking-[0.22em] text-[#8B4860]/55 font-medium tabular-nums shrink-0 ml-3"
+                style={{ fontFamily: "'Manrope', sans-serif" }}
+              >
+                {String(pageNumber).padStart(2, '0')}
+                {' '}
+                <span className="opacity-40">/</span>
+                {' '}
+                {String(pageTotal).padStart(2, '0')}
+              </span>
             )}
+          </motion.header>
+
+          {/* Hairline separator */}
+          <motion.div
+            className="shrink-0 mx-5 sm:mx-8 lg:mx-14 xl:mx-20 h-px bg-[#F5B8A8]/18 z-20"
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ delay: 0.25, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            style={{ transformOrigin: 'left center' }}
+          />
+
+          {/* ── Editorial Photo Composition ─────────────────────────────────── */}
+          <div className="flex-1 min-h-0 flex items-center justify-center w-full px-3 sm:px-6 lg:px-12 xl:px-16 overflow-hidden">
+
+            {/* ── Case 1: Hero Single (Single-Photo Page) ── */}
+            {isSingle && (
+              <div className="flex flex-col lg:flex-row items-center justify-center w-full h-full max-w-6xl gap-5 lg:gap-12 xl:gap-16">
+                {/* Large vertical portrait frame */}
+                <div className="shrink-0 flex items-center justify-center">
+                  <PhotoFrame
+                    photo={photos[0]}
+                    className="w-[78vw] max-w-[320px] sm:max-w-[360px] lg:max-w-[430px] xl:max-w-[470px] h-[50vh] sm:h-[56vh] lg:h-[66vh] xl:h-[70vh] max-h-[720px]"
+                    index={0}
+                    variant="journal"
+                    tilt={0}
+                    hideCaption={false} // Clean caption visible below frame
+                  />
+                </div>
+
+                {/* Separate editorial typography & storytelling column (Desktop) */}
+                <div className="hidden lg:flex flex-col justify-center text-left max-w-md xl:max-w-lg">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span
+                      className="px-2.5 py-1 rounded-full text-[10px] tracking-[0.28em] uppercase font-semibold text-[#8B4860] bg-[#FAF7F2] border border-[#F5B8A8]/40 shadow-xs"
+                      style={{ fontFamily: "'Manrope', sans-serif" }}
+                    >
+                      Stage I · Little Beginnings
+                    </span>
+                  </div>
+
+                  <h2
+                    className="text-[#45152D] text-3xl lg:text-4xl xl:text-[2.75rem] font-normal italic leading-[1.18] mb-4"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
+                    “{photos[0]?.caption || 'Where your story began.'}”
+                  </h2>
+
+                  <div className="w-16 h-px bg-[#F5B8A8]/60 mb-4" />
+
+                  <p
+                    className="text-[#45152D]/75 text-sm sm:text-base lg:text-[15px] font-normal leading-relaxed italic"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
+                    From the earliest smiles and gentle childhood wonder, every quiet moment carried the warmth of the person you would become. Preserved in quiet grace, radiant from the very start.
+                  </p>
+
+                  <div className="mt-6 pt-4 border-t border-[#F5B8A8]/20 flex items-center gap-2">
+                    <span
+                      className="text-[10px] tracking-[0.3em] uppercase text-[#8B4860]/70 font-medium"
+                      style={{ fontFamily: "'Manrope', sans-serif" }}
+                    >
+                      Archival Portrait No. 01 · Keerthana
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Case 2: Duo Portraits (Two-Photo Pages) ── */}
+            {isDuo && (
+              <div className="flex flex-row items-center justify-center gap-3 sm:gap-6 lg:gap-10 xl:gap-14 w-full h-full max-w-5xl">
+                {photos.map((photo, i) => {
+                  // Subtle vertical offset for visual rhythm without scrapbook clutter
+                  const asymmetryClass = i === 1 ? 'sm:mt-6 lg:mt-8' : '';
+                  return (
+                    <PhotoFrame
+                      key={photo.id || i}
+                      photo={photo}
+                      className={`w-[48%] sm:w-[44%] lg:w-[40%] xl:w-[38%] max-w-[430px] h-[50vh] sm:h-[60vh] lg:h-[68vh] xl:h-[72vh] max-h-[720px] ${asymmetryClass}`}
+                      index={i}
+                      variant="journal"
+                      tilt={0}
+                    />
+                  );
+                })}
+              </div>
+            )}
+
+            {/* ── Case 3: Mixed Trio (Three-Photo Page) ── */}
+            {isTrio && (
+              <div className="w-full h-full max-w-6xl flex items-center justify-center">
+                {/* Desktop: Featured landscape + typography on left, two vertical portraits on right */}
+                <div className="hidden lg:flex flex-row items-center justify-center gap-10 xl:gap-14 w-full h-full">
+                  {/* Left Column: Featured landscape photo + editorial commentary */}
+                  <div className="w-[46%] xl:w-[44%] max-w-[500px] flex flex-col justify-center">
+                    <PhotoFrame
+                      photo={photos[topLandscapeIdx]}
+                      className="w-full h-[32vh] xl:h-[36vh] max-h-[380px]"
+                      index={0}
+                      variant="journal"
+                      tilt={0}
+                    />
+
+                    {/* Editorial stage commentary card below landscape */}
+                    <div className="mt-5 p-4 rounded-lg bg-[#FAF7F2]/80 border border-[#F5B8A8]/25 text-left shadow-xs">
+                      <span
+                        className="text-[9px] uppercase tracking-[0.28em] text-[#8B4860] font-semibold block mb-1"
+                        style={{ fontFamily: "'Manrope', sans-serif" }}
+                      >
+                        Stage II · Growing Up
+                      </span>
+                      <h3
+                        className="text-lg xl:text-xl font-normal italic text-[#45152D] leading-snug mb-1"
+                        style={{ fontFamily: "'Playfair Display', serif" }}
+                      >
+                        Sunlit Afternoons & Quiet Poise
+                      </h3>
+                      <p
+                        className="text-xs text-[#45152D]/70 font-normal italic leading-relaxed"
+                        style={{ fontFamily: "'Playfair Display', serif" }}
+                      >
+                        Growing into effortless elegance, accompanied by quiet confidence and steady warmth.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Two tall vertical portraits standing side by side */}
+                  <div className="w-[54%] xl:w-[56%] flex flex-row items-center justify-center gap-4 xl:gap-6">
+                    {bottomPortraitIndices.map((bIdx, subI) => (
+                      <PhotoFrame
+                        key={photos[bIdx]?.id || bIdx}
+                        photo={photos[bIdx]}
+                        className="w-[48%] max-w-[280px] h-[62vh] xl:h-[66vh] max-h-[680px]"
+                        index={subI + 1}
+                        variant="journal"
+                        tilt={0}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Mobile: Stacked featured landscape above two vertical portraits */}
+                <div className="flex lg:hidden flex-col items-center justify-center gap-2.5 sm:gap-3.5 w-full h-full">
+                  {/* Top featured photo */}
+                  <PhotoFrame
+                    photo={photos[topLandscapeIdx]}
+                    className="w-full max-w-[340px] h-[22vh] sm:h-[26vh]"
+                    index={0}
+                    variant="journal"
+                    tilt={0}
+                  />
+
+                  {/* Bottom two vertical portraits side-by-side */}
+                  <div className="flex flex-row items-center justify-center gap-2.5 sm:gap-3.5 w-full max-w-[340px]">
+                    {bottomPortraitIndices.map((bIdx, subI) => (
+                      <PhotoFrame
+                        key={photos[bIdx]?.id || bIdx}
+                        photo={photos[bIdx]}
+                        className="w-[48%] max-w-[170px] h-[28vh] sm:h-[32vh]"
+                        index={subI + 1}
+                        variant="journal"
+                        tilt={0}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Case 4: Editorial Finale (Signature Priority) ── */}
+            {isFinale && (
+              <div className="flex flex-row items-center justify-center gap-3 sm:gap-6 lg:gap-10 xl:gap-14 w-full h-full max-w-5xl">
+                {/* Companion Portrait — Supporting Scale */}
+                <div className="w-[42%] sm:w-[38%] lg:w-[32%] xl:w-[30%] max-w-[350px] sm:mt-8 lg:mt-12">
+                  <PhotoFrame
+                    photo={photos[0]}
+                    className="w-full h-[46vh] sm:h-[54vh] lg:h-[60vh] xl:h-[64vh] max-h-[640px]"
+                    index={0}
+                    variant="journal"
+                    tilt={0}
+                  />
+                </div>
+
+                {/* Signature Hero Portrait — Primary Focal Point with Generous Scale */}
+                <div className="w-[54%] sm:w-[50%] lg:w-[44%] xl:w-[42%] max-w-[480px] relative">
+                  {/* Warm champagne / blush halo behind signature portrait */}
+                  <div
+                    className="absolute -inset-4 sm:-inset-6 pointer-events-none rounded-2xl"
+                    style={{
+                      background:
+                        'radial-gradient(ellipse at center, rgba(243,217,162,0.18) 0%, rgba(245,184,168,0.10) 50%, transparent 75%)',
+                    }}
+                  />
+
+                  <PhotoFrame
+                    photo={photos[1]}
+                    className="relative w-full h-[52vh] sm:h-[62vh] lg:h-[70vh] xl:h-[74vh] max-h-[760px]"
+                    index={1}
+                    variant="journal"
+                    tilt={0}
+                  />
+                </div>
+              </div>
+            )}
+
           </div>
         </motion.div>
       )}

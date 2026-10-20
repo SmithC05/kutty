@@ -209,21 +209,53 @@ export const chapter2Data = {
     signoff: 'Always in your corner,',
     sender: 'Your Best Friend',
   },
-  // Shared photographs:
-  // Designed for photographs from the one in-person meeting.
-  // When files are added to public/images/shared-photos/, configure them here.
-  // The scrapbook engine automatically displays them when present.
+  // ── Shared photographs from the in-person meeting ──────────────────────────
+  // All four files verified present in public/images/shared-photos/
+  // photos[0] is always treated as the hero memory by ScrapbookExperience.
   photos: [
-    // Template for when shared photos are placed in /images/shared-photos/:
-    // {
-    //   id: 'shared-hero',
-    //   url: '/images/shared-photos/us-1.jpg',
-    //   caption: 'In the same frame at last.',
-    //   stage: 'hero',
-    //   orientation: 'portrait',
-    //   emphasis: 'hero-polaroid',
-    // },
+    {
+      id: 'shared-hero',
+      url: encodeURI('/images/shared-photos/WhatsApp Image 2026-10-19 at 1.37.54 PM.jpeg'),
+      caption: 'In the same frame at last.',
+      stage: 'hero',
+      orientation: 'portrait',
+      emphasis: 'hero-polaroid',
+    },
+    {
+      id: 'shared-2',
+      url: encodeURI('/images/shared-photos/WhatsApp Image 2026-10-19 at 1.37.59 PM.jpeg'),
+      caption: 'Side by side.',
+      stage: 'collection',
+      orientation: 'portrait',
+      emphasis: 'collection',
+    },
+    {
+      id: 'shared-3',
+      url: encodeURI('/images/shared-photos/WhatsApp Image 2026-10-20 at 9.55.00 AM.jpeg'),
+      caption: 'The moments that matter.',
+      stage: 'collection',
+      orientation: 'portrait',
+      emphasis: 'collection',
+    },
+    {
+      id: 'shared-4',
+      url: encodeURI('/images/shared-photos/WhatsApp Image 2026-10-20 at 9.55.09 AM.jpeg'),
+      caption: 'One unforgettable day.',
+      stage: 'collection',
+      orientation: 'portrait',
+      emphasis: 'collection',
+    },
   ],
+  // ── Shared video memory ────────────────────────────────────────────────────
+  // Kept separate from photos[] so it is never passed to analyzeImages or PhotoFrame.
+  // ScrapbookExperience renders this on its own dedicated page (page 3 in the sequence).
+  // poster uses the hero photograph for a clean first frame before playback.
+  video: {
+    id: 'shared-video',
+    src: '/images/shared-photos/keerthi.mp4',
+    poster: encodeURI('/images/shared-photos/WhatsApp Image 2026-10-19 at 1.37.54 PM.jpeg'),
+    caption: 'A moment worth replaying.',
+  },
 };
 
 // Unified export for existing components
