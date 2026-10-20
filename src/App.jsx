@@ -7,6 +7,7 @@ import { HandwritingReveal } from './scenes/HandwritingReveal';
 import { DateAwareScene } from './scenes/DateAwareScene';
 import { SecretVault } from './scenes/SecretVault';
 import { MemoryJourney } from './scenes/MemoryJourney';
+import { ArtistChapter } from './scenes/ArtistChapter';
 import { Loader } from './components/ui/Loader';
 import { Background } from './components/ui/Background';
 import { useMediaLoading } from './hooks/useMediaLoading';
@@ -59,6 +60,11 @@ function App() {
         {/* Memory Journey — Chapter 2: Together */}
         {isLoaded && currentScene === SCENES.MEMORY_JOURNEY_TOGETHER && (
           <MemoryJourney key="memory-together" chapterIndex={1} />
+        )}
+
+        {/* Phase 10: The Artist's Hand — Pencil Portrait Reveal */}
+        {isLoaded && currentScene === SCENES.ARTIST_CHAPTER && (
+          <ArtistChapter key="artist-chapter" />
         )}
       </AnimatePresence>
     </>

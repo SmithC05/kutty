@@ -264,7 +264,7 @@ function ChapterTransitionScreen({ onContinue }) {
 // Memory Journey Orchestrator
 // ─────────────────────────────────────────────────────────────────────────────
 export function MemoryJourney({ chapterIndex: propChapterIndex }) {
-  const { next, transitionTo, currentScene } = useScene();
+  const { next, currentScene } = useScene();
 
   // Resolve active chapter index
   const activeChapterIndex =
@@ -282,80 +282,16 @@ export function MemoryJourney({ chapterIndex: propChapterIndex }) {
     activeChapterIndex === 1
   );
 
-  const [isCompleted, setIsCompleted] = useState(false);
-
   // Handle Chapter 1 completion -> navigate to Chapter 2
   const handleChapter1Complete = () => {
     next();
   };
 
-  // Handle Chapter 2 completion -> show grand finale card
+  // Handle Chapter 2 completion -> continue to ArtistChapter
   const handleChapter2Complete = () => {
-    setIsCompleted(true);
     next();
   };
 
-  // ── Completion Card ──
-  if (isCompleted) {
-    return (
-      <div
-        className="fixed inset-0 w-full h-full flex flex-col items-center justify-center p-6 text-center z-50 select-none"
-        style={{
-          background:
-            'radial-gradient(ellipse at 50% 25%, #FFFDFB 0%, #FAF7F2 50%, #EBF3FA 100%)',
-        }}
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92, y: 16 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-md w-full bg-[#FFFDF9]/95 backdrop-blur-md rounded-3xl p-8 sm:p-10 shadow-[0_20px_55px_rgba(69,21,45,0.12),0_4px_16px_rgba(0,0,0,0.04)] border border-[#F5B8A8]/40 flex flex-col items-center"
-        >
-          <span className="text-4xl mb-3">✨</span>
-
-          <span
-            className="text-[#8B4860] text-[11px] uppercase tracking-[0.3em] font-medium mb-1"
-            style={{ fontFamily: "'Manrope', sans-serif" }}
-          >
-            Memories Preserved
-          </span>
-
-          <h2
-            className="text-[#45152D] text-3xl sm:text-4xl font-normal italic tracking-tight mb-3"
-            style={{ fontFamily: "'Playfair Display', serif" }}
-          >
-            Just You · Us
-          </h2>
-
-          <div className="w-12 h-px bg-[#F5B8A8] my-2" />
-
-          <p
-            className="text-[#475569] text-sm sm:text-base leading-relaxed max-w-sm mt-2"
-            style={{ fontFamily: "'Manrope', sans-serif" }}
-          >
-            Every memory tells a story, and every moment with you is unforgettable,
-            Kutty.
-            <br />
-            <span className="text-xs text-[#94A3B8] mt-2 block">
-              More magic awaits on October 30th.
-            </span>
-          </p>
-
-          <button
-            type="button"
-            onClick={() => {
-              setIsCompleted(false);
-              transitionTo('MEMORY_JOURNEY_SOLO');
-            }}
-            className="mt-7 px-6 py-2.5 rounded-full border border-[#8B4860]/40 text-[#45152D] text-xs tracking-[0.2em] uppercase font-medium hover:bg-[#FAF7F2] active:scale-95 transition-all shadow-sm"
-            style={{ fontFamily: "'Manrope', sans-serif" }}
-          >
-            Revisit Memories
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
 
   // ── Render Chapter One: "Just You" ──
   if (activeChapterIndex === 0) {

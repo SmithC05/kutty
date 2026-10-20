@@ -28,7 +28,6 @@ export function useSceneManager() {
       SCENES.SECRET_VAULT,
       SCENES.MEMORY_JOURNEY_SOLO,
       SCENES.MEMORY_JOURNEY_TOGETHER,
-      SCENES.INTERACTIVE_WISHES,
       SCENES.ARTIST_CHAPTER,
       SCENES.FINAL_MESSAGE
     ];
@@ -41,7 +40,8 @@ export function useSceneManager() {
         SCENES.DATE_AWARE,
         SCENES.SECRET_VAULT,
         SCENES.MEMORY_JOURNEY_SOLO,
-        SCENES.MEMORY_JOURNEY_TOGETHER
+        SCENES.MEMORY_JOURNEY_TOGETHER,
+        SCENES.ARTIST_CHAPTER,
       ];
       if (implementedScenes.includes(nextScene)) {
         preloadNext();
