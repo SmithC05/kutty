@@ -23,9 +23,9 @@ export function DevotionalUIOverlay({
   const isBlessing = act === 'blessing' || act === 'complete';
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between select-none">
+    <div className="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between select-none overflow-x-hidden overflow-y-auto">
       {/* ── TOP HEADER: Sacred Scene Moniker ───────────────────────────────── */}
-      <header className="w-full flex justify-center pt-[max(16px,env(safe-area-inset-top))] px-4">
+      <header className="w-full flex justify-center pt-[max(12px,env(safe-area-inset-top))] px-4 shrink-0">
         <AnimatePresence>
           {(isReveal || isBlessing) && (
             <motion.div
@@ -33,11 +33,11 @@ export function DevotionalUIOverlay({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-              className="flex items-center gap-3 px-5 py-2 rounded-full border border-amber-400/20 bg-slate-950/40 backdrop-blur-md shadow-lg"
+              className="flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border border-amber-400/20 bg-slate-950/40 backdrop-blur-md shadow-lg"
             >
               <span className="text-xs" style={{ color: palette.sacredGold }}>🔱</span>
               <span
-                className="text-[11px] uppercase tracking-[0.42em] font-medium"
+                className="text-[10px] sm:text-[11px] uppercase tracking-[0.38em] sm:tracking-[0.42em] font-medium"
                 style={{
                   fontFamily: "'Manrope', sans-serif",
                   color: palette.moonSilver,
@@ -52,7 +52,7 @@ export function DevotionalUIOverlay({
       </header>
 
       {/* ── BOTTOM STAGE: Reverent Text & Action Buttons ───────────────────── */}
-      <footer className="w-full flex flex-col items-center text-center px-4 sm:px-6 pb-[max(24px,env(safe-area-inset-bottom))]">
+      <footer className="w-full flex flex-col items-center text-center px-4 sm:px-6 pt-2 pb-[max(20px,env(safe-area-inset-bottom))] shrink-0">
         {/* ── ACT III: Pre-Blessing Contemplation ── */}
         <AnimatePresence>
           {isReveal && (
@@ -65,7 +65,7 @@ export function DevotionalUIOverlay({
             >
               {/* Contemplative Quote */}
               <p
-                className="text-base sm:text-lg md:text-xl font-light italic leading-relaxed mb-3"
+                className="text-sm sm:text-base md:text-xl font-light italic leading-relaxed mb-2 sm:mb-3 max-w-md"
                 style={{
                   fontFamily: "'Playfair Display', serif",
                   color: palette.moonSilver,
@@ -77,7 +77,7 @@ export function DevotionalUIOverlay({
 
               {/* Ornamental Gold Divider */}
               <div
-                className="h-px my-4"
+                className="h-px my-2.5 sm:my-4"
                 style={{
                   width: '64px',
                   background: `linear-gradient(to right, transparent, ${palette.sacredGold}, transparent)`,
@@ -88,7 +88,7 @@ export function DevotionalUIOverlay({
               <motion.button
                 type="button"
                 onClick={onReceiveBlessings}
-                className="px-8 sm:px-10 py-3.5 sm:py-4 rounded-full font-medium tracking-[0.2em] uppercase text-xs sm:text-sm transition-all duration-300 active:scale-95 cursor-pointer shadow-2xl"
+                className="px-6 sm:px-10 py-3 sm:py-4 rounded-full font-medium tracking-[0.18em] sm:tracking-[0.2em] uppercase text-xs sm:text-sm transition-all duration-300 active:scale-95 cursor-pointer shadow-2xl"
                 style={{
                   fontFamily: "'Manrope', sans-serif",
                   background: 'linear-gradient(135deg, rgba(230,199,122,0.24) 0%, rgba(184,148,64,0.16) 100%)',
@@ -122,7 +122,7 @@ export function DevotionalUIOverlay({
             >
               {/* Blessing Editorial Card */}
               <div
-                className="relative rounded-2xl px-6 sm:px-9 py-5 sm:py-7 mb-4 backdrop-blur-xl border border-amber-400/25 shadow-2xl"
+                className="relative rounded-2xl px-4 sm:px-9 py-4 sm:py-7 mb-3 sm:mb-4 backdrop-blur-xl border border-amber-400/25 shadow-2xl w-full max-w-xl"
                 style={{
                   background: 'linear-gradient(145deg, rgba(8,20,38,0.85) 0%, rgba(16,43,72,0.80) 100%)',
                   boxShadow: '0 10px 48px rgba(0,0,0,0.65), 0 0 80px rgba(230,199,122,0.08)',
@@ -130,7 +130,7 @@ export function DevotionalUIOverlay({
                 }}
               >
                 {/* Top Sacred Arch Ornament */}
-                <div className="flex items-center gap-3 justify-center mb-3">
+                <div className="flex items-center gap-3 justify-center mb-2 sm:mb-3">
                   <div
                     className="h-px flex-1"
                     style={{ background: `linear-gradient(to right, transparent, ${palette.sacredGold})` }}
@@ -144,7 +144,7 @@ export function DevotionalUIOverlay({
 
                 {/* Subtitle */}
                 <p
-                  className="text-[10px] sm:text-xs uppercase tracking-[0.36em] font-medium mb-3"
+                  className="text-[10px] sm:text-xs uppercase tracking-[0.32em] sm:tracking-[0.36em] font-medium mb-2 sm:mb-3"
                   style={{
                     fontFamily: "'Manrope', sans-serif",
                     color: `${palette.sacredGold}E6`,
@@ -155,11 +155,11 @@ export function DevotionalUIOverlay({
 
                 {/* Authoritative Required Blessing */}
                 <p
-                  className="text-sm sm:text-base md:text-lg font-light italic leading-relaxed"
+                  className="text-xs sm:text-base md:text-lg font-light italic leading-relaxed"
                   style={{
                     fontFamily: "'Playfair Display', serif",
                     color: palette.moonSilver,
-                    lineHeight: '1.85',
+                    lineHeight: '1.75',
                     textShadow: '0 2px 10px rgba(0,0,0,0.7)',
                   }}
                 >
@@ -167,7 +167,7 @@ export function DevotionalUIOverlay({
                 </p>
 
                 {/* Bottom Filigree */}
-                <div className="flex items-center gap-3 justify-center mt-3">
+                <div className="flex items-center gap-3 justify-center mt-2.5 sm:mt-3">
                   <div
                     className="h-px flex-1"
                     style={{ background: 'linear-gradient(to right, transparent, rgba(215,231,245,0.25))' }}
@@ -185,10 +185,10 @@ export function DevotionalUIOverlay({
                 type="button"
                 onClick={onContinue}
                 disabled={isTransitioning}
-                className="py-2.5 px-6 rounded-full text-xs sm:text-sm uppercase tracking-[0.28em] font-medium transition-all duration-300 cursor-pointer border border-sky-300/20 bg-slate-900/40 backdrop-blur-md active:scale-95"
+                className="py-2.5 sm:py-3 px-6 sm:px-8 rounded-full text-xs sm:text-sm uppercase tracking-[0.24em] sm:tracking-[0.28em] font-medium transition-all duration-300 cursor-pointer border border-sky-300/30 bg-slate-900/60 backdrop-blur-md active:scale-95 shadow-lg"
                 style={{
                   fontFamily: "'Manrope', sans-serif",
-                  color: 'rgba(215,231,245,0.75)',
+                  color: 'rgba(215,231,245,0.85)',
                 }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

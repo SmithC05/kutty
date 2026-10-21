@@ -439,7 +439,7 @@ function StudioReveal({ onComplete, reducedMotion }) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 select-none overflow-hidden w-screen h-screen min-h-[100dvh]"
+      className="fixed inset-0 z-50 select-none overflow-x-hidden overflow-y-auto lg:overflow-hidden w-full h-full min-h-[100dvh] flex flex-col justify-between"
       style={{
         background:
           'radial-gradient(ellipse 95% 90% at 38% 50%, #241D15 0%, #16120C 50%, #0A0806 100%)',
@@ -508,7 +508,7 @@ function StudioReveal({ onComplete, reducedMotion }) {
             <motion.button
               type="button"
               onClick={handleSkip}
-              className="text-[10px] uppercase tracking-[0.22em] font-medium px-3 py-1.5 rounded-full border border-amber-900/40 text-amber-200/75 bg-amber-950/20 active:scale-95 cursor-pointer"
+              className="text-[10px] uppercase tracking-[0.22em] font-medium px-3.5 py-1.5 rounded-full border border-amber-900/40 text-amber-200/80 bg-amber-950/40 active:scale-95 cursor-pointer shadow-sm"
               style={{ fontFamily: "'Manrope', sans-serif" }}
               initial={{ opacity: 0, x: 6 }}
               animate={{ opacity: 1, x: 0 }}
@@ -520,20 +520,16 @@ function StudioReveal({ onComplete, reducedMotion }) {
         </AnimatePresence>
       </header>
 
-      {/* ── MAIN LAYOUT: TRUE 75/25 GRID ON DESKTOP, VERTICAL ON MOBILE ──────── */}
-      <div className="relative z-10 w-full h-full flex flex-col lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(300px,1fr)] overflow-hidden">
+      {/* ── MAIN LAYOUT: TRUE 75/25 GRID ON DESKTOP, NATURAL FLOW ON MOBILE ──── */}
+      <div className="relative z-10 w-full flex-1 flex flex-col lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(300px,1fr)] lg:h-full lg:overflow-hidden">
         
-        {/* ── LEFT 75% ARTWORK STAGE: DOMINANT, 95% VIEWPORT HEIGHT ───────────── */}
-        <section className="relative flex items-center justify-center w-full h-full p-2 sm:p-4 lg:p-6 overflow-hidden my-auto">
-          {/* Ivory Drawing Paper Sheet — Maximize vertical scale to 95vh */}
+        {/* ── LEFT 75% ARTWORK STAGE: DOMINANT ON DESKTOP, BALANCED ON MOBILE ─── */}
+        <section className="relative flex items-center justify-center w-full p-2 sm:p-4 lg:p-6 my-auto shrink-0 lg:h-full lg:overflow-hidden">
+          {/* Ivory Drawing Paper Sheet — Responsive & uncropped */}
           <div
-            className="relative flex items-center justify-center overflow-hidden transition-all duration-700"
+            className="relative flex items-center justify-center overflow-hidden transition-all duration-700 h-[clamp(280px,56dvh,520px)] max-h-[calc(100dvh-180px)] max-w-[calc(100vw-24px)] lg:h-[clamp(360px,95dvh,1020px)] lg:max-h-[calc(100dvh-80px)] lg:max-w-none"
             style={{
               aspectRatio: '896 / 1200',
-              // Desktop: 94-96% of available viewport height; Mobile: safe vertical fit
-              height: 'clamp(360px, 95dvh, 1020px)',
-              maxHeight: 'calc(100dvh - 160px)',
-              maxWidth: 'calc(100vw - 24px)',
               borderRadius: '2px',
               boxShadow: isComplete
                 ? '0 30px 80px -15px rgba(0,0,0,0.85), 0 10px 25px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.45)'
@@ -765,18 +761,18 @@ function StudioReveal({ onComplete, reducedMotion }) {
       </div>
 
       {/* ── MOBILE FOOTER (Hidden on Desktop) ─────────────────────────────────── */}
-      <footer className="lg:hidden relative z-20 w-full flex flex-col items-center text-center px-4 pb-[max(12px,env(safe-area-inset-bottom))] shrink-0">
+      <footer className="lg:hidden relative z-20 w-full flex flex-col items-center text-center px-4 pt-2 pb-[max(20px,env(safe-area-inset-bottom))] shrink-0">
         <AnimatePresence>
           {!isComplete && (
             <motion.div
-              className="flex items-center gap-2 py-1"
+              className="flex items-center gap-2 py-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <span className="text-xs">✏️</span>
+              <span className="text-sm">✏️</span>
               <span
-                className="text-[10px] uppercase tracking-[0.3em] font-medium text-amber-200/60"
+                className="text-[11px] uppercase tracking-[0.3em] font-medium text-amber-200/75"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
               >
                 Almost there…
@@ -797,24 +793,24 @@ function StudioReveal({ onComplete, reducedMotion }) {
                 className="font-bold leading-none mb-1 text-amber-50"
                 style={{
                   fontFamily: "'Dancing Script', cursive",
-                  fontSize: 'clamp(1.7rem, 5vw, 2.4rem)',
+                  fontSize: 'clamp(1.8rem, 6vw, 2.5rem)',
                 }}
               >
                 Keerthana
               </p>
 
               <p
-                className="text-xs font-light italic leading-snug text-amber-100/80 mb-2.5"
+                className="text-xs sm:text-sm font-light italic leading-snug text-amber-100/85 mb-3"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
                 &ldquo;A little piece of you, captured in pencil.&rdquo;
               </p>
 
-              <div className="flex items-center justify-center gap-2.5">
+              <div className="flex items-center justify-center gap-3 w-full max-w-xs mb-3">
                 <button
                   type="button"
                   onClick={handleReplay}
-                  className="px-3.5 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium border border-amber-900/40 text-amber-200/80 bg-amber-950/20 active:scale-95 cursor-pointer"
+                  className="flex-1 py-2.5 px-4 rounded-full text-[11px] uppercase tracking-[0.2em] font-medium border border-amber-900/40 text-amber-200/90 bg-amber-950/40 active:scale-95 cursor-pointer text-center"
                   style={{ fontFamily: "'Manrope', sans-serif" }}
                 >
                   ↺ Watch again
@@ -823,17 +819,18 @@ function StudioReveal({ onComplete, reducedMotion }) {
                 <a
                   href={ARTWORK_SRC}
                   download="Keerthana-Pencil-Portrait.webp"
-                  className="px-3.5 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium border border-amber-600/50 text-amber-100 bg-amber-900/40 active:scale-95 cursor-pointer"
+                  className="flex-1 py-2.5 px-4 rounded-full text-[11px] uppercase tracking-[0.2em] font-medium border border-amber-600/50 text-amber-100 bg-amber-900/50 active:scale-95 cursor-pointer text-center"
                   style={{ fontFamily: "'Manrope', sans-serif", textDecoration: 'none' }}
                 >
                   ↓ Keep
                 </a>
               </div>
 
+              {/* Prominent, easily reachable Continue action on mobile */}
               <button
                 type="button"
                 onClick={onComplete}
-                className="mt-2 text-[10px] uppercase tracking-[0.26em] font-medium text-amber-200/50 hover:text-amber-200 transition-colors py-1 cursor-pointer"
+                className="w-full max-w-xs py-3 px-6 rounded-full text-xs uppercase tracking-[0.24em] font-semibold text-amber-100 bg-gradient-to-r from-amber-600/35 via-amber-500/45 to-amber-600/35 hover:from-amber-600/50 hover:to-amber-600/50 border border-amber-400/55 shadow-[0_0_18px_rgba(245,158,11,0.22)] active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
               >
                 Continue the journey →

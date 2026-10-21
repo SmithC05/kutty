@@ -69,13 +69,10 @@ export const BirthdayPortrait = forwardRef(function BirthdayPortrait(
           alt="Keerthana ❤️"
           onLoad={() => setIsLoaded(true)}
           onError={handleError}
-          className={`h-auto object-contain transition-opacity duration-700 ${
+          className={`h-auto object-contain transition-opacity duration-700 max-h-[36vh] sm:max-h-[44vh] lg:max-h-[min(80vh,760px)] max-w-[min(85vw,320px)] sm:max-w-[400px] lg:max-w-[540px] ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           style={{
-            // Responsive constraints: tall and majestic on desktop, balanced on mobile
-            maxHeight: 'min(80vh, 760px)',
-            maxWidth: 'min(90vw, 540px)',
             // Golden & rose rim-light glow framing her silhouette
             filter: 'drop-shadow(0 0 16px rgba(245, 158, 11, 0.38)) drop-shadow(0 0 36px rgba(244, 63, 94, 0.22))',
           }}

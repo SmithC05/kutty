@@ -341,7 +341,7 @@ export function FinalBirthdayCelebration() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 w-screen h-screen min-h-[100dvh] overflow-hidden select-none bg-[#03060d] text-white"
+      className="fixed inset-0 w-full h-full min-h-[100dvh] overflow-x-hidden overflow-y-auto lg:overflow-hidden select-none bg-[#03060d] text-white"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
@@ -374,33 +374,26 @@ export function FinalBirthdayCelebration() {
       )}
 
       {/* ── Layer 4: Stage World & Responsive Layout ──────────────── */}
-      <div className="relative z-20 w-full h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between pointer-events-none">
-        
-        {/* Left Column (Desktop) / Top Section (Mobile): Typography & Message Card */}
-        <div className="w-full lg:w-1/2 flex flex-col justify-center pt-8 sm:pt-10 lg:pt-0 pointer-events-auto z-30">
-          <BirthdayTypography
-            data={birthdayFinaleData}
-            titleRef={titleRef}
-            nameRef={nameRef}
-            quoteRef={quoteRef}
-            messageCardRef={messageCardRef}
-            actionsRef={actionsRef}
-            onReplay={handleReplay}
-            onRevisitMemories={handleRevisitMemories}
-            isAudioPlaying={isAudioPlaying}
-            onToggleAudio={toggleAudio}
-          />
-        </div>
-
-        {/* Right Column (Desktop) / Center Section (Mobile): Keerthana's Real Portrait */}
-        <div className="w-full lg:w-1/2 h-[48vh] sm:h-[55vh] lg:h-full flex items-end justify-center lg:justify-end pb-0 sm:pb-2 lg:pb-0 pointer-events-none z-20">
-          <BirthdayPortrait
-            ref={portraitRef}
-            isFloating={isPortraitFloating}
-            className="w-full max-w-[360px] sm:max-w-[440px] lg:max-w-[560px]"
-          />
-        </div>
-
+      <div className="relative z-20 w-full min-h-full lg:h-full flex flex-col justify-center pointer-events-none">
+        <BirthdayTypography
+          data={birthdayFinaleData}
+          titleRef={titleRef}
+          nameRef={nameRef}
+          quoteRef={quoteRef}
+          messageCardRef={messageCardRef}
+          actionsRef={actionsRef}
+          onReplay={handleReplay}
+          onRevisitMemories={handleRevisitMemories}
+          isAudioPlaying={isAudioPlaying}
+          onToggleAudio={toggleAudio}
+          portraitSlot={
+            <BirthdayPortrait
+              ref={portraitRef}
+              isFloating={isPortraitFloating}
+              className="w-full max-w-[280px] sm:max-w-[360px] lg:max-w-[560px]"
+            />
+          }
+        />
       </div>
     </div>
   );
