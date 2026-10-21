@@ -10,6 +10,7 @@ export const SCENES = {
   ARTIST_CHAPTER: 'ARTIST_CHAPTER', // Phase 10: The Artist's Hand pencil reveal
   LORD_SHIVA_BLESSING: 'LORD_SHIVA_BLESSING', // Phase 11: Sacred Himalayan Blessings
   FINAL_MESSAGE: 'FINAL_MESSAGE', // Phase 12: Grand Finale
+  SONIC_BLOOM: 'SONIC_BLOOM', // Phase 13: Sonic Bloom — Six Songs, the Way I See You
 };
 
 import { birthdayConfig } from '../config';

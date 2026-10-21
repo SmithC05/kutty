@@ -9,6 +9,7 @@ import { devMode } from '../config';
 export function useSceneManager() {
   const [currentScene, setCurrentScene] = useState(devMode.enabled && devMode.startScene ? devMode.startScene : SCENES.LOADING);
   const [isBackgroundPaused, setIsBackgroundPaused] = useState(false);
+  const [hasCompletedCelebrationIntro, setHasCompletedCelebrationIntro] = useState(false);
 
   const transitionTo = useCallback((newScene) => {
     // Allows us to intercept GSAP page transitions before React unmounts
@@ -30,7 +31,8 @@ export function useSceneManager() {
       SCENES.MEMORY_JOURNEY_TOGETHER,
       SCENES.ARTIST_CHAPTER,
       SCENES.LORD_SHIVA_BLESSING,
-      SCENES.FINAL_MESSAGE
+      SCENES.FINAL_MESSAGE,
+      SCENES.SONIC_BLOOM
     ];
     const currentIndex = order.indexOf(currentScene);
     if (currentIndex >= 0 && currentIndex < order.length - 1) {
@@ -45,6 +47,7 @@ export function useSceneManager() {
         SCENES.ARTIST_CHAPTER,
         SCENES.LORD_SHIVA_BLESSING,
         SCENES.FINAL_MESSAGE,
+        SCENES.SONIC_BLOOM,
       ];
       if (implementedScenes.includes(nextScene)) {
         preloadNext();
@@ -55,5 +58,13 @@ export function useSceneManager() {
     }
   }, [currentScene, transitionTo, preloadNext]);
 
-  return { currentScene, transitionTo, next, isBackgroundPaused, setIsBackgroundPaused };
+  return { 
+    currentScene, 
+    transitionTo, 
+    next, 
+    isBackgroundPaused, 
+    setIsBackgroundPaused,
+    hasCompletedCelebrationIntro,
+    setHasCompletedCelebrationIntro
+  };
 }

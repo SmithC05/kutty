@@ -21,6 +21,9 @@ export function BirthdayTypography({
   actionsRef,
   onReplay,
   onRevisitMemories,
+  onOpenSonicBloom,
+  showSonicBloomButton = false,
+  reducedMotion = false,
   portraitSlot = null,
   _isAudioPlaying,
   _onToggleAudio,
@@ -109,9 +112,11 @@ export function BirthdayTypography({
       </div>
 
       {/* ── 4. Final Action Buttons ──────────────────────────────────── */}
-      <div className={`${portraitSlot ? 'order-4 lg:order-none lg:col-start-1 lg:row-start-3' : 'mt-5 sm:mt-6'} flex justify-center lg:justify-start z-30 pointer-events-auto mt-3 sm:mt-4 lg:mt-6 pb-6 lg:pb-0`}>
+      <div
+        ref={actionsRef}
+        className={`${portraitSlot ? 'order-4 lg:order-none lg:col-start-1 lg:row-start-3' : 'mt-5 sm:mt-6'} flex flex-col justify-center lg:justify-start z-30 pointer-events-auto mt-3 sm:mt-4 lg:mt-6 pb-6 lg:pb-0 gap-3 sm:gap-4`}
+      >
         <div
-          ref={actionsRef}
           className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 w-full sm:w-auto"
         >
           {/* Celebrate Again */}
@@ -134,6 +139,36 @@ export function BirthdayTypography({
             <span>{actions.revisitText || 'Revisit Memories'}</span>
           </button>
         </div>
+
+        {/* New Navigation Action: Six Songs, the Way I See You → */}
+        {onOpenSonicBloom && (
+          <div
+            className={`flex justify-center lg:justify-start w-full sm:w-auto transition-all duration-700 ease-out ${
+              showSonicBloomButton
+                ? 'opacity-100 translate-y-0 pointer-events-auto visible'
+                : reducedMotion
+                ? 'opacity-0 pointer-events-none invisible'
+                : 'opacity-0 translate-y-2 pointer-events-none invisible'
+            }`}
+            style={{ minHeight: '48px' }}
+            aria-hidden={!showSonicBloomButton}
+          >
+            <button
+              type="button"
+              onClick={onOpenSonicBloom}
+              tabIndex={showSonicBloomButton ? 0 : -1}
+              aria-label="Experience Six Songs, the Way I See You"
+              className="group relative inline-flex items-center justify-center gap-2.5 px-6 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-indigo-950/80 via-slate-900/90 to-cyan-950/80 hover:from-indigo-900/90 hover:via-slate-800 hover:to-cyan-900/90 border border-cyan-400/35 hover:border-cyan-300/60 text-cyan-200 hover:text-white font-medium text-xs sm:text-sm tracking-wide backdrop-blur-xl shadow-[0_4px_20px_rgba(6,182,212,0.15)] hover:shadow-[0_0_28px_rgba(6,182,212,0.35)] transition-all transform hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-950 min-h-[44px] cursor-pointer w-full sm:w-auto"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400"></span>
+              </span>
+              <span className="font-sans font-medium tracking-wide">Six Songs, the Way I See You</span>
+              <span className="text-cyan-400 group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

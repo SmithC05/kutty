@@ -10,6 +10,7 @@ import { MemoryJourney } from './scenes/MemoryJourney';
 import { ArtistChapter } from './scenes/ArtistChapter';
 import { LordShivaBlessing } from './scenes/LordShivaBlessing';
 import { FinalBirthdayCelebration } from './scenes/FinalBirthdayCelebration';
+import { SonicBloomScene } from './scenes/sonicBloom/SonicBloomScene';
 import { Loader } from './components/ui/Loader';
 import { Background } from './components/ui/Background';
 import { useMediaLoading } from './hooks/useMediaLoading';
@@ -77,6 +78,11 @@ function App() {
         {/* Phase 12: Grand Finale — 12:00 AM The World Celebrates You */}
         {isLoaded && currentScene === SCENES.FINAL_MESSAGE && (
           <FinalBirthdayCelebration key="final-birthday-celebration" />
+        )}
+
+        {/* Phase 13: SONIC BLOOM — Six Songs, the Way I See You */}
+        {isLoaded && currentScene === SCENES.SONIC_BLOOM && (
+          <SonicBloomScene key="sonic-bloom" />
         )}
       </AnimatePresence>
     </>

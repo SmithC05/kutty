@@ -39,8 +39,21 @@ import { BirthdayTypography } from './celebration/BirthdayTypography';
 const AUDIO_SRC = '/audio/music/intro.mp3';
 
 export function FinalBirthdayCelebration() {
-  const { transitionTo } = useScene();
+  const { transitionTo, hasCompletedCelebrationIntro, setHasCompletedCelebrationIntro } = useScene();
   const reducedMotion = useReducedMotion();
+  const isTransitioningToSonicRef = useRef(false);
+  const [showSonicButton, setShowSonicButton] = useState(false);
+  const sonicTimerRef = useRef(null);
+
+  const startSonicButtonTimer = useCallback(() => {
+    if (sonicTimerRef.current) {
+      clearTimeout(sonicTimerRef.current);
+    }
+    setShowSonicButton(false);
+    sonicTimerRef.current = setTimeout(() => {
+      setShowSonicButton(true);
+    }, 1000);
+  }, []);
 
   // Root container & subcomponent refs for GSAP context
   const containerRef = useRef(null);
@@ -109,13 +122,13 @@ export function FinalBirthdayCelebration() {
 
   // Main Coordinated GSAP Cinematic Timeline
   useEffect(() => {
-    if (reducedMotion) {
-      // Reduced motion: Instant, fully composed peaceful reveal
+    if (reducedMotion || hasCompletedCelebrationIntro) {
+      // Reduced motion or returning from Sonic Bloom: Instant, fully composed peaceful celebration stage
       setSpotlightProgress(1);
       setAuraIntensity(1);
       setFloorGlowIntensity(1);
-      setIsPortraitFloating(false);
-      setCanvasMode('reduced');
+      setIsPortraitFloating(true);
+      setCanvasMode(reducedMotion ? 'reduced' : 'continuous');
 
       if (introContainerRef.current) {
         gsap.set(introContainerRef.current, { display: 'none' });
@@ -126,7 +139,13 @@ export function FinalBirthdayCelebration() {
       [titleRef, nameRef, quoteRef, messageCardRef, actionsRef].forEach((r) => {
         if (r.current) gsap.set(r.current, { opacity: 1, y: 0 });
       });
-      return;
+      startSonicButtonTimer();
+      return () => {
+        if (sonicTimerRef.current) {
+          clearTimeout(sonicTimerRef.current);
+          sonicTimerRef.current = null;
+        }
+      };
     }
 
     const ctx = gsap.context(() => {
@@ -152,6 +171,7 @@ export function FinalBirthdayCelebration() {
           setIsPortraitFloating(true);
           setCanvasMode('continuous');
           isReplayingRef.current = false;
+          setHasCompletedCelebrationIntro?.(true);
         },
       });
 
@@ -304,6 +324,9 @@ export function FinalBirthdayCelebration() {
         duration: 0.6,
         ease: 'power2.out',
       }, 11.7)
+      .call(() => {
+        startSonicButtonTimer();
+      }, null, 11.7)
 
       // Seamlessly transition into Mode B (Continuous Celebration Loop)
       .call(() => {
@@ -314,13 +337,23 @@ export function FinalBirthdayCelebration() {
 
     return () => {
       ctx.revert();
+      if (sonicTimerRef.current) {
+        clearTimeout(sonicTimerRef.current);
+        sonicTimerRef.current = null;
+      }
     };
-  }, [reducedMotion]);
+  }, [reducedMotion, hasCompletedCelebrationIntro, setHasCompletedCelebrationIntro, startSonicButtonTimer]);
 
   // Replay celebration without reloading or resetting memory journey
   const handleReplay = useCallback(() => {
     if (isReplayingRef.current) return;
     isReplayingRef.current = true;
+
+    if (sonicTimerRef.current) {
+      clearTimeout(sonicTimerRef.current);
+      sonicTimerRef.current = null;
+    }
+    setShowSonicButton(false);
 
     setIsPortraitFloating(false);
     setSpotlightProgress(0);
@@ -337,6 +370,40 @@ export function FinalBirthdayCelebration() {
   const handleRevisitMemories = useCallback(() => {
     transitionTo(SCENES.MEMORY_JOURNEY_SOLO);
   }, [transitionTo]);
+
+  // Transition to Sonic Bloom — Six Songs, the Way I See You
+  const handleOpenSonicBloom = useCallback(() => {
+    if (isTransitioningToSonicRef.current) return;
+    isTransitioningToSonicRef.current = true;
+    setHasCompletedCelebrationIntro?.(true);
+
+    if (reducedMotion) {
+      transitionTo(SCENES.SONIC_BLOOM);
+      return;
+    }
+
+    // Step B — Create the sonic transition:
+    // Gradually soften the fireworks and ambient particles without abruptly cutting the scene.
+    setCanvasMode('reduced');
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        transitionTo(SCENES.SONIC_BLOOM);
+      },
+    });
+
+    // Fade typography and actions softly
+    [titleRef, nameRef, quoteRef, messageCardRef, actionsRef].forEach((r) => {
+      if (r.current) {
+        tl.to(r.current, { opacity: 0, y: -10, duration: 0.6, ease: 'power2.in' }, 0);
+      }
+    });
+
+    // Soften portrait
+    if (portraitRef.current) {
+      tl.to(portraitRef.current, { opacity: 0, scale: 0.96, duration: 0.75, ease: 'power2.inOut' }, 0.1);
+    }
+  }, [reducedMotion, transitionTo, setHasCompletedCelebrationIntro]);
 
   return (
     <div
@@ -384,6 +451,9 @@ export function FinalBirthdayCelebration() {
           actionsRef={actionsRef}
           onReplay={handleReplay}
           onRevisitMemories={handleRevisitMemories}
+          onOpenSonicBloom={handleOpenSonicBloom}
+          showSonicBloomButton={showSonicButton}
+          reducedMotion={reducedMotion}
           isAudioPlaying={isAudioPlaying}
           onToggleAudio={toggleAudio}
           portraitSlot={
