@@ -67,8 +67,8 @@ export function OpeningScene() {
       
       {/* Subtle hint text positioned cleanly at the bottom */}
       <div className={`absolute bottom-10 sm:bottom-14 left-0 right-0 flex justify-center pointer-events-none z-20 transition-opacity duration-1000 ${isOpening ? 'opacity-0' : 'opacity-100'}`}>
-        <Typography variant="caption" className="animate-pulse opacity-60 tracking-[0.4em] uppercase text-xs sm:text-sm text-blue-200/80">
-          Awaits
+        <Typography variant="caption" className="animate-pulse opacity-75 tracking-wider normal-case text-xs sm:text-sm text-blue-200/90 font-medium">
+          Your surprise is waiting, Kutty. 💝
         </Typography>
       </div>
     </div>

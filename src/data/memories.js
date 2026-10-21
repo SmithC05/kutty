@@ -27,19 +27,19 @@ export const chapter1Data = {
     textMuted: '#8B4860',  // Muted rose text
   },
   stages: [
-    { id: 'little-beginnings', title: 'Little Beginnings' },
+    { id: 'little-beginnings', title: 'Little You' },
     { id: 'growing-up', title: 'Growing Up' },
-    { id: 'today', title: 'The Keerthana We Know Today' },
+    { id: 'today', title: 'You Today' },
   ],
   // 12 verified genuine local solo photos in deliberate chronological order
   photos: [
-    // ── Phase 1: Little Beginnings ──────────────────────────────────────────
+    // ── Phase 1: Little You ─────────────────────────────────────────────────
     {
       id: 'solo-baby-cake',
       url: encodeURI('/images/solo-photos/WhatsApp Image 2026-10-17 at 10.27.18 AM (1).jpeg'),
       caption: 'Where your story began.',
       stage: 'little-beginnings',
-      stageTitle: 'Little Beginnings',
+      stageTitle: 'Little You',
       aspectRatio: 0.62,
       orientation: 'portrait',
       emphasis: 'hero',
@@ -49,9 +49,9 @@ export const chapter1Data = {
     {
       id: 'solo-toddler-ball',
       url: encodeURI('/images/solo-photos/WhatsApp Image 2026-10-17 at 10.27.18 AM.jpeg'),
-      caption: 'Playful curiosity from day one.',
+      caption: 'That little smile! ❤️',
       stage: 'little-beginnings',
-      stageTitle: 'Little Beginnings',
+      stageTitle: 'Little You',
       aspectRatio: 0.60,
       orientation: 'portrait',
       emphasis: 'duo-left',
@@ -61,9 +61,9 @@ export const chapter1Data = {
     {
       id: 'solo-young-smile',
       url: encodeURI('/images/solo-photos/WhatsApp Image 2026-10-17 at 10.27.18 AM (2).jpeg'),
-      caption: 'A smile that never changed.',
+      caption: 'That smile is still so you. ❤️',
       stage: 'little-beginnings',
-      stageTitle: 'Little Beginnings',
+      stageTitle: 'Little You',
       aspectRatio: 0.45,
       orientation: 'portrait',
       emphasis: 'duo-right',
@@ -75,7 +75,7 @@ export const chapter1Data = {
     {
       id: 'solo-green-salwar',
       url: encodeURI('/images/solo-photos/WhatsApp Image 2026-10-17 at 10.27.15 AM.jpeg'),
-      caption: 'Quiet grace and steady warmth.',
+      caption: 'That green looks so good on you. 💚',
       stage: 'growing-up',
       stageTitle: 'Growing Up',
       aspectRatio: 0.60,
@@ -87,7 +87,7 @@ export const chapter1Data = {
     {
       id: 'solo-pink-saree',
       url: encodeURI('/images/solo-photos/WhatsApp Image 2026-10-17 at 10.27.17 AM.jpeg'),
-      caption: 'Growing into effortless elegance.',
+      caption: 'Okay, this look is gorgeous! 💗',
       stage: 'growing-up',
       stageTitle: 'Growing Up',
       aspectRatio: 0.56,
@@ -99,7 +99,7 @@ export const chapter1Data = {
     {
       id: 'solo-red-landscape',
       url: encodeURI('/images/solo-photos/WhatsApp Image 2026-10-17 at 10.27.20 AM.jpeg'),
-      caption: 'Sunlit afternoons and quiet moments.',
+      caption: 'You look so pretty here. ❤️',
       stage: 'growing-up',
       stageTitle: 'Growing Up',
       aspectRatio: 1.78,
@@ -111,7 +111,7 @@ export const chapter1Data = {
     {
       id: 'solo-red-portrait',
       url: encodeURI('/images/solo-photos/WhatsApp Image 2026-10-17 at 10.27.20 AM (1).jpeg'),
-      caption: 'Warm confidence.',
+      caption: 'Looking good as always! ❤️',
       stage: 'growing-up',
       stageTitle: 'Growing Up',
       aspectRatio: 0.56,
@@ -123,7 +123,7 @@ export const chapter1Data = {
     {
       id: 'solo-purple-curls',
       url: encodeURI('/images/solo-photos/WhatsApp Image 2026-10-17 at 10.27.19 AM.jpeg'),
-      caption: 'Gentle, genuine, and kind.',
+      caption: 'Pretty girl being pretty! 💜',
       stage: 'growing-up',
       stageTitle: 'Growing Up',
       aspectRatio: 0.56,
@@ -133,13 +133,13 @@ export const chapter1Data = {
       pageGroup: 4,
     },
 
-    // ── Phase 3: The Keerthana We Know Today ──────────────────────────────
+    // ── Phase 3: You Today ──────────────────────────────────────────────────
     {
       id: 'solo-darkgreen-lehenga',
       url: encodeURI('/images/solo-photos/WhatsApp Image 2026-10-17 at 10.27.21 AM (1).jpeg'),
-      caption: 'The vibrant spirit you bring everywhere.',
+      caption: 'wow!!',
       stage: 'today',
-      stageTitle: 'The Keerthana We Know Today',
+      stageTitle: 'You Today',
       aspectRatio: 0.45,
       orientation: 'portrait',
       emphasis: 'duo-left',
@@ -149,9 +149,9 @@ export const chapter1Data = {
     {
       id: 'solo-lightblue-salwar',
       url: encodeURI('/images/solo-photos/WhatsApp Image 2026-10-17 at 10.27.21 AM.jpeg'),
-      caption: 'Unapologetically yourself.',
+      caption: '💙',
       stage: 'today',
-      stageTitle: 'The Keerthana We Know Today',
+      stageTitle: 'You Today',
       aspectRatio: 0.45,
       orientation: 'portrait',
       emphasis: 'duo-right',
@@ -161,9 +161,9 @@ export const chapter1Data = {
     {
       id: 'solo-fun-selfie',
       url: encodeURI('/images/solo-photos/WhatsApp Image 2026-10-17 at 10.30.35 AM (1).jpeg'),
-      caption: 'Pure laughter and spontaneous joy.',
+      caption: 'My favourite kind of Keerthana smile. ❤️',
       stage: 'today',
-      stageTitle: 'The Keerthana We Know Today',
+      stageTitle: 'You Today',
       aspectRatio: 0.45,
       orientation: 'portrait',
       emphasis: 'collage-side',
@@ -173,9 +173,9 @@ export const chapter1Data = {
     {
       id: 'solo-kutty-signature',
       url: encodeURI('/images/solo-photos/kutty1.jpeg'),
-      caption: 'Radiant, today and always.',
+      caption: 'And that\'s my Keerthana today. ❤️',
       stage: 'today',
-      stageTitle: 'The Keerthana We Know Today',
+      stageTitle: 'You Today',
       aspectRatio: 0.56,
       orientation: 'portrait',
       emphasis: 'collage-hero',
@@ -205,7 +205,7 @@ export const chapter2Data = {
   introSubtitle: 'Miles apart across different cities and busy routines, yet for one special day, our worlds were in the exact same frame.',
   personalNote: {
     salutation: 'To Kutty —',
-    body: "Miles apart across different cities, college routines, and busy days. But that one day we shared in person proved that real friendship doesn't need constant proximity—it just picks up right where it left off without skipping a beat.\n\nEvery memory from that meeting is something I treasure. Thank you for being such an extraordinary friend.",
+    body: "Miles apart across different cities, college routines, and busy days. But that one day we shared in person proved that real friendship doesn't need constant proximity—it just picks up right where it left off without skipping a beat.\n\nEvery memory from that meeting is something I treasure. You're my favouriteeeeee best friend ever, and I'm so glad to have you in my life. ❤️",
     signoff: 'Always in your corner,',
     sender: 'Your Best Friend',
   },

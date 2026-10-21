@@ -66,7 +66,7 @@ export const BirthdayPortrait = forwardRef(function BirthdayPortrait(
       >
         <img
           src={imgSrc}
-          alt="Keerthana — Birthday Portrait"
+          alt="Keerthana ❤️"
           onLoad={() => setIsLoaded(true)}
           onError={handleError}
           className={`h-auto object-contain transition-opacity duration-700 ${

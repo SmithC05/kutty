@@ -73,29 +73,18 @@ function JournalCoverCard({ onDismiss }) {
       {/* ── Central Content ── */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 sm:px-10 lg:px-16 max-w-3xl w-full">
 
-        {/* Chapter label */}
-        <motion.span
-          className="text-[#8B4860]/65 text-[10px] sm:text-[11px] uppercase tracking-[0.42em] font-medium mb-5 sm:mb-6"
-          style={{ fontFamily: "'Manrope', sans-serif" }}
-          initial={{ opacity: 0, y: reducedMotion ? 0 : -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.15 * stagger, ease: [0.22, 1, 0.36, 1] }}
-        >
-          Chapter One
-        </motion.span>
-
         {/* Large display title */}
         <motion.h1
-          className="text-[#45152D] font-normal italic leading-none tracking-tight mb-5 sm:mb-6"
+          className="text-[#45152D] font-normal italic leading-tight tracking-tight mb-5 sm:mb-6"
           style={{
             fontFamily: "'Playfair Display', serif",
-            fontSize: 'clamp(3rem, 8vw, 6.5rem)',
+            fontSize: 'clamp(2.2rem, 5.5vw, 4.2rem)',
           }}
           initial={{ opacity: 0, y: reducedMotion ? 0 : 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.0, delay: 0.28 * stagger, ease: [0.22, 1, 0.36, 1] }}
         >
-          Just You
+          This one&apos;s all about you, Keerthana.
         </motion.h1>
 
         {/* Animated horizontal rule */}
@@ -115,7 +104,7 @@ function JournalCoverCard({ onDismiss }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, delay: 0.54 * stagger, ease: [0.22, 1, 0.36, 1] }}
         >
-          A portrait journal celebrating Keerthana
+          A few moments of you, brought together just for you. ❤️
         </motion.p>
 
         {/* Three-stage identity pills */}
@@ -125,7 +114,7 @@ function JournalCoverCard({ onDismiss }) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.66 * stagger }}
         >
-          {['Little Beginnings', 'Growing Up', 'Today'].map((stage, i) => (
+          {['Little You', 'Growing Up', 'You Today'].map((stage, i) => (
             <React.Fragment key={stage}>
               <span
                 className="text-[10px] sm:text-[11px] uppercase tracking-[0.28em] text-[#8B4860]/55 font-medium"
@@ -153,7 +142,7 @@ function JournalCoverCard({ onDismiss }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 * stagger, ease: [0.22, 1, 0.36, 1] }}
         >
-          Open Journal →
+          TAKE A LOOK →
         </motion.button>
       </div>
     </motion.div>
@@ -216,7 +205,7 @@ function ChapterTransitionScreen({ onContinue }) {
           className="text-[#E94B70] text-[11px] uppercase tracking-[0.35em] font-semibold mb-5"
           style={{ fontFamily: "'Manrope', sans-serif" }}
         >
-          A New Chapter
+          Now, About Us…
         </span>
 
         {/* The Exact Handwritten Transition Message */}
@@ -240,7 +229,7 @@ function ChapterTransitionScreen({ onContinue }) {
           className="text-xs uppercase tracking-[0.25em] text-[#64748B] mt-4 font-medium"
           style={{ fontFamily: "'Manrope', sans-serif" }}
         >
-          Chapter Two · Us
+          Us ❤️
         </p>
 
         {/* Enter Our Story Button */}

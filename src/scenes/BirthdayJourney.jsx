@@ -1014,7 +1014,7 @@ export function BirthdayJourney() {
         {!portraitFailed ? (
           <img
             src={PORTRAIT_SRC}
-            alt="Keerthana — birthday portrait"
+            alt="Keerthana ❤️"
             className="bd-portrait-img"
             onLoad={() => setPortraitLoaded(true)}
             onError={() => {
@@ -1034,7 +1034,7 @@ export function BirthdayJourney() {
 
       {/* Text column */}
       <div className="bd-text-col">
-        <span className="bd-label" aria-hidden="true">October 30th · A Celebration for</span>
+        <span className="bd-label" aria-hidden="true">October 30th · A Day Celebrating You</span>
 
         <span ref={happyRef}    className="bd-happy"    style={{ opacity:0 }}>Happy</span>
         <span ref={birthdayRef} className="bd-birthday" style={{ opacity:0 }}>Birthday,</span>
@@ -1045,8 +1045,7 @@ export function BirthdayJourney() {
         </div>
 
         <p ref={subRef} className="bd-sub" style={{ opacity:0 }}>
-          Here's to more laughter, unforgettable memories,
-          and another wonderful year of being you.
+          I hope this year gives you a thousand little reasons to smile with me, Kutty. ❤️
         </p>
 
         <div ref={ctaRef} className="bd-cta-wrap" style={{ opacity: 0 }}>
@@ -1055,9 +1054,9 @@ export function BirthdayJourney() {
             className="bd-cta"
             onClick={triggerTransition}
             disabled={isTransitioning}
-            aria-label="Enter the surprise"
+            aria-label="Open your memories"
           >
-            ENTER THE SURPRISE
+            Open Your Memories
             <span className="bd-cta-arrow" aria-hidden="true">&#8594;</span>
           </button>
         </div>

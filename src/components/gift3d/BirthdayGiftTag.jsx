@@ -69,7 +69,7 @@ function createTagTexture() {
   // Bottom Sweet Note
   ctx.fillStyle = '#93c5fd';
   ctx.font = 'italic 20px "Playfair Display", Georgia, serif';
-  ctx.fillText('A magical day awaits you', 256, 240);
+  ctx.fillText('Made with love, just for you.', 256, 240);
 
   // Bottom tiny stars
   ctx.fillStyle = '#fde047';

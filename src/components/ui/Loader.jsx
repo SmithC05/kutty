@@ -14,7 +14,7 @@ export function Loader({ progress = 0, className }) {
       */}
       <div className="w-12 h-12 rounded-full border-t-2 border-blue-200 animate-spin mb-8"></div>
       <Typography variant="caption" className="animate-pulse">
-        Magic loading... {Math.round(progress)}%
+        Getting your surprise ready… {Math.round(progress)}%
       </Typography>
     </div>
   );

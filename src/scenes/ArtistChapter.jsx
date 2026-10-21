@@ -194,7 +194,7 @@ function StudioEntrance({ onBegin, reducedMotion }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
         >
-          A Portrait, Made for You
+          Something Special for You ❤️
         </motion.span>
 
         <motion.h1
@@ -208,7 +208,7 @@ function StudioEntrance({ onBegin, reducedMotion }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.95, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
         >
-          The Artist&apos;s Hand
+          Drawn Just for You ❤️
         </motion.h1>
 
         <motion.div
@@ -261,7 +261,7 @@ function StudioEntrance({ onBegin, reducedMotion }) {
             scale: 1.03,
           }}
         >
-          Reveal the portrait →
+          Look what I made for you →
         </motion.button>
       </div>
     </motion.div>
@@ -493,13 +493,13 @@ function StudioReveal({ onComplete, reducedMotion }) {
             className="text-[9px] uppercase tracking-[0.35em] font-medium text-amber-200/60"
             style={{ fontFamily: "'Manrope', sans-serif" }}
           >
-            A Portrait, Made for You
+            Something Special for You ❤️
           </span>
           <span
             className="text-xs uppercase tracking-[0.24em] font-medium text-amber-100/90"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
-            The Artist&apos;s Hand
+            Drawn Just for You ❤️
           </span>
         </div>
 
@@ -581,7 +581,7 @@ function StudioReveal({ onComplete, reducedMotion }) {
                   className="text-xs uppercase tracking-widest font-medium"
                   style={{ color: 'rgba(80,60,40,0.6)', fontFamily: "'Manrope', sans-serif" }}
                 >
-                  Keerthana&apos;s Portrait
+                  Your portrait, Keerthana ❤️
                 </p>
               </div>
             )}
@@ -598,7 +598,7 @@ function StudioReveal({ onComplete, reducedMotion }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
           >
-            A Portrait, Made for You
+            Something Special for You ❤️
           </motion.span>
 
           {/* Title */}
@@ -612,7 +612,7 @@ function StudioReveal({ onComplete, reducedMotion }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
           >
-            The Artist&apos;s Hand
+            Drawn Just for You ❤️
           </motion.h1>
 
           {/* Supporting line */}
@@ -623,7 +623,7 @@ function StudioReveal({ onComplete, reducedMotion }) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.28 }}
           >
-            Every little detail, drawn with care.
+            A little drawing, made just for you. ❤️
           </motion.p>
 
           {/* Thin champagne separator */}
@@ -660,14 +660,14 @@ function StudioReveal({ onComplete, reducedMotion }) {
                     className="text-[11px] uppercase tracking-[0.28em] font-medium text-amber-200/80"
                     style={{ fontFamily: "'Manrope', sans-serif" }}
                   >
-                    Drawing in progress
+                    Almost there…
                   </span>
                 </div>
                 <p
                   className="text-xs font-light text-stone-400 max-w-xs leading-relaxed"
                   style={{ fontFamily: "'Manrope', sans-serif" }}
                 >
-                  Graphite flecks and delicate contours materializing organically across cold-press ivory paper.
+                  Just wait till you see yourself, Keerthana. ❤️
                 </p>
                 <div className="mt-2">
                   <button
@@ -779,7 +779,7 @@ function StudioReveal({ onComplete, reducedMotion }) {
                 className="text-[10px] uppercase tracking-[0.3em] font-medium text-amber-200/60"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
               >
-                Drawing in progress
+                Almost there…
               </span>
             </motion.div>
           )}

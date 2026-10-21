@@ -13,12 +13,12 @@ export const birthdayFinaleData = {
   title: 'HAPPY BIRTHDAY',
   recipientName: 'Keerthana',
   heartEmoji: '❤️',
-  dedicationQuote: '“To the girl who deserves all the light in the world.”',
+  dedicationQuote: 'For my favouriteeeeee best friend, always. ❤️',
 
   // Personal Letter / Message from Best Friend (Editable)
   personalMessage: {
     salutation: 'Dearest Kutty,',
-    body: 'To the girl who deserves all the happiness in the world — may this new year of your life bring you beautiful memories, courage for every challenge, and countless reasons to smile. Happy Birthday, Kutty. Always in your corner. ❤️',
+    body: "Happy birthday, Kutty. ❤️ I'm really glad to have you in my life. Even with the distance between us, I'm so happy we became best friends, and I'll always be cheering for you. I hope this year brings you lots of happiness and things that make you smile.",
     signoff: 'With love, always',
   },
 
@@ -27,11 +27,4 @@ export const birthdayFinaleData = {
     replayText: 'Celebrate Again',
     revisitText: 'Revisit Memories',
   },
-
-  // Optional voice / audio note support (user triggered only, no autoplay)
-  audio: {
-    enabled: false,
-    src: null,
-    label: 'Listen to Birthday Note',
-  }
 };

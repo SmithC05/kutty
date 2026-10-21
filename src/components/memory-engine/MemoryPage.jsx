@@ -76,7 +76,7 @@ export function MemoryPage({ pageData, isVisible }) {
                 className="text-[10px] sm:text-[11px] uppercase tracking-[0.32em] text-[#8B4860]/85 font-medium truncate"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
               >
-                Chapter One · {stageTitle || 'Just You'}
+                {stageTitle || 'Little You'}
               </span>
             </div>
 
@@ -105,16 +105,16 @@ export function MemoryPage({ pageData, isVisible }) {
           />
 
           {/* ── Editorial Photo Composition ─────────────────────────────────── */}
-          <div className="flex-1 min-h-0 flex items-center justify-center w-full px-3 sm:px-6 lg:px-12 xl:px-16 overflow-hidden">
+          <div className="flex-1 min-h-0 flex items-center justify-center w-full px-3 sm:px-6 lg:px-12 xl:px-16 overflow-y-auto lg:overflow-hidden">
 
             {/* ── Case 1: Hero Single (Single-Photo Page) ── */}
             {isSingle && (
-              <div className="flex flex-col lg:flex-row items-center justify-center w-full h-full max-w-6xl gap-5 lg:gap-12 xl:gap-16">
+              <div className="flex flex-col lg:flex-row items-center justify-start lg:justify-center w-full h-full max-w-6xl gap-4 sm:gap-6 lg:gap-12 xl:gap-16 py-2 lg:py-0 overflow-y-auto lg:overflow-visible">
                 {/* Large vertical portrait frame */}
                 <div className="shrink-0 flex items-center justify-center">
                   <PhotoFrame
                     photo={photos[0]}
-                    className="w-[78vw] max-w-[320px] sm:max-w-[360px] lg:max-w-[430px] xl:max-w-[470px] h-[50vh] sm:h-[56vh] lg:h-[66vh] xl:h-[70vh] max-h-[720px]"
+                    className="w-[72vw] max-w-[260px] sm:max-w-[320px] lg:max-w-[430px] xl:max-w-[470px] h-[36vh] sm:h-[46vh] lg:h-[66vh] xl:h-[70vh] max-h-[720px]"
                     index={0}
                     variant="journal"
                     tilt={0}
@@ -122,39 +122,39 @@ export function MemoryPage({ pageData, isVisible }) {
                   />
                 </div>
 
-                {/* Separate editorial typography & storytelling column (Desktop) */}
-                <div className="hidden lg:flex flex-col justify-center text-left max-w-md xl:max-w-lg">
-                  <div className="flex items-center gap-2 mb-3">
+                {/* Separate editorial typography & storytelling column (Desktop and Mobile) */}
+                <div className="flex flex-col justify-center text-center lg:text-left max-w-sm sm:max-w-md xl:max-w-lg px-2 lg:px-0">
+                  <div className="flex items-center justify-center lg:justify-start gap-2 mb-2 lg:mb-3">
                     <span
                       className="px-2.5 py-1 rounded-full text-[10px] tracking-[0.28em] uppercase font-semibold text-[#8B4860] bg-[#FAF7F2] border border-[#F5B8A8]/40 shadow-xs"
                       style={{ fontFamily: "'Manrope', sans-serif" }}
                     >
-                      Stage I · Little Beginnings
+                      Little You
                     </span>
                   </div>
 
                   <h2
-                    className="text-[#45152D] text-3xl lg:text-4xl xl:text-[2.75rem] font-normal italic leading-[1.18] mb-4"
+                    className="text-[#45152D] text-xl sm:text-2xl lg:text-4xl xl:text-[2.75rem] font-normal italic leading-[1.18] mb-2 lg:mb-4"
                     style={{ fontFamily: "'Playfair Display', serif" }}
                   >
                     “{photos[0]?.caption || 'Where your story began.'}”
                   </h2>
 
-                  <div className="w-16 h-px bg-[#F5B8A8]/60 mb-4" />
+                  <div className="w-12 lg:w-16 h-px bg-[#F5B8A8]/60 mx-auto lg:mx-0 mb-2.5 lg:mb-4" />
 
                   <p
-                    className="text-[#45152D]/75 text-sm sm:text-base lg:text-[15px] font-normal leading-relaxed italic"
+                    className="text-[#45152D]/80 text-xs sm:text-sm lg:text-[15px] font-normal leading-relaxed italic"
                     style={{ fontFamily: "'Playfair Display', serif" }}
                   >
-                    From the earliest smiles and gentle childhood wonder, every quiet moment carried the warmth of the person you would become. Preserved in quiet grace, radiant from the very start.
+                    Look at little Keerthana beside her birthday cake! ❤️ It’s so sweet getting a glimpse of the little girl you were. I’m glad I get to know the person you are today — and call you my best friend.
                   </p>
 
-                  <div className="mt-6 pt-4 border-t border-[#F5B8A8]/20 flex items-center gap-2">
+                  <div className="mt-3 lg:mt-6 pt-2 lg:pt-4 border-t border-[#F5B8A8]/20 flex items-center justify-center lg:justify-start gap-2">
                     <span
-                      className="text-[10px] tracking-[0.3em] uppercase text-[#8B4860]/70 font-medium"
+                      className="text-[10px] tracking-[0.3em] uppercase text-[#8B4860]/80 font-medium"
                       style={{ fontFamily: "'Manrope', sans-serif" }}
                     >
-                      Archival Portrait No. 01 · Keerthana
+                      Little Keerthana ❤️
                     </span>
                   </div>
                 </div>
@@ -202,19 +202,19 @@ export function MemoryPage({ pageData, isVisible }) {
                         className="text-[9px] uppercase tracking-[0.28em] text-[#8B4860] font-semibold block mb-1"
                         style={{ fontFamily: "'Manrope', sans-serif" }}
                       >
-                        Stage II · Growing Up
+                        Growing Up
                       </span>
                       <h3
                         className="text-lg xl:text-xl font-normal italic text-[#45152D] leading-snug mb-1"
                         style={{ fontFamily: "'Playfair Display', serif" }}
                       >
-                        Sunlit Afternoons & Quiet Poise
+                        Look at you now, Keerthana ❤️
                       </h3>
                       <p
                         className="text-xs text-[#45152D]/70 font-normal italic leading-relaxed"
                         style={{ fontFamily: "'Playfair Display', serif" }}
                       >
-                        Growing into effortless elegance, accompanied by quiet confidence and steady warmth.
+                        It&apos;s lovely seeing these different moments of your life, Keerthana. I hope these photos make you smile as much as they make me smile. ❤️
                       </p>
                     </div>
                   </div>
@@ -234,29 +234,51 @@ export function MemoryPage({ pageData, isVisible }) {
                   </div>
                 </div>
 
-                {/* Mobile: Stacked featured landscape above two vertical portraits */}
-                <div className="flex lg:hidden flex-col items-center justify-center gap-2.5 sm:gap-3.5 w-full h-full">
+                {/* Mobile: Stacked featured landscape above two vertical portraits + commentary card */}
+                <div className="flex lg:hidden flex-col items-center justify-start gap-2.5 sm:gap-3.5 w-full h-full overflow-y-auto py-2">
                   {/* Top featured photo */}
                   <PhotoFrame
                     photo={photos[topLandscapeIdx]}
-                    className="w-full max-w-[340px] h-[22vh] sm:h-[26vh]"
+                    className="w-full max-w-[320px] h-[19vh] sm:h-[23vh]"
                     index={0}
                     variant="journal"
                     tilt={0}
                   />
 
                   {/* Bottom two vertical portraits side-by-side */}
-                  <div className="flex flex-row items-center justify-center gap-2.5 sm:gap-3.5 w-full max-w-[340px]">
+                  <div className="flex flex-row items-center justify-center gap-2 sm:gap-3 w-full max-w-[320px]">
                     {bottomPortraitIndices.map((bIdx, subI) => (
                       <PhotoFrame
                         key={photos[bIdx]?.id || bIdx}
                         photo={photos[bIdx]}
-                        className="w-[48%] max-w-[170px] h-[28vh] sm:h-[32vh]"
+                        className="w-[48%] max-w-[155px] h-[22vh] sm:h-[26vh]"
                         index={subI + 1}
                         variant="journal"
                         tilt={0}
                       />
                     ))}
+                  </div>
+
+                  {/* Editorial stage commentary card below portraits (Mobile) */}
+                  <div className="w-full max-w-[320px] p-3 rounded-lg bg-[#FAF7F2]/90 border border-[#F5B8A8]/30 text-center shadow-xs">
+                    <span
+                      className="text-[9px] uppercase tracking-[0.28em] text-[#8B4860] font-semibold block mb-1"
+                      style={{ fontFamily: "'Manrope', sans-serif" }}
+                    >
+                      Growing Up
+                    </span>
+                    <h3
+                      className="text-base font-normal italic text-[#45152D] leading-snug mb-1"
+                      style={{ fontFamily: "'Playfair Display', serif" }}
+                    >
+                      Look at you now, Keerthana ❤️
+                    </h3>
+                    <p
+                      className="text-xs text-[#45152D]/80 font-normal italic leading-relaxed"
+                      style={{ fontFamily: "'Playfair Display', serif" }}
+                    >
+                      It&apos;s lovely seeing these different moments of your life, Keerthana. I hope these photos make you smile as much as they make me smile. ❤️
+                    </p>
                   </div>
                 </div>
               </div>

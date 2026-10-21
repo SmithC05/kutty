@@ -58,7 +58,7 @@ function VideoPage({ video }) {
               className="text-xs text-[#94A3B8] tracking-widest uppercase font-medium"
               style={{ fontFamily: "'Manrope', sans-serif" }}
             >
-              Video memory currently unavailable
+              Oops, this little moment won&apos;t play right now. ❤️
             </p>
           </div>
         ) : (
@@ -93,7 +93,7 @@ function VideoPage({ video }) {
           className="text-[10px] tracking-[0.2em] uppercase text-[#64748B] font-medium"
           style={{ fontFamily: "'Manrope', sans-serif" }}
         >
-          Shared Video Memory · Press Play
+          Press play to watch ❤️
         </span>
       </div>
     </div>
@@ -146,12 +146,6 @@ function GallerySpread({ photos }) {
                 >
                   {items[0].caption}
                 </p>
-                <span
-                  className="text-[9px] uppercase tracking-[0.25em] text-[#64748B] font-medium"
-                  style={{ fontFamily: "'Manrope', sans-serif" }}
-                >
-                  Panoramic Memory · 01 of 03
-                </span>
               </div>
             )}
           </div>
@@ -180,12 +174,6 @@ function GallerySpread({ photos }) {
                   >
                     {item.caption}
                   </p>
-                  <span
-                    className="text-[9px] uppercase tracking-[0.25em] text-[#64748B] font-medium"
-                    style={{ fontFamily: "'Manrope', sans-serif" }}
-                  >
-                    {`Memory 0${idx + 2} of 03`}
-                  </span>
                 </div>
               )}
             </div>
@@ -242,7 +230,7 @@ function GallerySpread({ photos }) {
             className="px-3 py-1.5 rounded-full text-xs font-medium bg-white/90 border border-[#CBD5E1]/70 text-[#1E293B] shadow-sm active:scale-95 transition-all"
             style={{ fontFamily: "'Manrope', sans-serif" }}
           >
-            ← Prev Photo
+            ← Back
           </button>
 
           {/* Dots Indicator */}
@@ -271,7 +259,7 @@ function GallerySpread({ photos }) {
             className="px-3 py-1.5 rounded-full text-xs font-medium bg-white/90 border border-[#CBD5E1]/70 text-[#1E293B] shadow-sm active:scale-95 transition-all"
             style={{ fontFamily: "'Manrope', sans-serif" }}
           >
-            Next Photo →
+            Next →
           </button>
         </div>
       </div>
@@ -432,10 +420,7 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
             className="text-[10px] sm:text-[11px] uppercase tracking-[0.32em] text-[#1E293B]/75 font-semibold truncate"
             style={{ fontFamily: "'Manrope', sans-serif" }}
           >
-            Chapter Two · Us
-          </span>
-          <span className="hidden sm:inline-block text-[#94A3B8] text-[10px] tracking-widest uppercase">
-            · {currentPageDef.label}
+            You & Me · {currentPageDef.label}
           </span>
         </div>
 
@@ -489,7 +474,7 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
                 className="text-[10px] sm:text-[11px] uppercase tracking-[0.35em] text-[#E94B70] font-semibold mb-3 block"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
               >
-                Chapter Two · Us
+                You & Me ❤️
               </span>
 
               {/* Display Title */}
@@ -521,7 +506,7 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
                   className="px-2.5 py-1 rounded-full text-[10px] uppercase tracking-[0.2em] font-medium bg-[#EBF3FA] text-[#1E293B]/70 border border-[#93C5FD]/40"
                   style={{ fontFamily: "'Manrope', sans-serif" }}
                 >
-                  4 Photographs · 1 Video Memory · 1 Keepsake Letter
+                  4 photos, a video, and a little letter from me to you. ❤️
                 </span>
               </div>
 
@@ -535,7 +520,7 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
                 className="mt-7 px-8 py-3 rounded-full bg-[#1E293B] text-[#FFFDF9] text-xs uppercase tracking-[0.22em] font-medium shadow-md hover:bg-[#334155] active:scale-95 transition-all flex items-center gap-2"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
               >
-                Enter Our Story →
+                Let&apos;s Look Back →
               </button>
             </motion.div>
           )}
@@ -588,7 +573,7 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
                     className="text-[10px] uppercase tracking-[0.25em] text-[#64748B] font-medium"
                     style={{ fontFamily: "'Manrope', sans-serif" }}
                   >
-                    October In-Person Meeting · Kutty & Best Friend
+                    That Day in May · You &amp; Me ❤️
                   </span>
                 </div>
               </div>
@@ -678,7 +663,7 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
                   className="text-[10px] uppercase tracking-[0.25em] text-[#94A3B8] font-medium"
                   style={{ fontFamily: "'Manrope', sans-serif" }}
                 >
-                  Friendship Keepsake · 2026
+                  A little note for you ❤️
                 </span>
 
                 <div className="text-right">
@@ -749,7 +734,7 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
               >
-                {currentPage >= totalPages - 1 ? 'Complete Journey ✨' : 'Turn Page →'}
+                {currentPage >= totalPages - 1 ? 'Hope this made you smile ❤️' : 'Keep exploring →'}
               </motion.span>
             )}
           </AnimatePresence>
@@ -781,7 +766,7 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
               className="pointer-events-auto px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full text-[11px] sm:text-xs tracking-[0.18em] uppercase font-semibold bg-[#1E293B] text-white hover:bg-[#334155] shadow-md active:scale-95 transition-all flex items-center gap-1.5 disabled:opacity-40"
               style={{ fontFamily: "'Manrope', sans-serif" }}
             >
-              Finish ✨
+              That&apos;s All ❤️
             </button>
           )}
         </div>

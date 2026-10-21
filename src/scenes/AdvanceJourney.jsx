@@ -17,7 +17,7 @@ export function AdvanceJourney() {
   const messages = [
     "Good things take time...",
     "Anticipation is a gift in itself.",
-    "Advance Happy Birthday, Kutty."
+    "Advance happy birthday, my Kutty! ❤️"
   ];
 
   useEffect(() => {

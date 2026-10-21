@@ -32,7 +32,7 @@ export function ShivaFallback2D({
             className="text-[11px] uppercase tracking-[0.42em] font-medium"
             style={{ fontFamily: "'Manrope', sans-serif", color: palette.moonSilver }}
           >
-            A Moment of Blessings
+            Lord Shiva&apos;s Blessings
           </span>
           <span className="text-xs" style={{ color: palette.sacredGold }}>🔱</span>
         </div>
@@ -77,11 +77,12 @@ export function ShivaFallback2D({
                 className="text-base sm:text-lg font-light italic leading-relaxed mb-3"
                 style={{ fontFamily: "'Playfair Display', serif", color: palette.moonSilver }}
               >
-                &ldquo;May peace find you, strength guide you, and blessings follow every step.&rdquo;
+                May Lord Shiva always watch over you, Keerthana, and guide you towards peace and happiness. ❤️
               </p>
               <button
                 type="button"
                 onClick={onReceiveBlessings}
+                aria-label="Receive Lord Shiva's Blessings"
                 className="px-8 py-3 rounded-full font-medium tracking-[0.2em] uppercase text-xs transition-all active:scale-95 cursor-pointer"
                 style={{
                   fontFamily: "'Manrope', sans-serif",
@@ -90,7 +91,7 @@ export function ShivaFallback2D({
                   border: '1px solid rgba(230,199,122,0.60)',
                 }}
               >
-                🔱 Receive Blessings
+                🔱 Receive Lord Shiva&apos;s Blessings
               </button>
             </motion.div>
           ) : (
@@ -109,13 +110,13 @@ export function ShivaFallback2D({
                   className="text-[10px] uppercase tracking-[0.35em] font-medium mb-2"
                   style={{ fontFamily: "'Manrope', sans-serif", color: palette.sacredGold }}
                 >
-                  Blessings for Keerthana
+                  Lord Shiva&apos;s Blessings for Keerthana
                 </p>
                 <p
                   className="text-sm sm:text-base font-light italic leading-relaxed"
                   style={{ fontFamily: "'Playfair Display', serif", color: palette.moonSilver }}
                 >
-                  &ldquo;May Lord Shiva guide your path, protect your heart, give you courage through every challenge, and fill your life with peace, happiness, and countless blessings.&rdquo;
+                  May Lord Shiva bless your dreams, give you wisdom for the choices ahead, and guide you towards a future filled with purpose and joy. 🔱
                 </p>
               </div>
               <button

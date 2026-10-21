@@ -43,7 +43,7 @@ export function DevotionalUIOverlay({
                   color: palette.moonSilver,
                 }}
               >
-                A Moment of Blessings
+                Lord Shiva&apos;s Blessings
               </span>
               <span className="text-xs" style={{ color: palette.sacredGold }}>🔱</span>
             </motion.div>
@@ -72,8 +72,7 @@ export function DevotionalUIOverlay({
                   textShadow: '0 2px 14px rgba(0,0,0,0.85)',
                 }}
               >
-                &ldquo;May peace find you, strength guide you,<br className="hidden sm:inline" />
-                and blessings follow every step.&rdquo;
+                May Lord Shiva always watch over you, Keerthana, and guide you towards peace and happiness. ❤️
               </p>
 
               {/* Ornamental Gold Divider */}
@@ -104,9 +103,9 @@ export function DevotionalUIOverlay({
                   scale: 1.04,
                   boxShadow: '0 8px 36px rgba(230,199,122,0.35)',
                 }}
-                aria-label="Receive Blessings"
+                aria-label="Receive Lord Shiva's Blessings"
               >
-                🔱 Receive Blessings
+                🔱 Receive Lord Shiva&apos;s Blessings
               </motion.button>
             </motion.div>
           )}
@@ -151,7 +150,7 @@ export function DevotionalUIOverlay({
                     color: `${palette.sacredGold}E6`,
                   }}
                 >
-                  Blessings for Keerthana
+                  Lord Shiva&apos;s Blessings for Keerthana
                 </p>
 
                 {/* Authoritative Required Blessing */}
@@ -164,9 +163,7 @@ export function DevotionalUIOverlay({
                     textShadow: '0 2px 10px rgba(0,0,0,0.7)',
                   }}
                 >
-                  &ldquo;May Lord Shiva guide your path, protect your heart,
-                  give you courage through every challenge, and fill your life
-                  with peace, happiness, and countless blessings.&rdquo;
+                  May Lord Shiva bless your dreams, give you wisdom for the choices ahead, and guide you towards a future filled with purpose and joy. 🔱
                 </p>
 
                 {/* Bottom Filigree */}

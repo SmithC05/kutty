@@ -177,7 +177,7 @@ export function MemoryBook({
           }`}
           style={{ fontFamily: "'Manrope', sans-serif" }}
         >
-          {isScrapbook ? 'Assembling Keepsake' : 'Turning Pages'}
+          Getting things ready… ❤️
         </p>
       </motion.div>
     );
@@ -303,7 +303,7 @@ export function MemoryBook({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
               >
-                {currentIndex >= pages.length - 1 ? 'Finish Chapter ✨' : 'Turn Page →'}
+                {currentIndex >= pages.length - 1 ? 'On to Our Memories →' : 'Keep exploring →'}
               </motion.span>
             )}
           </AnimatePresence>

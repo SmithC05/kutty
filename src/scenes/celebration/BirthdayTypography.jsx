@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Film, Volume2, VolumeX } from 'lucide-react';
+import { Sparkles, Film } from 'lucide-react';
 
 /**
  * BirthdayTypography — Main Birthday Dedication, Personal Letter & Actions
@@ -10,7 +10,6 @@ import { Sparkles, Film, Volume2, VolumeX } from 'lucide-react';
  *  - Editable dedication quote
  *  - Editable Personal Message Letter Card from Best Friend
  *  - "Celebrate Again" & "Revisit Memories" action buttons
- *  - Optional audio toggle (deliberate user click, no autoplay)
  */
 
 export function BirthdayTypography({
@@ -22,8 +21,8 @@ export function BirthdayTypography({
   actionsRef,
   onReplay,
   onRevisitMemories,
-  isAudioPlaying,
-  onToggleAudio,
+  _isAudioPlaying,
+  _onToggleAudio,
   className = '',
 }) {
   const {
@@ -37,28 +36,6 @@ export function BirthdayTypography({
 
   return (
     <div className={`flex flex-col select-none ${className}`} style={{ zIndex: 30 }}>
-      {/* ── Top Audio / Ambient Sound Control (Optional) ──────────── */}
-      <div className="flex justify-end mb-2">
-        <button
-          type="button"
-          onClick={onToggleAudio}
-          className="group flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/60 hover:bg-slate-800/80 border border-amber-200/20 backdrop-blur-md text-amber-200/80 hover:text-amber-100 text-xs transition-all focus:outline-none focus:ring-2 focus:ring-amber-400"
-          title={isAudioPlaying ? 'Mute Celebration Music' : 'Play Celebration Music'}
-          aria-label={isAudioPlaying ? 'Mute celebration music' : 'Play celebration music'}
-        >
-          {isAudioPlaying ? (
-            <>
-              <Volume2 className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-              <span className="hidden sm:inline">Music On</span>
-            </>
-          ) : (
-            <>
-              <VolumeX className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100" />
-              <span className="hidden sm:inline">Music Off</span>
-            </>
-          )}
-        </button>
-      </div>
 
       {/* ── Main Birthday Dedication ──────────────────────────────── */}
       <div className="space-y-1 md:space-y-2">
