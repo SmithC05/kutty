@@ -9,6 +9,7 @@ import { SecretVault } from './scenes/SecretVault';
 import { MemoryJourney } from './scenes/MemoryJourney';
 import { ArtistChapter } from './scenes/ArtistChapter';
 import { LordShivaBlessing } from './scenes/LordShivaBlessing';
+import { FinalBirthdayCelebration } from './scenes/FinalBirthdayCelebration';
 import { Loader } from './components/ui/Loader';
 import { Background } from './components/ui/Background';
 import { useMediaLoading } from './hooks/useMediaLoading';
@@ -71,6 +72,11 @@ function App() {
         {/* Phase 11: Lord Shiva's Blessings — Cinematic Devotional Experience */}
         {isLoaded && currentScene === SCENES.LORD_SHIVA_BLESSING && (
           <LordShivaBlessing key="lord-shiva-blessing" />
+        )}
+
+        {/* Phase 12: Grand Finale — 12:00 AM The World Celebrates You */}
+        {isLoaded && currentScene === SCENES.FINAL_MESSAGE && (
+          <FinalBirthdayCelebration key="final-birthday-celebration" />
         )}
       </AnimatePresence>
     </>

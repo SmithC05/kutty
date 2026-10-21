@@ -44,6 +44,7 @@ export function useSceneManager() {
         SCENES.MEMORY_JOURNEY_TOGETHER,
         SCENES.ARTIST_CHAPTER,
         SCENES.LORD_SHIVA_BLESSING,
+        SCENES.FINAL_MESSAGE,
       ];
       if (implementedScenes.includes(nextScene)) {
         preloadNext();
