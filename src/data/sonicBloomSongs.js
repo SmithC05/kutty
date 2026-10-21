@@ -1,24 +1,25 @@
 /**
  * SONIC BLOOM — Six Songs, the Way I See You
  * Central data store for the six-song birthday experience.
- * 
+ *
  * All personal notes and metadata are centralized here for easy refinement
  * without altering visual or layout components.
  */
 
 export const sonicBloomConfig = {
   header: {
-    wordmark: "SONIC BLOOM",
-    subtitleBadge: "Six Songs, the Way I See You",
-    mainHeading: "Six Songs, the Way I See You.",
-    supportingLine: "Six songs. Six little pieces of what you mean to me, Kutty. ❤️",
+    wordmark: 'SONIC BLOOM',
+    subtitleBadge: 'Six Songs, the Way I See You',
+    mainHeading: 'Six Songs, the Way I See You.',
+    supportingLine: 'Six songs. Six little pieces of what you mean to me, Kutty. ❤️',
   },
   closing: {
-    title: "The Full Blossom",
-    message: "Six songs could never say everything, but each one carries a little piece of what you mean to me, Kutty. ❤️",
-    backActionText: "Back to the Birthday",
+    title: 'The Full Bloom',
+    message:
+      'Six songs could never say everything, but each one carries a little piece of what you mean to me, Kutty. ❤️',
+    backActionText: 'Back to the Birthday',
   },
-  playerPreviewNotice: "Design Preview — Audio integration reserved for final phase",
+  sculptureCaption: 'Six songs. Six little pieces of you.',
 };
 
 export const sonicBloomSongs = [
@@ -27,16 +28,15 @@ export const sonicBloomSongs = [
     trackNumber: '01',
     title: 'Unnale',
     film: 'Raja Rani',
-    meaning: 'Her favourite song from her favourite movie.',
-    theme: 'Her Favourite Song — Recognition & Familiarity',
+    // theme: short human label shown in track list
+    theme: 'Her favourite, first of course',
     personalNote: 'Your favourite song had to be the first one, Kutty. ❤️',
     colors: {
-      primary: '#00f0ff',     // Bright Electric Cyan
-      secondary: '#ff5376',   // Playful Coral
-      glow: 'rgba(0, 240, 255, 0.45)',
-      accent: '#38bdf8',
-      core: '#e0f2fe',
-      bgGradient: 'from-cyan-950/40 via-slate-950 to-indigo-950/50',
+      primary: '#0ff0c0',     // Brighter teal-mint — playful energy
+      secondary: '#ff6b6b',   // Warm coral — warmth & recognition
+      glow: 'rgba(15, 240, 192, 0.40)',
+      accent: '#ffd166',      // Butter-yellow spark
+      core: '#e0fff5',
     },
     motion: {
       energy: 1.15,
@@ -57,16 +57,14 @@ export const sonicBloomSongs = [
     trackNumber: '02',
     title: 'Chella Magale',
     film: 'Jana Nayagan',
-    meaning: 'The perspective on her—how precious she is and wanting her to flourish.',
-    theme: 'How Precious You Are — Flourish & Grace',
+    theme: 'How precious you are to me',
     personalNote: 'I hope you always know how precious you are to the people who care about you.',
     colors: {
-      primary: '#c084fc',     // Soft Lavender
-      secondary: '#67e8f9',   // Pale Cyan
-      glow: 'rgba(192, 132, 252, 0.4)',
+      primary: '#b57bee',     // Warm lavender — flowing, gentle
+      secondary: '#5eead4',   // Soft teal
+      glow: 'rgba(181, 123, 238, 0.38)',
       accent: '#e9d5ff',
-      core: '#f5f3ff',
-      bgGradient: 'from-purple-950/40 via-slate-950 to-cyan-950/40',
+      core: '#f5f0ff',
     },
     motion: {
       energy: 0.85,
@@ -86,17 +84,16 @@ export const sonicBloomSongs = [
     id: 'magale',
     trackNumber: '03',
     title: 'Magale',
-    film: 'Special Selection', // Configurable film credit
-    meaning: 'Feeling accepted, understood, and cared for even when struggling with yourself.',
-    theme: 'Accepted & Understood — Through Every Day',
-    personalNote: "You have a way of making me feel understood, even on days when I don't quite understand myself.",
+    film: null, // film credit unverified — left blank
+    theme: 'You make me feel understood',
+    personalNote:
+      "You have a way of making me feel understood, even on days when I don't quite understand myself.",
     colors: {
-      primary: '#818cf8',     // Translucent Periwinkle
-      secondary: '#c4b5fd',   // Pale Lilac
-      glow: 'rgba(129, 140, 248, 0.42)',
+      primary: '#7c8ff8',     // Periwinkle-indigo — layered, contemplative
+      secondary: '#c4b5fd',   // Pale lilac shimmer
+      glow: 'rgba(124, 143, 248, 0.42)',
       accent: '#a5b4fc',
       core: '#eef2ff',
-      bgGradient: 'from-indigo-950/45 via-slate-950 to-blue-950/40',
     },
     motion: {
       energy: 0.9,
@@ -117,19 +114,18 @@ export const sonicBloomSongs = [
     trackNumber: '04',
     title: 'Alakolava',
     film: 'OM Chapter 1',
-    meaning: 'How precious she is to him—his favourite person, someone irreplaceable in his life.',
-    theme: 'Quietly Irreplaceable — Meaningful Connection',
-    personalNote: "Out of all the people who come into our lives, some quietly become irreplaceable. You're one of those people to me. ❤️",
+    theme: 'My favourite person',
+    personalNote:
+      "Out of all the people who come into our lives, some quietly become irreplaceable. You're one of those people to me. ❤️",
     colors: {
-      primary: '#9333ea',     // Deep Violet
-      secondary: '#fb7185',   // Luminous Coral
-      glow: 'rgba(147, 51, 234, 0.48)',
+      primary: '#9d3fe8',     // Rich violet — intricate, important
+      secondary: '#ff7c5c',   // Tangerine-coral
+      glow: 'rgba(157, 63, 232, 0.46)',
       accent: '#f43f5e',
       core: '#faf5ff',
-      bgGradient: 'from-violet-950/50 via-slate-950 to-rose-950/35',
     },
     motion: {
-      energy: 1.0,
+      energy: 1.05,
       particleSpeed: 1.0,
       petalSpread: 0.95,
       style: 'intimate',
@@ -146,21 +142,20 @@ export const sonicBloomSongs = [
     id: 'engey-andha-vennnila',
     trackNumber: '05',
     title: 'Engey Andha Vennnila',
-    film: 'Timeless Melody',
-    meaning: 'Someone he turns to when sad. Her presence feels safe, caring, and comforting.',
-    theme: 'A Safe Sanctuary — Warmth, Care & Comfort',
-    personalNote: "When life feels heavy, you're someone I wish I could sit beside and talk to. You make me feel safe in a way that's difficult to explain.",
+    film: null, // film credit unverified — left blank
+    theme: 'Where I find comfort',
+    personalNote:
+      "When life feels heavy, you're someone I wish I could sit beside and talk to. You make me feel safe in a way that's difficult to explain.",
     colors: {
-      primary: '#38bdf8',     // Muted Periwinkle / Sky
-      secondary: '#818cf8',   // Midnight Indigo Accent
-      glow: 'rgba(56, 189, 248, 0.35)',
+      primary: '#4aa8d8',     // Quiet midnight sky blue
+      secondary: '#6d7fe8',   // Periwinkle dusk
+      glow: 'rgba(74, 168, 216, 0.32)',
       accent: '#93c5fd',
       core: '#f0f9ff',
-      bgGradient: 'from-sky-950/35 via-slate-950 to-blue-950/50',
     },
     motion: {
-      energy: 0.65,
-      particleSpeed: 0.6,
+      energy: 0.62,
+      particleSpeed: 0.55,
       petalSpread: 0.9,
       style: 'quiet',
     },
@@ -177,20 +172,19 @@ export const sonicBloomSongs = [
     trackNumber: '06',
     title: 'Life of Pazham',
     film: 'Thiruchitrambalam',
-    meaning: 'How she motivates him, lightens his outlook, and influences his life.',
-    theme: 'Gratitude & Inspiration — Full Coordinated Bloom',
-    personalNote: "You've probably motivated me in ways you don't even realise, Kutty. I'm really glad you're part of my life. ❤️",
+    theme: 'You keep me going',
+    personalNote:
+      "You've probably motivated me in ways you don't even realise, Kutty. I'm really glad you're part of my life. ❤️",
     colors: {
-      primary: '#06b6d4',     // Electric Cyan
-      secondary: '#f43f5e',   // Radiant Coral Rose
-      glow: 'rgba(6, 182, 212, 0.5)',
-      accent: '#f59e0b',      // Sunrise Amber Warmth
+      primary: '#06c9ac',     // Uplifting bright cyan-teal
+      secondary: '#ff6040',   // Energetic coral-red
+      glow: 'rgba(6, 201, 172, 0.50)',
+      accent: '#fbbf24',      // Warm amber — brightness, life
       core: '#fffbeb',
-      bgGradient: 'from-cyan-950/45 via-slate-950 to-amber-950/35',
     },
     motion: {
-      energy: 1.2,
-      particleSpeed: 1.15,
+      energy: 1.25,
+      particleSpeed: 1.2,
       petalSpread: 1.2,
       style: 'harmonious',
     },

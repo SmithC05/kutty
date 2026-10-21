@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * TrackSelector
- * 
- * Sleek, refined vertical track selector for the six songs.
- * Shows number, title, film credit, and concise emotional theme label.
- * Active track expands its personal note with generous typography.
- * Supports full keyboard navigation and accessible touch targets.
+ *
+ * A curated, handcrafted track list — not a data table.
+ * The selected track is visually elevated with its song colour and a larger presence.
+ * The five inactive tracks form a compact, well-spaced list with minimal visual noise.
+ *
+ * Keyboard navigation: Arrow keys, Home, End.
  */
 export function TrackSelector({
   tracks = [],
@@ -35,7 +36,6 @@ export function TrackSelector({
 
     if (nextIndex !== index && onSelectTrack) {
       onSelectTrack(nextIndex);
-      // Focus next item button
       const buttons = containerRef.current?.querySelectorAll('button[role="tab"]');
       if (buttons && buttons[nextIndex]) {
         buttons[nextIndex].focus();
@@ -48,19 +48,15 @@ export function TrackSelector({
       ref={containerRef}
       role="tablist"
       aria-label="Six Songs Sequence"
-      className={`flex flex-col space-y-1 sm:space-y-1.5 select-none ${className}`}
+      className={`flex flex-col select-none ${className}`}
     >
       {tracks.map((track, idx) => {
         const isActive = idx === activeTrackIndex;
-        const color = track.colors?.primary || '#00f0ff';
-        const secondaryColor = track.colors?.secondary || '#c084fc';
+        const color = track.colors?.primary || '#0ff0c0';
 
         return (
-          <div
-            key={track.id}
-            className="group relative transition-all duration-300"
-          >
-            {/* Interactive Track Header Button */}
+          <div key={track.id} className="group relative">
+            {/* Track row */}
             <button
               type="button"
               role="tab"
@@ -70,74 +66,76 @@ export function TrackSelector({
               tabIndex={0}
               onClick={() => onSelectTrack(idx)}
               onKeyDown={(e) => handleKeyDown(e, idx)}
-              className={`w-full text-left min-h-[44px] px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all duration-300 flex items-center justify-between cursor-pointer border ${
+              className={`w-full text-left min-h-[44px] px-2.5 sm:px-3 py-2 sm:py-2.5 transition-all duration-300 flex items-center gap-3 cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent ${
                 isActive
-                  ? 'bg-gradient-to-r from-slate-900/95 via-indigo-950/70 to-slate-900/85 border-cyan-400/40 shadow-[0_2px_16px_rgba(0,240,255,0.12)]'
-                  : 'bg-slate-950/40 hover:bg-slate-900/50 border-white/5 hover:border-white/15'
-              } focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950`}
+                  ? 'bg-white/[0.05]'
+                  : 'hover:bg-white/[0.03]'
+              }`}
+              style={{
+                focusVisibleRingColor: color,
+              }}
             >
-              {/* Left Column: Index & Song Details */}
-              <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0 flex-1">
-                {/* Illuminated Track Index Pill */}
-                <span
-                  className={`font-sonic-mono text-[11px] sm:text-xs font-bold tracking-wider transition-colors duration-300 px-1.5 py-0.5 rounded ${
-                    isActive
-                      ? 'text-cyan-300 bg-cyan-950/80 border border-cyan-400/40'
-                      : 'text-slate-300 group-hover:text-white bg-slate-900/70 border border-white/5'
-                  }`}
-                >
-                  {track.trackNumber}
-                </span>
+              {/* Track number — small, quiet */}
+              <span
+                className={`font-sonic-mono text-[10px] sm:text-[11px] font-bold tabular-nums flex-shrink-0 w-5 text-right transition-colors duration-300 ${
+                  isActive ? '' : 'text-slate-600 group-hover:text-slate-500'
+                }`}
+                style={isActive ? { color } : {}}
+              >
+                {track.trackNumber}
+              </span>
 
-                {/* Song Title & Film */}
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-baseline space-x-1.5 leading-tight">
-                    <span
-                      className={`font-sonic-body text-[13px] sm:text-[14px] font-semibold tracking-normal transition-colors truncate ${
-                        isActive
-                          ? 'text-white'
-                          : 'text-slate-200 group-hover:text-white'
-                      }`}
-                    >
-                      {track.title}
-                    </span>
-                    {track.film && (
-                      <span className="font-sonic-body text-[11px] text-slate-300/80 font-normal truncate">
-                        • {track.film}
-                      </span>
-                    )}
-                  </div>
-                  {/* Emotional Theme Label */}
-                  <p
-                    className={`font-sonic-body text-[10.5px] sm:text-[11px] tracking-normal leading-tight transition-colors truncate mt-0.5 ${
-                      isActive ? 'text-cyan-300 font-medium' : 'text-slate-300'
+              {/* Vertical colour bar — only visible when active */}
+              <span
+                className="w-[2.5px] flex-shrink-0 rounded-full transition-all duration-500"
+                style={{
+                  height: isActive ? '32px' : '14px',
+                  backgroundColor: isActive ? color : 'rgba(255,255,255,0.06)',
+                  opacity: isActive ? 1 : 0.6,
+                }}
+              />
+
+              {/* Song details */}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className={`font-sonic-body leading-tight transition-all duration-300 truncate ${
+                      isActive
+                        ? 'text-[14px] sm:text-[15px] font-semibold text-white'
+                        : 'text-[13px] sm:text-[14px] font-normal text-slate-300 group-hover:text-slate-100'
                     }`}
                   >
-                    {track.theme}
-                  </p>
+                    {track.title}
+                  </span>
+                  {track.film && (
+                    <span className="font-sonic-body text-[11px] text-slate-500 font-normal truncate hidden sm:inline">
+                      {track.film}
+                    </span>
+                  )}
                 </div>
+                {/* Short human theme label */}
+                <p
+                  className={`font-sonic-body text-[10.5px] sm:text-[11px] leading-tight transition-colors duration-300 truncate mt-[2px] ${
+                    isActive ? 'font-normal' : 'text-slate-500 group-hover:text-slate-400'
+                  }`}
+                  style={isActive ? { color: `${color}cc` } : {}}
+                >
+                  {track.theme}
+                </p>
               </div>
 
-              {/* Right Column: Visual Selected Mark */}
-              <div className="flex items-center pl-2 flex-shrink-0">
-                {isActive ? (
-                  <span className="flex h-2.5 w-2.5 relative">
-                    <span
-                      className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-                      style={{ backgroundColor: color }}
-                    />
-                    <span
-                      className="relative inline-flex rounded-full h-2.5 w-2.5"
-                      style={{ backgroundColor: color }}
-                    />
-                  </span>
-                ) : (
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-600/70 group-hover:bg-slate-400 transition-colors" />
+              {/* Selection indicator — right edge, only for active */}
+              <div className="flex-shrink-0 w-5 flex justify-end">
+                {isActive && (
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ backgroundColor: color, boxShadow: `0 0 6px ${color}` }}
+                  />
                 )}
               </div>
             </button>
 
-            {/* Expanded Personal Note for the Active Track */}
+            {/* Expanded personal note for active track */}
             <AnimatePresence initial={false}>
               {isActive && (
                 <motion.div
@@ -151,29 +149,24 @@ export function TrackSelector({
                   className="overflow-hidden"
                 >
                   <div
-                    className="mt-1 mb-1 mx-0.5 px-3 py-2 sm:py-2.5 rounded-lg bg-gradient-to-r from-indigo-950/75 via-slate-900/85 to-slate-950/90 border-l-2 border-t border-r border-b border-t-white/5 border-r-white/5 border-b-white/5 shadow-inner"
-                    style={{ borderLeftColor: color }}
+                    className="mx-3 mb-1 px-3 py-2.5 sm:py-3 rounded-lg"
+                    style={{
+                      background: `linear-gradient(135deg, ${color}0a 0%, rgba(255,255,255,0.025) 100%)`,
+                      borderLeft: `2px solid ${color}55`,
+                    }}
                   >
-                    <div className="flex items-center space-x-1.5 mb-1">
-                      <span
-                        className="inline-block w-1.5 h-1.5 rounded-full"
-                        style={{ backgroundColor: secondaryColor }}
-                      />
-                      <span className="font-sonic-mono text-[9px] uppercase tracking-[0.2em] font-semibold text-slate-300/90">
-                        Personal Note
-                      </span>
-                    </div>
-
-                    <p className="font-sonic-body text-xs sm:text-[13px] leading-relaxed text-slate-100 italic tracking-normal">
-                      “{track.personalNote}”
+                    <p className="font-sonic-body text-[12px] sm:text-[13px] leading-relaxed text-slate-200 tracking-[0.01em]">
+                      &ldquo;{track.personalNote}&rdquo;
                     </p>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Hairline subtle divider */}
-            <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/5 to-transparent mt-0.5" />
+            {/* Hairline divider — very subtle */}
+            {idx < tracks.length - 1 && (
+              <div className="h-[1px] w-full" style={{ background: 'rgba(255,255,255,0.035)' }} />
+            )}
           </div>
         );
       })}
