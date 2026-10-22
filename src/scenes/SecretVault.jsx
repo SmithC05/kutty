@@ -200,7 +200,7 @@ function KeyButton({ label, onPress, disabled, reducedMotion }) {
    ───────────────────────────────────────────────────────────── */
 export function SecretVault() {
   const { next } = useScene();
-  const { playSfx } = useAudio();
+  const { playSfx, playTrack } = useAudio();
   const reducedMotion = useReducedMotion();
 
   const [pin, setPin] = useState('');
@@ -211,6 +211,11 @@ export function SecretVault() {
 
   const navigatingRef = useRef(false);
   const timeoutsRef = useRef([]);
+
+  // Ensure remo continues playing while entering PIN
+  useEffect(() => {
+    playTrack('remo');
+  }, [playTrack]);
 
   /* Safe timer registration that cleans up on unmount */
   const registerTimeout = useCallback((fn, delay) => {
@@ -252,6 +257,9 @@ export function SecretVault() {
           playSfx('sparkle');
           playSfx('heartbeat');
 
+          // Transition to Bus Love Pt 2 on successful PIN entry
+          playTrack('bus_love');
+
           /* Short delightful celebration before dissolve */
           registerTimeout(() => {
             setStatus('dissolving');
@@ -276,7 +284,7 @@ export function SecretVault() {
         }
       }
     },
-    [pin, status, next, playSfx, registerTimeout]
+    [pin, status, next, playSfx, playTrack, registerTimeout]
   );
 
   /* Keyboard entry support (0-9, Backspace) */

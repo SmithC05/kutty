@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useScene } from '../../context/SceneContext';
+import { useAudio } from '../../context';
 import { SCENES } from '../../constants';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { sonicBloomSongs, sonicBloomConfig } from '../../data/sonicBloomSongs';
@@ -14,7 +15,7 @@ import { ClosingDedication } from './ClosingDedication';
 import { ConcertAtmosphere } from './ConcertAtmosphere';
 import { ConcertPyrotechnics } from './ConcertPyrotechnics';
 import { TrackBurst } from './TrackBurst';
-import { triggerDevPyrotechnic } from './audioAnalyzer';
+import { triggerDevPyrotechnic, SonicBloomAudioEngine } from './audioAnalyzer';
 
 function checkWebGLSupport() {
   try {
@@ -44,29 +45,167 @@ function useIsMobile() {
 
 export function SonicBloomScene() {
   const { transitionTo } = useScene();
+  const { stopBgm } = useAudio();
   const reducedMotion = useReducedMotion();
   const isMobile = useIsMobile();
+
+  // Stop / fade out background music while in Sonic Bloom
+  useEffect(() => {
+    stopBgm(500);
+  }, [stopBgm]);
 
   const [hasWebGL, setHasWebGL] = useState(true);
   const [activeTrackIndex, setActiveTrackIndex] = useState(0);
   const [isTransitionActive, setIsTransitionActive] = useState(!reducedMotion);
   const [isClosingState, setIsClosingState] = useState(false);
 
-  // Future Audio Reactivity State Interface
-  // (Deterministic ambient values until audio source setup in final stage)
-  const audioReactivity = useMemo(
-    () => ({
-      amplitude: 0,
-      lowFreq: 0,
-      midFreq: 0,
-      highFreq: 0,
-      progress: 0,
-      isPlaying: false,
-      isQuiet: false,
-      isSustainedHigh: false,
-    }),
-    []
-  );
+  // Audio Playback & Real-time Reactivity Engine
+  const audioRef = useRef(null);
+  const engineRef = useRef(null);
+  const isPlayingRef = useRef(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [audioReactivity, setAudioReactivity] = useState({
+    amplitude: 0,
+    lowFreq: 0,
+    midFreq: 0,
+    highFreq: 0,
+    progress: 0,
+    isPlaying: false,
+    isQuiet: false,
+    isSustainedHigh: false,
+  });
+
+  // Keep isPlayingRef in sync for event callbacks
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
+  // Initialize engine and audio element
+  useEffect(() => {
+    const engine = new SonicBloomAudioEngine();
+    engineRef.current = engine;
+
+    const audio = new Audio();
+    audio.preload = 'metadata';
+    audioRef.current = audio;
+
+    const initialTrack = sonicBloomSongs[0];
+    if (initialTrack?.audio?.src) {
+      audio.src = initialTrack.audio.src;
+      setDuration(initialTrack.audio.duration || 0);
+    }
+
+    const onTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+    const onLoadedMetadata = () => {
+      setDuration(audio.duration || 0);
+    };
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    const onEnded = () => {
+      setIsPlaying(false);
+      setActiveTrackIndex((prev) => {
+        if (prev < sonicBloomSongs.length - 1) {
+          return prev + 1;
+        } else {
+          setIsClosingState(true);
+          return prev;
+        }
+      });
+    };
+
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('loadedmetadata', onLoadedMetadata);
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+    audio.addEventListener('ended', onEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', onTimeUpdate);
+      audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('ended', onEnded);
+      audio.pause();
+      audio.src = '';
+      engine.destroy();
+    };
+  }, []);
+
+  // Update track src when activeTrackIndex changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const track = sonicBloomSongs[activeTrackIndex];
+    if (track?.audio?.src) {
+      const wasPlaying = isPlayingRef.current;
+      audio.src = track.audio.src;
+      audio.currentTime = 0;
+      setCurrentTime(0);
+      setDuration(track.audio.duration || 0);
+
+      if (wasPlaying) {
+        if (engineRef.current) {
+          engineRef.current.connectAudioElement(audio);
+        }
+        audio.play().catch((err) => {
+          console.warn('[SonicBloom] Playback interrupted on track switch:', err);
+        });
+      }
+    }
+  }, [activeTrackIndex]);
+
+  // Continuous animation loop for Web Audio API frequency analysis
+  useEffect(() => {
+    let animId;
+    let lastTime = performance.now();
+
+    const loop = (now) => {
+      const deltaMs = now - lastTime;
+      lastTime = now;
+
+      if (engineRef.current) {
+        const nextState = engineRef.current.update(deltaMs);
+        setAudioReactivity(nextState);
+      }
+      animId = requestAnimationFrame(loop);
+    };
+
+    animId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  const handleTogglePlay = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      const track = sonicBloomSongs[activeTrackIndex];
+      if (!audio.src && track?.audio?.src) {
+        audio.src = track.audio.src;
+      }
+      if (engineRef.current) {
+        engineRef.current.connectAudioElement(audio);
+      }
+      audio.play().catch((err) => {
+        console.warn('[SonicBloom] Audio play failed:', err);
+      });
+    }
+  }, [isPlaying, activeTrackIndex]);
+
+  const handleSeek = useCallback((time) => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = time;
+      setCurrentTime(time);
+    }
+  }, []);
 
   useEffect(() => {
     setHasWebGL(checkWebGLSupport());
@@ -100,6 +239,9 @@ export function SonicBloomScene() {
   }, []);
 
   const handleBackToBirthday = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
     transitionTo(SCENES.FINAL_MESSAGE);
   }, [transitionTo]);
 
@@ -343,6 +485,11 @@ export function SonicBloomScene() {
                       activeTrack={activeTrack}
                       activeTrackIndex={activeTrackIndex}
                       totalTracks={sonicBloomSongs.length}
+                      isPlaying={isPlaying}
+                      currentTime={currentTime}
+                      duration={duration}
+                      onTogglePlay={handleTogglePlay}
+                      onSeek={handleSeek}
                       onPreviousTrack={handlePreviousTrack}
                       onNextTrack={handleNextTrack}
                       onPreviewEnding={() => setIsClosingState(true)}

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
-import { useScene } from '../context/SceneContext';
+import { useScene, useAudio } from '../context';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { ShivaScene3D } from './shiva/ShivaScene3D';
 import { DevotionalUIOverlay } from './shiva/DevotionalUIOverlay';
@@ -38,6 +38,7 @@ function checkWebGLSupport() {
 
 export function LordShivaBlessing() {
   const { next } = useScene();
+  const { playTrack } = useAudio();
   const reducedMotion = useReducedMotion();
 
   const [hasWebGL, setHasWebGL] = useState(true);
@@ -48,6 +49,11 @@ export function LordShivaBlessing() {
 
   // Duplicate-tap guard
   const actionFiredRef = useRef(false);
+
+  // Fade out Dheema and start Deva Deva on entering Lord Shiva's Blessings
+  useEffect(() => {
+    playTrack('deva_deva');
+  }, [playTrack]);
 
   // Check WebGL availability on mount
   useEffect(() => {

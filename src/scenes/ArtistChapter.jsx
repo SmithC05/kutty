@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useScene } from '../context/SceneContext';
+import { useScene, useAudio } from '../context';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -805,7 +805,6 @@ function StudioReveal({ onComplete, reducedMotion }) {
               >
                 &ldquo;A little piece of you, captured in pencil.&rdquo;
               </p>
-
               <div className="flex items-center justify-center gap-3 w-full max-w-xs mb-3">
                 <button
                   type="button"
@@ -846,8 +845,14 @@ function StudioReveal({ onComplete, reducedMotion }) {
 // ─── Root Orchestrator: ArtistChapter ─────────────────────────────────────────
 export function ArtistChapter() {
   const { next } = useScene();
+  const { playTrack } = useAudio();
   const reducedMotion = useReducedMotion();
   const [act, setAct] = useState('studio'); // 'studio' | 'reveal'
+
+  // Fade out Friendship Anthem and start Dheema for the pencil portrait experience
+  useEffect(() => {
+    playTrack('dheema');
+  }, [playTrack]);
 
   const handleBegin = useCallback(() => {
     setAct('reveal');

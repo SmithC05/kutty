@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import gsap from 'gsap';
-import { useScene } from '../context/SceneContext';
+import { useScene, useAudio } from '../context';
 import { SCENES } from '../constants';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { birthdayFinaleData } from '../data/birthdayMessage';
@@ -36,14 +36,18 @@ import { BirthdayTypography } from './celebration/BirthdayTypography';
  *             and starlight sparkles while Keerthana reads and enjoys the scene.
  */
 
-const AUDIO_SRC = '/audio/music/intro.mp3';
-
 export function FinalBirthdayCelebration() {
   const { transitionTo, hasCompletedCelebrationIntro, setHasCompletedCelebrationIntro } = useScene();
+  const { playTrack, stopBgm } = useAudio();
   const reducedMotion = useReducedMotion();
   const isTransitioningToSonicRef = useRef(false);
   const [showSonicButton, setShowSonicButton] = useState(false);
   const sonicTimerRef = useRef(null);
+
+  // Fade out Deva Deva and start Happy Birthday Thatsa for the grand finale
+  useEffect(() => {
+    playTrack('happy_birthday');
+  }, [playTrack]);
 
   const startSonicButtonTimer = useCallback(() => {
     if (sonicTimerRef.current) {
@@ -77,48 +81,12 @@ export function FinalBirthdayCelebration() {
   const timelineRef = useRef(null);
   const isReplayingRef = useRef(false);
 
-  // Audio ref for optional user-triggered celebration music
-  const audioRef = useRef(null);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-
   // Lighting & visual state management
   const [spotlightProgress, setSpotlightProgress] = useState(0);
   const [auraIntensity, setAuraIntensity] = useState(0);
   const [floorGlowIntensity, setFloorGlowIntensity] = useState(0);
   const [isPortraitFloating, setIsPortraitFloating] = useState(false);
   const [canvasMode, setCanvasMode] = useState('continuous');
-
-  // Handle optional celebration audio toggle (deliberate click only, no autoplay)
-  const toggleAudio = useCallback(() => {
-    if (!audioRef.current) {
-      const audio = new Audio(AUDIO_SRC);
-      audio.loop = true;
-      audio.volume = 0.5;
-      audioRef.current = audio;
-    }
-
-    if (isAudioPlaying) {
-      audioRef.current.pause();
-      setIsAudioPlaying(false);
-    } else {
-      audioRef.current.play().then(() => {
-        setIsAudioPlaying(true);
-      }).catch((err) => {
-        console.warn('[FinalBirthdayCelebration] Audio play blocked or not found:', err);
-      });
-    }
-  }, [isAudioPlaying]);
-
-  // Clean up audio on unmount
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-        audioRef.current = null;
-      }
-    };
-  }, []);
 
   // Main Coordinated GSAP Cinematic Timeline
   useEffect(() => {
@@ -377,6 +345,9 @@ export function FinalBirthdayCelebration() {
     isTransitioningToSonicRef.current = true;
     setHasCompletedCelebrationIntro?.(true);
 
+    // Fade out and stop finale BGM so it never competes with Sonic Bloom
+    stopBgm(800);
+
     if (reducedMotion) {
       transitionTo(SCENES.SONIC_BLOOM);
       return;
@@ -403,7 +374,7 @@ export function FinalBirthdayCelebration() {
     if (portraitRef.current) {
       tl.to(portraitRef.current, { opacity: 0, scale: 0.96, duration: 0.75, ease: 'power2.inOut' }, 0.1);
     }
-  }, [reducedMotion, transitionTo, setHasCompletedCelebrationIntro]);
+  }, [reducedMotion, transitionTo, setHasCompletedCelebrationIntro, stopBgm]);
 
   return (
     <div
@@ -454,8 +425,6 @@ export function FinalBirthdayCelebration() {
           onOpenSonicBloom={handleOpenSonicBloom}
           showSonicBloomButton={showSonicButton}
           reducedMotion={reducedMotion}
-          isAudioPlaying={isAudioPlaying}
-          onToggleAudio={toggleAudio}
           portraitSlot={
             <BirthdayPortrait
               ref={portraitRef}

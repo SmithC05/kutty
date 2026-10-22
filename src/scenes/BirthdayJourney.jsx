@@ -580,6 +580,11 @@ export function BirthdayJourney() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const transitioningRef = useRef(false);
 
+  // Maintain remo.mp3 across the birthday reveal sequence
+  useEffect(() => {
+    playTrack('remo');
+  }, [playTrack]);
+
   useCelebrationCanvas(canvasRef, reducedMotion);
 
   /* Intentional continuation trigger: only executes when Keerthana clicks the button */
@@ -627,7 +632,6 @@ export function BirthdayJourney() {
       tl.fromTo(sceneRef.current,
         { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power2.inOut' }
       );
-      tl.call(() => playTrack('intro'));
 
       if (!reducedMotion && panelTopRef.current && panelBotRef.current) {
         tl.fromTo([panelTopRef.current, panelBotRef.current],

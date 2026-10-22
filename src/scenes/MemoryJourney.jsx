@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useScene } from '../context/SceneContext';
+import { useScene, useAudio } from '../context';
 import { chapter1Data, chapter2Data } from '../data/memories';
 import { MemoryBook } from '../components/memory-engine/MemoryBook';
 import { ScrapbookExperience } from '../components/memory-engine/ScrapbookExperience';
@@ -254,6 +254,7 @@ function ChapterTransitionScreen({ onContinue }) {
 // ─────────────────────────────────────────────────────────────────────────────
 export function MemoryJourney({ chapterIndex: propChapterIndex }) {
   const { next, currentScene } = useScene();
+  const { playTrack } = useAudio();
 
   // Resolve active chapter index
   const activeChapterIndex =
@@ -271,6 +272,20 @@ export function MemoryJourney({ chapterIndex: propChapterIndex }) {
     activeChapterIndex === 1
   );
 
+  // Chapter 1 (Just You): Ensure bus_love is active throughout
+  useEffect(() => {
+    if (activeChapterIndex === 0) {
+      playTrack('bus_love');
+    }
+  }, [activeChapterIndex, playTrack]);
+
+  // If Chapter 2 is active and transition screen has already completed, ensure friendship anthem is playing
+  useEffect(() => {
+    if (activeChapterIndex === 1 && !showChapter2Transition) {
+      playTrack('friendship');
+    }
+  }, [activeChapterIndex, showChapter2Transition, playTrack]);
+
   // Handle Chapter 1 completion -> navigate to Chapter 2
   const handleChapter1Complete = () => {
     next();
@@ -281,6 +296,11 @@ export function MemoryJourney({ chapterIndex: propChapterIndex }) {
     next();
   };
 
+  // Triggered when Keerthana clicks "Enter Our Story →" (or the transition card) to enter Us
+  const handleEnterUs = useCallback(() => {
+    playTrack('friendship');
+    setShowChapter2Transition(false);
+  }, [playTrack]);
 
   // ── Render Chapter One: "Just You" ──
   if (activeChapterIndex === 0) {
@@ -313,7 +333,7 @@ export function MemoryJourney({ chapterIndex: propChapterIndex }) {
         {showChapter2Transition ? (
           <ChapterTransitionScreen
             key="ch2-transition"
-            onContinue={() => setShowChapter2Transition(false)}
+            onContinue={handleEnterUs}
           />
         ) : (
           <ScrapbookExperience

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Typography } from '../components/core/Typography';
 import { Screen } from '../components/core/Screen';
 import { Countdown } from '../components/ui/Countdown';
-import { useTime } from '../context';
+import { useTime, useAudio } from '../context';
 import { fadeIn, easeCinematic } from '../animations/presets';
 
 /**
@@ -12,6 +12,7 @@ import { fadeIn, easeCinematic } from '../animations/presets';
  */
 export function AdvanceJourney() {
   const timeState = useTime();
+  const { playTrack, stopBgm } = useAudio();
   const [step, setStep] = useState(0);
 
   const messages = [
@@ -19,6 +20,14 @@ export function AdvanceJourney() {
     "Anticipation is a gift in itself.",
     "Advance happy birthday, my Kutty! ❤️"
   ];
+
+  // Start intro.mp3 when Advance Journey becomes active, fade out on leave
+  useEffect(() => {
+    playTrack('intro');
+    return () => {
+      stopBgm(800);
+    };
+  }, [playTrack, stopBgm]);
 
   useEffect(() => {
     // Sequence the text messages

@@ -1,33 +1,46 @@
-import React, { useState } from 'react';
-import { Play, SkipBack, SkipForward, Music } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { Play, Pause, SkipBack, SkipForward, Music } from 'lucide-react';
+
+function formatTime(seconds) {
+  if (!seconds || isNaN(seconds)) return '0:00';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
 
 /**
  * AudioPlayerShell
  *
- * A calm, integral player interface — not a settings panel.
- * Clearly shows the selected song state without claiming anything is playing.
- * Navigation between songs is always live and functional.
- * Audio playback remains in the final integration phase.
+ * A calm, integral player interface.
+ * Shows selected song state and live playback progress.
+ * Navigation between songs and interactive audio playback are fully live.
  */
 export function AudioPlayerShell({
   activeTrack,
   activeTrackIndex = 0,
   totalTracks = 6,
+  isPlaying = false,
+  currentTime = 0,
+  duration = 0,
+  onTogglePlay,
+  onSeek,
   onPreviousTrack,
   onNextTrack,
   onPreviewEnding,
   className = '',
 }) {
-  const [showNotice, setShowNotice] = useState(false);
-
-  const handlePlayAttempt = () => {
-    setShowNotice(true);
-    setTimeout(() => setShowNotice(false), 3800);
-  };
-
   const primaryColor = activeTrack?.colors?.primary || '#0ff0c0';
   const isLastTrack = activeTrackIndex === totalTracks - 1;
+  const effectiveDuration = duration || activeTrack?.audio?.duration || 30;
+  const progressPercent = Math.min(100, Math.max(0, (currentTime / effectiveDuration) * 100));
+
+  const handleProgressBarClick = (e) => {
+    if (!onSeek) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+    onSeek(ratio * effectiveDuration);
+  };
 
   return (
     <div
@@ -38,15 +51,20 @@ export function AudioPlayerShell({
         backdropFilter: 'blur(16px)',
       }}
     >
-      {/* Song identity line — what is selected, not what is "playing" */}
+      {/* Song identity line */}
       <div className="flex items-center justify-between mb-2 gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          {/* YOUR PICK indicator — no false playing state */}
           <span
-            className="text-[9px] font-sonic-mono font-bold tracking-[0.22em] uppercase flex-shrink-0"
-            style={{ color: `${primaryColor}aa` }}
+            className="text-[9px] font-sonic-mono font-bold tracking-[0.22em] uppercase flex-shrink-0 flex items-center gap-1.5"
+            style={{ color: `${primaryColor}cc` }}
           >
-            YOUR PICK
+            {isPlaying && (
+              <span
+                className="inline-block w-1.5 h-1.5 rounded-full animate-pulse"
+                style={{ backgroundColor: primaryColor }}
+              />
+            )}
+            {isPlaying ? 'PLAYING' : 'YOUR PICK'}
           </span>
           <span className="text-slate-600 text-[10px]">·</span>
           <span className="font-sonic-body text-[12px] sm:text-[13px] font-medium text-slate-200 truncate">
@@ -59,7 +77,7 @@ export function AudioPlayerShell({
           )}
         </div>
 
-        {/* Explore ending — only on track 6, and not labelled as a dev feature */}
+        {/* Explore ending — only on track 6 */}
         {isLastTrack && onPreviewEnding && (
           <button
             type="button"
@@ -84,26 +102,34 @@ export function AudioPlayerShell({
         )}
       </div>
 
-      {/* Progress track — elegantly resting at zero */}
+      {/* Interactive Progress track */}
       <div className="space-y-1 mb-2.5">
         <div
-          className="relative w-full h-[3px] rounded-full overflow-hidden"
-          style={{ background: 'rgba(255,255,255,0.07)' }}
-          title="Audio coming in the final stage"
+          role="slider"
+          aria-label="Audio progress"
+          aria-valuenow={Math.round(progressPercent)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          onClick={handleProgressBarClick}
+          className="relative w-full h-[5px] sm:h-[4px] hover:h-[6px] rounded-full overflow-hidden cursor-pointer transition-all"
+          style={{ background: 'rgba(255,255,255,0.08)' }}
+          title="Click to seek"
         >
           <div
-            className="h-full rounded-full"
+            className="h-full rounded-full pointer-events-none"
             style={{
-              width: '0%',
+              width: `${progressPercent}%`,
               background: `linear-gradient(to right, ${primaryColor}80, ${primaryColor})`,
               boxShadow: `0 0 8px ${primaryColor}60`,
-              transition: 'background 0.8s ease',
+              transition: isPlaying ? 'none' : 'width 0.2s ease',
             }}
           />
         </div>
-        <div className="flex justify-between font-sonic-mono text-[9px] text-slate-600">
-          <span>—</span>
-          <span style={{ color: `${primaryColor}55` }}>audio · final stage</span>
+        <div className="flex justify-between font-sonic-mono text-[9px] text-slate-500">
+          <span>{formatTime(currentTime)}</span>
+          <span style={{ color: `${primaryColor}88` }}>
+            {formatTime(effectiveDuration)}
+          </span>
         </div>
       </div>
 
@@ -114,7 +140,7 @@ export function AudioPlayerShell({
           {activeTrack?.trackNumber || '01'} / {String(totalTracks).padStart(2, '0')}
         </span>
 
-        {/* Centre: Previous · Play · Next */}
+        {/* Centre: Previous · Play/Pause · Next */}
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             type="button"
@@ -127,11 +153,11 @@ export function AudioPlayerShell({
             <SkipBack className="w-4 h-4" />
           </button>
 
-          {/* Central play button — distinctive, not a generic circle */}
+          {/* Central play/pause button */}
           <button
             type="button"
-            onClick={handlePlayAttempt}
-            aria-label="Select for playback"
+            onClick={onTogglePlay}
+            aria-label={isPlaying ? 'Pause song' : 'Play song'}
             className="relative p-3 rounded-full transition-all transform hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
             style={{
               background: `radial-gradient(circle at 40% 38%, ${primaryColor}30 0%, ${primaryColor}10 65%, transparent 100%)`,
@@ -141,10 +167,17 @@ export function AudioPlayerShell({
               transition: 'all 0.5s ease',
             }}
           >
-            <Play
-              className="w-4 h-4 ml-0.5"
-              style={{ color: primaryColor, transition: 'color 0.5s ease' }}
-            />
+            {isPlaying ? (
+              <Pause
+                className="w-4 h-4"
+                style={{ color: primaryColor, transition: 'color 0.5s ease' }}
+              />
+            ) : (
+              <Play
+                className="w-4 h-4 ml-0.5"
+                style={{ color: primaryColor, transition: 'color 0.5s ease' }}
+              />
+            )}
           </button>
 
           <button
@@ -159,7 +192,7 @@ export function AudioPlayerShell({
           </button>
         </div>
 
-        {/* Right: placeholder for future repeat control */}
+        {/* Right: repeat symbol */}
         <div className="w-14 flex justify-end">
           <span
             className="font-sonic-mono text-[8.5px] tracking-wider opacity-30"
@@ -169,37 +202,6 @@ export function AudioPlayerShell({
           </span>
         </div>
       </div>
-
-      {/* Soft notice when play is tapped */}
-      <AnimatePresence>
-        {showNotice && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
-            transition={{ duration: 0.22 }}
-            className="absolute left-2 right-2 -top-14 sm:-top-12 z-40 px-3 py-2 rounded-xl text-center text-[11px] font-sonic-body"
-            style={{
-              background: 'rgba(5, 7, 18, 0.94)',
-              border: `1px solid ${primaryColor}35`,
-              boxShadow: '0 8px 25px rgba(0,0,0,0.6)',
-              color: `${primaryColor}dd`,
-              backdropFilter: 'blur(12px)',
-            }}
-          >
-            Audio connects in the final stage — for now, choose your song above.
-            {onPreviewEnding && activeTrackIndex === totalTracks - 1 && (
-              <button
-                type="button"
-                onClick={() => { setShowNotice(false); onPreviewEnding(); }}
-                className="ml-2 underline text-white hover:opacity-80 font-medium cursor-pointer"
-              >
-                See the ending
-              </button>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

@@ -2,15 +2,59 @@
   "tracks": [
     {
       "id": "intro",
+      "name": "Intro (Advance Journey)",
       "src": "/audio/music/intro.mp3",
-      "volume": 0.5,
-      "crossfade": 2000
+      "volume": 0.45,
+      "crossfade": 800,
+      "loop": true
     },
     {
-      "id": "gallery",
-      "src": "/audio/music/ph_gallery.mp3",
-      "volume": 0.7,
-      "crossfade": 3000
+      "id": "remo",
+      "name": "Remo (Gift Opening & Secret Vault)",
+      "src": "/audio/music/remo.mp3",
+      "volume": 0.45,
+      "crossfade": 800,
+      "loop": true
+    },
+    {
+      "id": "bus_love",
+      "name": "Bus Love Pt 2 (Just You)",
+      "src": "/audio/music/09-Bus-Love-Pt-2-MassTamilan.com.mp3",
+      "volume": 0.45,
+      "crossfade": 800,
+      "loop": true
+    },
+    {
+      "id": "friendship",
+      "name": "Friendship Anthem (Us)",
+      "src": "/audio/music/friendship anthem.mp3",
+      "volume": 0.40,
+      "crossfade": 800,
+      "loop": true
+    },
+    {
+      "id": "dheema",
+      "name": "Dheema (The Artist's Hand)",
+      "src": "/audio/music/dheema.mp3",
+      "volume": 0.45,
+      "crossfade": 800,
+      "loop": true
+    },
+    {
+      "id": "deva_deva",
+      "name": "Deva Deva Instrumental (Lord Shiva's Blessings)",
+      "src": "/audio/music/deva_deva_instrumental.mp3",
+      "volume": 0.48,
+      "crossfade": 800,
+      "loop": true
+    },
+    {
+      "id": "happy_birthday",
+      "name": "Happy Birthday Thatsa (Grand Finale)",
+      "src": "/audio/music/Happy-Birthday.mp3",
+      "volume": 0.45,
+      "crossfade": 800,
+      "loop": true
     }
   ],
   "sfx": {
