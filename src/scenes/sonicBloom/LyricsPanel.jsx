@@ -11,7 +11,7 @@ import { LyricsBeatVisualizer } from './LyricsBeatVisualizer';
  *    - Active line: prominent, warm off-white, individual word-by-word highlight in sync with audio
  *    - Next line: visible beneath with 40% opacity as a smooth preview
  *    - Smooth crossfade transitions when advancing to the next line
- * 2. High-quality Tamil typography using Noto Sans Tamil with Unicode-safe word rendering
+ * 2. Handwritten Tamil typography using Kavivanar with Noto Sans Tamil fallback and Unicode-safe word rendering
  * 3. Dynamic concert stage lighting in the negative space (pointer-events-none behind text)
  * 4. Animated, audio-reactive beat visualizer along the bottom:
  *    - 28 real-time frequency spectrum bars driven directly by Web Audio FFT analysis
@@ -181,7 +181,7 @@ export function LyricsPanel({
       <div className="relative z-10 flex flex-1 min-h-0 flex-col items-center justify-center px-4 py-5 sm:px-6 sm:py-6 text-center">
         {currentLine ? (
           <div className="w-full max-w-xl flex flex-col items-center justify-center space-y-4 sm:space-y-5">
-            {/* ── Line 1: Active Line with Word-by-Word Synchronization ── */}
+            {/* ── Line 1: Active Line with Word-by-Word Synchronization (Kavivanar Handwritten Tamil) ── */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentLine.id || `line-${currentLineIndex}`}
@@ -189,10 +189,10 @@ export function LyricsPanel({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -12, scale: 0.98 }}
                 transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="w-full font-['Noto_Sans_Tamil',sans-serif] text-lg sm:text-xl md:text-2xl lg:text-[1.7rem] font-semibold leading-relaxed tracking-wide drop-shadow-sm"
+                className="w-full font-['Kavivanar','Noto_Sans_Tamil',sans-serif] font-normal text-xl sm:text-2xl md:text-3xl lg:text-[1.85rem] leading-relaxed tracking-normal select-none drop-shadow-sm"
               >
                 {Array.isArray(currentLine.words) && currentLine.words.length > 0 ? (
-                  <div className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5">
+                  <div className="inline-flex flex-wrap items-center justify-center gap-x-2.5 sm:gap-x-3.5 gap-y-2">
                     {currentLine.words.map((wObj, wIdx) => {
                       const isWordActive =
                         currentTime >= wObj.start && currentTime < wObj.end;
@@ -204,17 +204,20 @@ export function LyricsPanel({
                           className="relative inline-block transition-all duration-200"
                           style={{
                             color: isWordActive
-                              ? '#ffffff'
+                              ? '#fffdf5'
+                              : coreText,
+                            opacity: isWordActive
+                              ? 1
                               : isWordPast
-                              ? coreText
-                              : 'rgba(253, 251, 247, 0.42)',
+                              ? 0.85
+                              : 0.48,
                             textShadow: isWordActive
-                              ? `0 0 16px ${accent}ee, 0 0 32px ${accent}66, 0 2px 4px rgba(0,0,0,0.8)`
+                              ? `0 0 12px ${accent}bb, 0 0 24px ${accent}55, 0 1px 3px rgba(0,0,0,0.85)`
                               : isWordPast
-                              ? '0 1px 3px rgba(0,0,0,0.5)'
+                              ? '0 1px 2px rgba(0,0,0,0.5)'
                               : 'none',
-                            transform: isWordActive ? 'scale(1.05)' : 'scale(1)',
-                            fontWeight: isWordActive ? '700' : '600',
+                            transform: isWordActive ? 'scale(1.04)' : 'scale(1)',
+                            fontWeight: '400',
                           }}
                         >
                           {wObj.word}
@@ -223,10 +226,10 @@ export function LyricsPanel({
                           {isWordActive && (
                             <motion.span
                               layoutId="karaoke-active-underline"
-                              className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full"
+                              className="absolute -bottom-1 sm:-bottom-1.5 left-0 right-0 h-[2.5px] rounded-full"
                               style={{
                                 backgroundColor: accent,
-                                boxShadow: `0 0 8px ${accent}, 0 0 16px ${accent}88`,
+                                boxShadow: `0 0 8px ${accent}, 0 0 14px ${accent}88`,
                               }}
                               transition={{ duration: 0.2 }}
                             />
@@ -241,17 +244,17 @@ export function LyricsPanel({
               </motion.div>
             </AnimatePresence>
 
-            {/* ── Line 2: Next Upcoming Line (Gentle preview, reduced opacity) ── */}
+            {/* ── Line 2: Next Upcoming Line (Gentle preview, reduced opacity, Kavivanar font) ── */}
             <div className="min-h-[2.2rem] flex items-center justify-center">
               <AnimatePresence mode="wait">
                 {nextLine ? (
                   <motion.div
                     key={nextLine.id || `next-${currentLineIndex + 1}`}
                     initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 0.40, y: 0 }}
+                    animate={{ opacity: 0.42, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.4, ease: 'easeOut' }}
-                    className="font-['Noto_Sans_Tamil',sans-serif] text-xs sm:text-sm md:text-base font-medium leading-relaxed tracking-normal"
+                    className="font-['Kavivanar','Noto_Sans_Tamil',sans-serif] font-normal text-sm sm:text-base md:text-lg leading-relaxed tracking-normal select-none"
                     style={{ color: coreText }}
                   >
                     {nextLine.text}

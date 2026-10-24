@@ -37,6 +37,8 @@ export default {
         'sonic-heading': ['Outfit', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
         'sonic-body': ['"DM Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
         'sonic-mono': ['"DM Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+        tamil: ['"Kavivanar"', '"Noto Sans Tamil"', 'sans-serif'],
+        kavivanar: ['"Kavivanar"', '"Noto Sans Tamil"', 'sans-serif'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
