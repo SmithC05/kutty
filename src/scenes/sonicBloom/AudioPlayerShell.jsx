@@ -86,7 +86,7 @@ export function AudioPlayerShell({
             type="button"
             onClick={onTogglePlay}
             aria-label={isPlaying ? 'Pause song' : 'Play song'}
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-[#10120d] shadow-lg transition hover:scale-[1.04] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e1019] sm:h-13 sm:w-13"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-[#10120d] shadow-lg transition hover:scale-[1.04] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e1019] sm:h-12 sm:w-12"
             style={{
               background: `linear-gradient(145deg, ${primary}, ${primary}d9)`,
               boxShadow: `0 0 25px ${primary}24`,
