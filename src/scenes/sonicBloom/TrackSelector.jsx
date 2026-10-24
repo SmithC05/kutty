@@ -1,45 +1,45 @@
 import React, { useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AudioLines, Check, Music2, Play } from 'lucide-react';
 
 /**
  * TrackSelector
  *
- * A curated, handcrafted track list — not a data table.
- * The selected track is visually elevated with its song colour and a larger presence.
- * The five inactive tracks form a compact, well-spaced list with minimal visual noise.
- *
- * Keyboard navigation: Arrow keys, Home, End.
+ * A familiar streaming-app playlist list, personalized for Kutty.
+ * Keyboard navigation supports ArrowUp/ArrowDown, Home, and End.
  */
 export function TrackSelector({
   tracks = [],
   activeTrackIndex = 0,
   onSelectTrack,
+  isPlaying = false,
   className = '',
 }) {
   const containerRef = useRef(null);
 
-  const handleKeyDown = (e, index) => {
+  const handleKeyDown = (event, index) => {
+    if (!tracks.length) return;
     let nextIndex = index;
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      nextIndex = (index + 1) % tracks.length;
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      nextIndex = (index - 1 + tracks.length) % tracks.length;
-    } else if (e.key === 'Home') {
-      e.preventDefault();
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      nextIndex = Math.min(tracks.length - 1, index + 1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      nextIndex = Math.max(0, index - 1);
+    } else if (event.key === 'Home') {
+      event.preventDefault();
       nextIndex = 0;
-    } else if (e.key === 'End') {
-      e.preventDefault();
+    } else if (event.key === 'End') {
+      event.preventDefault();
       nextIndex = tracks.length - 1;
     }
 
-    if (nextIndex !== index && onSelectTrack) {
-      onSelectTrack(nextIndex);
-      const buttons = containerRef.current?.querySelectorAll('button[role="tab"]');
-      if (buttons && buttons[nextIndex]) {
-        buttons[nextIndex].focus();
-      }
+    if (nextIndex !== index) {
+      onSelectTrack?.(nextIndex);
+      containerRef.current
+        ?.querySelectorAll('button[role="tab"]')
+        ?.[nextIndex]
+        ?.focus();
     }
   };
 
@@ -47,127 +47,83 @@ export function TrackSelector({
     <div
       ref={containerRef}
       role="tablist"
-      aria-label="Six Songs Sequence"
-      className={`flex flex-col select-none ${className}`}
+      aria-label="Songs in Kutty Radio"
+      className={`flex flex-col gap-1.5 ${className}`}
     >
-      {tracks.map((track, idx) => {
-        const isActive = idx === activeTrackIndex;
-        const color = track.colors?.primary || '#0ff0c0';
+      {tracks.map((track, index) => {
+        const isActive = index === activeTrackIndex;
+        const primary = track.colors?.primary || '#a3e635';
+        const secondary = track.colors?.secondary || '#a78bfa';
 
         return (
-          <div key={track.id} className="group relative">
-            {/* Track row */}
-            <button
-              type="button"
-              role="tab"
-              id={`sonic-track-tab-${idx}`}
-              aria-selected={isActive}
-              aria-controls={`sonic-track-panel-${idx}`}
-              tabIndex={0}
-              onClick={() => onSelectTrack(idx)}
-              onKeyDown={(e) => handleKeyDown(e, idx)}
-              className={`w-full text-left min-h-[44px] px-2.5 sm:px-3 py-2 sm:py-2.5 transition-all duration-300 flex items-center gap-3 cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent ${
-                isActive
-                  ? 'bg-white/[0.05]'
-                  : 'hover:bg-white/[0.03]'
-              }`}
+          <button
+            key={track.id}
+            type="button"
+            role="tab"
+            id={`kutty-track-tab-${index}`}
+            aria-selected={isActive}
+            aria-controls={`kutty-track-panel-${index}`}
+            tabIndex={isActive ? 0 : -1}
+            onClick={() => onSelectTrack?.(index)}
+            onKeyDown={(event) => handleKeyDown(event, index)}
+            className="group flex min-h-[68px] w-full items-center gap-3 rounded-xl border px-2.5 py-2 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-[#10121c]"
+            style={{
+              borderColor: isActive ? `${primary}35` : 'transparent',
+              background: isActive
+                ? 'linear-gradient(100deg, rgba(255,255,255,0.085), rgba(255,255,255,0.025))'
+                : 'transparent',
+              '--tw-ring-color': primary,
+            }}
+            onMouseEnter={(event) => {
+              if (!isActive) event.currentTarget.style.background = 'rgba(255,255,255,0.035)';
+            }}
+            onMouseLeave={(event) => {
+              if (!isActive) event.currentTarget.style.background = 'transparent';
+            }}
+          >
+            <span
+              className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-lg"
               style={{
-                focusVisibleRingColor: color,
+                background: `linear-gradient(145deg, ${primary}70, ${secondary}48 58%, #10121c)`,
+                boxShadow: isActive ? `0 0 22px ${primary}1c` : 'none',
               }}
+              aria-hidden="true"
             >
-              {/* Track number — small, quiet */}
-              <span
-                className={`font-sonic-mono text-[10px] sm:text-[11px] font-bold tabular-nums flex-shrink-0 w-5 text-right transition-colors duration-300 ${
-                  isActive ? '' : 'text-slate-600 group-hover:text-slate-500'
-                }`}
-                style={isActive ? { color } : {}}
-              >
-                {track.trackNumber}
-              </span>
-
-              {/* Vertical colour bar — only visible when active */}
-              <span
-                className="w-[2.5px] flex-shrink-0 rounded-full transition-all duration-500"
-                style={{
-                  height: isActive ? '32px' : '14px',
-                  backgroundColor: isActive ? color : 'rgba(255,255,255,0.06)',
-                  opacity: isActive ? 1 : 0.6,
-                }}
-              />
-
-              {/* Song details */}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-baseline gap-2">
-                  <span
-                    className={`font-sonic-body leading-tight transition-all duration-300 truncate ${
-                      isActive
-                        ? 'text-[14px] sm:text-[15px] font-semibold text-white'
-                        : 'text-[13px] sm:text-[14px] font-normal text-slate-300 group-hover:text-slate-100'
-                    }`}
-                  >
-                    {track.title}
-                  </span>
-                  {track.film && (
-                    <span className="font-sonic-body text-[11px] text-slate-500 font-normal truncate hidden sm:inline">
-                      {track.film}
-                    </span>
-                  )}
-                </div>
-                {/* Short human theme label */}
-                <p
-                  className={`font-sonic-body text-[10.5px] sm:text-[11px] leading-tight transition-colors duration-300 truncate mt-[2px] ${
-                    isActive ? 'font-normal' : 'text-slate-500 group-hover:text-slate-400'
-                  }`}
-                  style={isActive ? { color: `${color}cc` } : {}}
-                >
-                  {track.theme}
-                </p>
-              </div>
-
-              {/* Selection indicator — right edge, only for active */}
-              <div className="flex-shrink-0 w-5 flex justify-end">
-                {isActive && (
-                  <span
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ backgroundColor: color, boxShadow: `0 0 6px ${color}` }}
-                  />
-                )}
-              </div>
-            </button>
-
-            {/* Expanded personal note for active track */}
-            <AnimatePresence initial={false}>
-              {isActive && (
-                <motion.div
-                  id={`sonic-track-panel-${idx}`}
-                  role="tabpanel"
-                  aria-labelledby={`sonic-track-tab-${idx}`}
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                  className="overflow-hidden"
-                >
-                  <div
-                    className="mx-3 mb-1 px-3 py-2.5 sm:py-3 rounded-lg"
-                    style={{
-                      background: `linear-gradient(135deg, ${color}0a 0%, rgba(255,255,255,0.025) 100%)`,
-                      borderLeft: `2px solid ${color}55`,
-                    }}
-                  >
-                    <p className="font-sonic-body text-[12px] sm:text-[13px] leading-relaxed text-slate-200 tracking-[0.01em]">
-                      &ldquo;{track.personalNote}&rdquo;
-                    </p>
-                  </div>
-                </motion.div>
+              <span className="absolute inset-0 opacity-50" style={{ background: 'radial-gradient(circle at 25% 20%, rgba(255,255,255,.6), transparent 52%)' }} />
+              {isActive && isPlaying ? (
+                <AudioLines className="relative h-5 w-5 text-white" />
+              ) : (
+                <Music2 className="relative h-5 w-5 text-white/90" />
               )}
-            </AnimatePresence>
+              {isActive && (
+                <span className="absolute inset-x-0 bottom-0 h-[2px]" style={{ background: primary }} />
+              )}
+            </span>
 
-            {/* Hairline divider — very subtle */}
-            {idx < tracks.length - 1 && (
-              <div className="h-[1px] w-full" style={{ background: 'rgba(255,255,255,0.035)' }} />
-            )}
-          </div>
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center gap-2">
+                <span className={`block truncate text-[13px] font-semibold ${isActive ? 'text-white' : 'text-slate-200 group-hover:text-white'}`}>
+                  {track.title}
+                </span>
+                {isActive && isPlaying && (
+                  <span className="shrink-0 text-[9px] font-semibold uppercase tracking-[0.12em]" style={{ color: primary }}>Playing</span>
+                )}
+              </span>
+              <span className="mt-1 block truncate text-[11px] text-slate-500">
+                {[track.film, track.theme].filter(Boolean).join(' · ')}
+              </span>
+            </span>
+
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-slate-500 transition-all group-hover:text-white" aria-hidden="true">
+              {isActive ? (
+                <span className="grid h-7 w-7 place-items-center rounded-full" style={{ background: `${primary}18`, color: primary }}>
+                  <Check className="h-3.5 w-3.5" />
+                </span>
+              ) : (
+                <Play className="h-4 w-4 translate-x-px opacity-0 transition-opacity group-hover:opacity-100" />
+              )}
+            </span>
+          </button>
         );
       })}
     </div>
