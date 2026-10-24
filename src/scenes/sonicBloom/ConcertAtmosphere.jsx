@@ -34,9 +34,9 @@ const SONG_MOODS = [
 
 export function ConcertAtmosphere({
   activeTrackIndex = 0,
-  primaryColor = '#0ff0c0',
-  secondaryColor = '#ff6b6b',
-  accentColor = '#ffd166',
+  primaryColor = '#a3e635',
+  secondaryColor = '#a78bfa',
+  accentColor = '#fde047',
   isClosingState = false,
   isMobile = false,
   audioReactivity = null,
@@ -44,9 +44,9 @@ export function ConcertAtmosphere({
   const mood = SONG_MOODS[activeTrackIndex] || SONG_MOODS[0];
 
   // Closing state unifies to a multi-song celebration palette
-  const col1 = isClosingState ? '#9d3fe8' : primaryColor;
-  const col2 = isClosingState ? '#ff6040' : secondaryColor;
-  const col3 = isClosingState ? '#06c9ac' : (accentColor || primaryColor);
+  const col1 = isClosingState ? '#a3e635' : primaryColor;
+  const col2 = isClosingState ? '#c084fc' : secondaryColor;
+  const col3 = isClosingState ? '#818cf8' : (accentColor || primaryColor);
 
   // Audio reactivity modulation
   const isQuiet = audioReactivity?.isQuiet || false;

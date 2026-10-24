@@ -1,9 +1,11 @@
 import React, { useRef } from 'react';
-import { AudioLines, Check, Music2, Play } from 'lucide-react';
+import { AudioLines, Check, Play } from 'lucide-react';
 
 /**
- * A familiar streaming-app playlist list, personalized for Kutty.
- * ArrowUp/ArrowDown, Home and End work while a song row is focused.
+ * TrackSelector — Space-efficient track list for Kutty Radio
+ *
+ * Renders the 6-song queue with compact rows, smooth hover states,
+ * keyboard accessibility (ArrowUp/Down, Home, End), and clear active/playing state.
  */
 export function TrackSelector({
   tracks = [],
@@ -51,7 +53,6 @@ export function TrackSelector({
       {tracks.map((track, index) => {
         const isActive = index === activeTrackIndex;
         const primary = track.colors?.primary || '#a3e635';
-        const secondary = track.colors?.secondary || '#a78bfa';
 
         return (
           <div role="listitem" key={track.id}>
@@ -61,61 +62,69 @@ export function TrackSelector({
               aria-current={isActive ? 'true' : undefined}
               onClick={() => onSelectTrack?.(index)}
               onKeyDown={(event) => handleKeyDown(event, index)}
-              className="group flex min-h-[68px] w-full items-center gap-3 rounded-xl border px-2.5 py-2 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-[#10121c]"
+              className={`group flex w-full items-center gap-3 rounded-xl px-2.5 py-1.5 sm:py-2 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-[#0e1118] ${
+                isActive
+                  ? 'border border-white/[0.12] bg-white/[0.08] shadow-sm'
+                  : 'border border-transparent bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.05]'
+              }`}
               style={{
-                borderColor: isActive ? `${primary}35` : 'transparent',
-                background: isActive
-                  ? 'linear-gradient(100deg, rgba(255,255,255,0.085), rgba(255,255,255,0.025))'
-                  : 'transparent',
                 '--tw-ring-color': primary,
               }}
-              onMouseEnter={(event) => {
-                if (!isActive) event.currentTarget.style.background = 'rgba(255,255,255,0.035)';
-              }}
-              onMouseLeave={(event) => {
-                if (!isActive) event.currentTarget.style.background = 'transparent';
-              }}
             >
+              {/* Track number / playing indicator */}
               <span
-                className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-lg"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-xs font-semibold tabular-nums transition-colors"
                 style={{
-                  background: `linear-gradient(145deg, ${primary}70, ${secondary}48 58%, #10121c)`,
-                  boxShadow: isActive ? `0 0 22px ${primary}1c` : 'none',
+                  background: isActive ? `${primary}20` : 'rgba(255,255,255,0.04)',
+                  color: isActive ? primary : '#9ca3af',
                 }}
                 aria-hidden="true"
               >
-                <span className="absolute inset-0 opacity-50" style={{ background: 'radial-gradient(circle at 25% 20%, rgba(255,255,255,.6), transparent 52%)' }} />
                 {isActive && isPlaying ? (
-                  <AudioLines className="relative h-5 w-5 text-white" />
+                  <AudioLines className="h-4 w-4 animate-pulse" style={{ color: primary }} />
                 ) : (
-                  <Music2 className="relative h-5 w-5 text-white/90" />
-                )}
-                {isActive && (
-                  <span className="absolute inset-x-0 bottom-0 h-[2px]" style={{ background: primary }} />
+                  track.trackNumber
                 )}
               </span>
 
+              {/* Title & metadata */}
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-2">
-                  <span className={`block truncate text-[13px] font-semibold ${isActive ? 'text-white' : 'text-slate-200 group-hover:text-white'}`}>
+                  <span
+                    className={`block truncate text-xs sm:text-[13px] font-semibold transition-colors ${
+                      isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'
+                    }`}
+                  >
                     {track.title}
                   </span>
-                  {isActive && isPlaying && (
-                    <span className="shrink-0 text-[9px] font-semibold uppercase tracking-[0.12em]" style={{ color: primary }}>Playing</span>
+                  {isActive && (
+                    <span
+                      className="shrink-0 text-[9px] font-semibold uppercase tracking-wider"
+                      style={{ color: primary }}
+                    >
+                      {isPlaying ? 'Playing' : 'Selected'}
+                    </span>
                   )}
                 </span>
-                <span className="mt-1 block truncate text-[11px] text-slate-500">
+                <span className="mt-0.5 block truncate text-[10px] text-slate-400">
                   {[track.film, track.theme].filter(Boolean).join(' · ')}
                 </span>
               </span>
 
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-slate-500 transition-all group-hover:text-white" aria-hidden="true">
+              {/* Trailing check or play button */}
+              <span
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-slate-500 transition-all group-hover:text-white"
+                aria-hidden="true"
+              >
                 {isActive ? (
-                  <span className="grid h-7 w-7 place-items-center rounded-full" style={{ background: `${primary}18`, color: primary }}>
-                    <Check className="h-3.5 w-3.5" />
+                  <span
+                    className="grid h-6 w-6 place-items-center rounded-full"
+                    style={{ background: `${primary}18`, color: primary }}
+                  >
+                    <Check className="h-3 w-3" />
                   </span>
                 ) : (
-                  <Play className="h-4 w-4 translate-x-px opacity-0 transition-opacity group-hover:opacity-100" />
+                  <Play className="h-3.5 w-3.5 translate-x-px opacity-0 transition-opacity group-hover:opacity-100" />
                 )}
               </span>
             </button>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, AudioLines, Heart, ListMusic, Mic2, Music2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Disc3, Heart, ListMusic, Music2, Sparkles, X } from 'lucide-react';
 import { useScene } from '../../context/SceneContext';
 import { useAudio } from '../../context';
 import { SCENES } from '../../constants';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
-import { sonicBloomSongs, sonicBloomConfig } from '../../data/sonicBloomSongs';
+import { sonicBloomSongs } from '../../data/sonicBloomSongs';
 import { SonicBloomCanvas } from './SonicBloomCanvas';
 import { SonicBloomFallback2D } from './SonicBloomFallback2D';
 import { SonicBloomTransition } from './SonicBloomTransition';
@@ -30,7 +30,6 @@ function checkWebGLSupport() {
   }
 }
 
-/** Detect a narrow viewport so the artwork and playlist can stack naturally. */
 function useIsMobile() {
   const [mobile, setMobile] = useState(() =>
     typeof window !== 'undefined' && window.innerWidth < 1024
@@ -46,12 +45,6 @@ function useIsMobile() {
   return mobile;
 }
 
-const PANELS = [
-  { id: 'songs', label: 'Songs', icon: ListMusic },
-  { id: 'lyrics', label: 'Lyrics', icon: Mic2 },
-  { id: 'note', label: 'A little note', icon: Heart },
-];
-
 export function SonicBloomScene() {
   const { transitionTo } = useScene();
   const { stopBgm } = useAudio();
@@ -65,10 +58,10 @@ export function SonicBloomScene() {
 
   const [hasWebGL, setHasWebGL] = useState(true);
   const [activeTrackIndex, setActiveTrackIndex] = useState(0);
-  const [activePanel, setActivePanel] = useState('songs');
   const [isTransitionActive, setIsTransitionActive] = useState(!reducedMotion);
   const handleTransitionComplete = useCallback(() => setIsTransitionActive(false), []);
   const [isClosingState, setIsClosingState] = useState(false);
+  const [mobileQueueOpen, setMobileQueueOpen] = useState(false);
 
   const audioRef = useRef(null);
   const engineRef = useRef(null);
@@ -106,7 +99,8 @@ export function SonicBloomScene() {
       setDuration(initialTrack.audio.duration || 0);
     }
 
-    const onTimeUpdate = () => setCurrentTime(Number.isFinite(audio.currentTime) ? audio.currentTime : 0);
+    const onTimeUpdate = () =>
+      setCurrentTime(Number.isFinite(audio.currentTime) ? audio.currentTime : 0);
     const onLoadedMetadata = () => {
       if (Number.isFinite(audio.duration)) setDuration(audio.duration);
     };
@@ -123,7 +117,6 @@ export function SonicBloomScene() {
       setIsPlaying(false);
       setActiveTrackIndex((previous) => {
         if (previous < sonicBloomSongs.length - 1) {
-          // Let the next track's source load before starting it automatically.
           autoAdvanceRef.current = true;
           return previous + 1;
         }
@@ -153,8 +146,7 @@ export function SonicBloomScene() {
     };
   }, []);
 
-  // Switch tracks and keep playing only when the user was already listening or
-  // the previous song ended naturally. Manual selection while paused stays paused.
+  // Switch tracks
   useEffect(() => {
     const audio = audioRef.current;
     const track = sonicBloomSongs[activeTrackIndex];
@@ -172,12 +164,12 @@ export function SonicBloomScene() {
     if (shouldContinue) {
       engineRef.current?.connectAudioElement(audio);
       audio.play().catch((error) => {
-        console.warn('[KuttyRadio] Playback could not continue automatically:', error);
+        console.warn('[KuttyRadio] Playback failed:', error);
       });
     }
   }, [activeTrackIndex]);
 
-  // Keep the audio-reactive lighting and fireworks responsive to the actual song.
+  // Audio analysis frame loop
   useEffect(() => {
     let animationFrame;
     let lastTime = performance.now();
@@ -227,7 +219,7 @@ export function SonicBloomScene() {
     setHasWebGL(checkWebGLSupport());
   }, []);
 
-  // Development-only key to test concert bursts before releasing the experience.
+  // Shift + P for dev testing of pyrotechnics
   useEffect(() => {
     if (!import.meta.env?.DEV) return;
     const handleKey = (event) => {
@@ -246,6 +238,7 @@ export function SonicBloomScene() {
     if (index < 0 || index >= sonicBloomSongs.length) return;
     setIsClosingState(false);
     setActiveTrackIndex(index);
+    setMobileQueueOpen(false);
   }, []);
 
   const handlePreviousTrack = useCallback(() => {
@@ -270,19 +263,21 @@ export function SonicBloomScene() {
     transitionTo(SCENES.MEMORY_JOURNEY_TOGETHER);
   }, [transitionTo]);
 
-  // Background follows the chosen track while concert lighting stays behind the UI.
+  // Background gradient: subtle, cohesive dark listening room
+  const primaryAccent = activeTrack.colors.primary;
   const bgGradient = isClosingState
-    ? 'radial-gradient(ellipse at 40% 35%, rgba(99,60,180,0.28) 0%, rgba(7,8,16,0.96) 56%, #06070c 100%)'
-    : `radial-gradient(ellipse at 38% 28%, ${activeTrack.colors.glow} 0%, rgba(7,8,16,0.92) 54%, #06070c 100%)`;
-  const accentGradient = isClosingState
-    ? 'radial-gradient(circle at 80% 75%, rgba(255,96,64,0.08) 0%, transparent 55%)'
-    : `radial-gradient(circle at 78% 72%, ${activeTrack.colors.glow.replace(/[\d.]+\)$/, '0.07)')} 0%, transparent 50%)`;
+    ? 'radial-gradient(ellipse at 42% 32%, rgba(163,230,53,0.12) 0%, rgba(14,16,22,0.96) 62%, #090b10 100%)'
+    : `radial-gradient(ellipse at 40% 28%, ${primaryAccent}15 0%, rgba(14,16,22,0.96) 60%, #090b10 100%)`;
 
   return (
     <div
-      className="relative min-h-[100dvh] overflow-x-hidden text-white"
-      style={{ backgroundColor: '#070810' }}
+      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden text-white font-['Inter'] select-none flex flex-col bg-[#090b10]"
+      style={{
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}
     >
+      {/* ── Transition ── */}
       {isTransitionActive && (
         <SonicBloomTransition
           onComplete={handleTransitionComplete}
@@ -290,6 +285,7 @@ export function SonicBloomScene() {
         />
       )}
 
+      {/* ── Background Atmosphere & Pyrotechnics ── */}
       <ConcertAtmosphere
         activeTrackIndex={activeTrackIndex}
         primaryColor={activeTrack.colors.primary}
@@ -305,86 +301,105 @@ export function SonicBloomScene() {
         isMobile={isMobile}
       />
 
-      <div className="pointer-events-none fixed inset-0 z-0 transition-all duration-[1200ms] ease-in-out" style={{ background: bgGradient }} />
-      <div className="pointer-events-none fixed inset-0 z-0 transition-all duration-[1400ms] ease-in-out" style={{ background: accentGradient }} />
+      {/* Background radial gradient */}
       <div
-        className="pointer-events-none fixed inset-0 z-[2] opacity-[0.018]"
+        className="pointer-events-none fixed inset-0 z-0 transition-all duration-[1000ms] ease-in-out"
+        style={{ background: bgGradient }}
+      />
+
+      {/* Subtle audio-grade noise texture */}
+      <div
+        className="pointer-events-none fixed inset-0 z-[2] opacity-[0.015]"
         style={{
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%221%22/%3E%3C/svg%3E")',
+          backgroundImage:
+            'url("data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%221%22/%3E%3C/svg%3E")',
           backgroundRepeat: 'repeat',
-          backgroundSize: '180px 180px',
           mixBlendMode: 'overlay',
         }}
       />
 
-      <div
-        className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[1480px] flex-col px-4 pb-[max(1.1rem,env(safe-area-inset-bottom))] pt-4 sm:px-6 sm:pt-5 lg:px-10"
-      >
-        {/* Top bar: this should feel like a music app, not a separate cinematic title page. */}
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.07] pb-4">
-          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-            <button
-              type="button"
-              onClick={handleBackToArtist}
-              className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.04] px-3.5 text-xs font-medium text-slate-300 transition hover:bg-white/[0.09] hover:text-white focus:outline-none focus-visible:ring-2"
-              style={{ '--tw-ring-color': activeTrack.colors.primary }}
-              aria-label="Back to the artist portrait"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Back</span>
-            </button>
-
-            <div
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-[#0b0d10]"
-              style={{ background: `linear-gradient(145deg, ${activeTrack.colors.primary}, ${activeTrack.colors.secondary})`, boxShadow: `0 0 24px ${activeTrack.colors.primary}20` }}
-              aria-hidden="true"
-            >
-              <Music2 className="h-5 w-5" />
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-bold tracking-tight text-white sm:text-base">Kutty Radio</p>
-              <p className="truncate text-[10px] text-slate-500 sm:text-[11px]">A tiny playlist, made with love ♡</p>
-            </div>
-          </div>
+      {/* ── TOP HEADER BAR (Compact) ── */}
+      <header className="relative z-20 shrink-0 flex items-center justify-between border-b border-white/[0.06] px-4 py-2 sm:px-6 sm:py-2.5">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleBackToArtist}
+            className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 text-xs font-medium text-slate-300 transition hover:bg-white/[0.08] hover:text-white focus:outline-none focus-visible:ring-2"
+            style={{ '--tw-ring-color': primaryAccent }}
+            aria-label="Back to the artist portrait"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>Back</span>
+          </button>
 
           <div className="flex items-center gap-2">
-            <span className="hidden rounded-full border border-white/[0.09] bg-white/[0.035] px-3 py-2 text-[10px] text-slate-400 sm:inline-flex sm:items-center sm:gap-2">
-              <Heart className="h-3 w-3 text-rose-300" /> Curated for Kutty
-            </span>
-            <span className="inline-flex min-h-9 items-center gap-2 rounded-full border px-3 text-[10px] font-semibold tracking-wide"
-              style={{ color: activeTrack.colors.primary, borderColor: `${activeTrack.colors.primary}25`, background: `${activeTrack.colors.primary}0c` }}>
-              <span className={isPlaying ? 'h-1.5 w-1.5 animate-pulse rounded-full' : 'h-1.5 w-1.5 rounded-full'} style={{ background: activeTrack.colors.primary }} />
-              {String(activeTrackIndex + 1).padStart(2, '0')} / 06
-            </span>
-          </div>
-        </header>
-
-        <main className="grid flex-1 grid-cols-1 items-start gap-5 py-5 sm:py-7 lg:grid-cols-[minmax(300px,0.85fr)_minmax(0,1.15fr)] lg:items-stretch lg:gap-8 lg:py-8">
-          {/* Left: dynamic cover art / concert visualizer */}
-          <section aria-label="Playlist artwork" className="flex min-w-0 flex-col">
-            <div className="mb-4 space-y-2 sm:mb-5">
-              <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.23em]" style={{ color: activeTrack.colors.primary }}>
-                <Sparkles className="h-3.5 w-3.5" /> A playlist for one favourite person
-              </p>
-              <h1 className="max-w-xl text-3xl font-bold leading-[1.06] tracking-[-0.045em] text-white sm:text-4xl xl:text-5xl">
-                Six songs.
-                <span className="mt-1 block font-medium" style={{ color: activeTrack.colors.primary, transition: 'color 0.7s ease' }}>All the things I can’t say.</span>
-              </h1>
-              <p className="max-w-md text-sm leading-relaxed text-slate-400">
-                {sonicBloomConfig.header.supportingLine}
-              </p>
-            </div>
-
             <div
-              className="group relative mx-auto aspect-square w-full max-w-[440px] overflow-visible rounded-[28px] sm:rounded-[32px] lg:mx-0"
-              style={{ boxShadow: `0 24px 80px rgba(0,0,0,0.42), 0 0 60px -25px ${activeTrack.colors.primary}55`, transition: 'box-shadow 0.8s ease' }}
+              className="grid h-7 w-7 place-items-center rounded-lg text-[#0a0d08]"
+              style={{
+                background: `linear-gradient(135deg, ${primaryAccent}, #84cc16)`,
+              }}
+              aria-hidden="true"
             >
-              <div
-                className="absolute inset-0 overflow-hidden rounded-[28px] border border-white/[0.13] sm:rounded-[32px]"
-                style={{ background: `linear-gradient(145deg, ${activeTrack.colors.primary}28, rgba(17,19,33,0.94) 50%, ${activeTrack.colors.secondary}22)` }}
-              >
-                <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 40%, rgba(255,255,255,0.07), transparent 42%), linear-gradient(180deg, transparent 55%, rgba(3,4,11,0.88) 100%)' }} />
-                <div className="absolute inset-0 opacity-90">
+              <Music2 className="h-4 w-4" />
+            </div>
+            <div>
+              <span className="text-sm font-bold tracking-tight text-white font-['Manrope']">
+                Kutty Radio
+              </span>
+              <span className="ml-2 hidden text-[11px] text-slate-400 sm:inline">
+                After-Hours Listening Room
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {/* Mobile Queue Toggle button */}
+          {isMobile && (
+            <button
+              type="button"
+              onClick={() => setMobileQueueOpen((prev) => !prev)}
+              className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] px-3 text-[11px] font-medium text-slate-300"
+            >
+              <ListMusic className="h-3.5 w-3.5" />
+              <span>Queue (6)</span>
+            </button>
+          )}
+
+          <span
+            className="inline-flex min-h-8 items-center gap-1.5 rounded-full border px-2.5 text-[10px] font-semibold tabular-nums tracking-wide"
+            style={{
+              color: primaryAccent,
+              borderColor: `${primaryAccent}30`,
+              background: `${primaryAccent}0e`,
+            }}
+          >
+            <span
+              className={
+                isPlaying
+                  ? 'h-1.5 w-1.5 animate-pulse rounded-full'
+                  : 'h-1.5 w-1.5 rounded-full'
+              }
+              style={{ background: primaryAccent }}
+            />
+            {String(activeTrackIndex + 1).padStart(2, '0')} / 06
+          </span>
+        </div>
+      </header>
+
+      {/* ── MAIN WORKSPACE (Locked to 100dvh, No whole-page scroll) ── */}
+      <main className="relative z-10 flex-1 min-h-0 w-full max-w-[1520px] mx-auto px-3 py-2 sm:px-6 sm:py-3">
+        {/* DESKTOP LAYOUT (2 Columns) */}
+        {!isMobile ? (
+          <div className="grid h-full min-h-0 grid-cols-12 gap-5 items-stretch">
+            {/* Left Column (5 Cols): Visualizer + Queue + Note */}
+            <section
+              aria-label="Vinyl visualizer and playlist"
+              className="col-span-5 flex h-full min-h-0 flex-col gap-3"
+            >
+              {/* Compact Visualizer Card */}
+              <div className="relative shrink-0 h-[210px] w-full overflow-hidden rounded-2xl border border-white/[0.08] bg-[#11141c]/90 shadow-lg">
+                <div className="absolute inset-0">
                   {hasWebGL ? (
                     <SonicBloomCanvas
                       activeTrackIndex={activeTrackIndex}
@@ -403,90 +418,82 @@ export function SonicBloomScene() {
                 {!isTransitionActive && (
                   <TrackBurst
                     activeTrackIndex={activeTrackIndex}
-                    isClosingState={isClosingState}
                     reducedMotion={reducedMotion}
                   />
                 )}
 
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 p-5 sm:p-7">
-                  <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/25 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] text-white/80 backdrop-blur">
-                    <AudioLines className="h-3.5 w-3.5" style={{ color: activeTrack.colors.primary }} />
-                    Kutty Radio · Side A
-                  </div>
-                  <h2 className="text-2xl font-bold leading-tight tracking-tight text-white drop-shadow-lg sm:text-3xl">{activeTrack.title}</h2>
-                  <p className="mt-1 text-xs text-white/75 sm:text-sm">
-                    {activeTrack.film || 'A song chosen for you'}{activeTrack.theme ? ` · ${activeTrack.theme}` : ''}
-                  </p>
-                </div>
-                <div className="pointer-events-none absolute right-4 top-4 z-20 rounded-full border border-white/10 bg-black/25 px-3 py-1.5 text-[9px] font-semibold tracking-[0.14em] text-white/65 backdrop-blur">
-                  {isPlaying ? 'NOW PLAYING' : 'YOUR PLAYLIST'}
-                </div>
-              </div>
-            </div>
-
-            <div className="mx-auto mt-4 flex w-full max-w-[440px] items-start gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.035] p-4 lg:mx-0">
-              <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl" style={{ background: `${activeTrack.colors.primary}16`, color: activeTrack.colors.primary }}>
-                <Heart className="h-4 w-4" />
-              </span>
-              <div className="min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Why this song?</p>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-slate-200">{activeTrack.personalNote}</p>
-              </div>
-            </div>
-          </section>
-
-          {/* Right: familiar song / lyrics / note tabs */}
-          <section aria-label="Playlist and lyrics" className="flex min-w-0 flex-col overflow-hidden rounded-[26px] border border-white/[0.09] bg-[#0b0d17]/85 shadow-2xl shadow-black/20 backdrop-blur-xl sm:rounded-[30px]">
-            <div className="border-b border-white/[0.07] px-4 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Your little collection</p>
-                  <h2 className="mt-1.5 text-xl font-bold tracking-tight text-white sm:text-2xl">Made for Kutty</h2>
-                  <p className="mt-1.5 text-xs text-slate-400">Six songs · picked one by one, just for you</p>
-                </div>
-                <div className="hidden h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/[0.08] bg-white/[0.035] sm:grid" aria-hidden="true">
-                  <Music2 className="h-5 w-5" style={{ color: activeTrack.colors.primary }} />
-                </div>
-              </div>
-
-              <div className="mt-5 flex gap-1 rounded-xl border border-white/[0.06] bg-black/20 p-1" role="tablist" aria-label="Playlist panels">
-                {PANELS.map(({ id, label, icon: Icon }) => {
-                  const active = activePanel === id;
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      role="tab"
-                      id={`kutty-panel-tab-${id}`}
-                      aria-selected={active}
-                      aria-controls={`kutty-panel-content-${id}`}
-                      onClick={() => setActivePanel(id)}
-                      className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-2 text-[11px] font-semibold transition-all focus:outline-none focus-visible:ring-2 sm:gap-2 sm:text-xs"
+                {/* Overlaid Badge */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate text-base font-bold text-white font-['Manrope']">
+                        {activeTrack.title}
+                      </p>
+                      <p className="truncate text-[11px] text-slate-300">
+                        {[activeTrack.film, activeTrack.theme].filter(Boolean).join(' · ')}
+                      </p>
+                    </div>
+                    <span
+                      className="shrink-0 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border"
                       style={{
-                        background: active ? 'rgba(255,255,255,0.09)' : 'transparent',
-                        color: active ? '#ffffff' : '#858998',
-                        boxShadow: active ? 'inset 0 0 0 1px rgba(255,255,255,0.055)' : 'none',
-                        '--tw-ring-color': activeTrack.colors.primary,
+                        color: primaryAccent,
+                        borderColor: `${primaryAccent}40`,
+                        background: `${primaryAccent}15`,
                       }}
                     >
-                      <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      {label}
-                    </button>
-                  );
-                })}
+                      {isPlaying ? 'Playing' : 'Paused'}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div className="flex-1 px-3 py-3 sm:px-5 sm:py-4" role="tabpanel" id={`kutty-panel-content-${activePanel}`} aria-labelledby={`kutty-panel-tab-${activePanel}`}>
-              <AnimatePresence mode="wait" initial={false}>
+              {/* 6-Song Track Queue (Scrollable internally if needed) */}
+              <div
+                className="flex-1 min-h-0 overflow-y-auto pr-1"
+                style={{
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(255,255,255,0.12) transparent',
+                }}
+              >
+                <div className="mb-1.5 flex items-center justify-between px-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Your Queue · 6 Songs
+                  </span>
+                  <span className="text-[10px] text-slate-500">Tap to select</span>
+                </div>
+                <TrackSelector
+                  tracks={sonicBloomSongs}
+                  activeTrackIndex={activeTrackIndex}
+                  onSelectTrack={handleSelectTrack}
+                  isPlaying={isPlaying}
+                />
+              </div>
+
+              {/* Personal Note Card */}
+              <div className="shrink-0 rounded-xl border border-white/[0.07] bg-[#12151f]/80 p-2.5">
+                <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                  <Heart className="h-3 w-3 text-rose-300" />
+                  <span>Why this song?</span>
+                </div>
+                <p className="mt-1 text-xs leading-relaxed text-slate-200 italic">
+                  “{activeTrack.personalNote}”
+                </p>
+              </div>
+            </section>
+
+            {/* Right Column (7 Cols): Lyrics Panel (Continuously Visible!) */}
+            <section
+              aria-label="Song Lyrics"
+              className="col-span-7 flex h-full min-h-0 flex-col"
+            >
+              <AnimatePresence mode="wait">
                 {isClosingState ? (
                   <motion.div
-                    key="playlist-finished"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.25 }}
-                    className="flex min-h-[380px] items-center justify-center px-2 py-5 sm:min-h-[440px]"
+                    key="closing-state"
+                    initial={{ opacity: 0, scale: 0.96 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.96 }}
+                    className="flex h-full min-h-0 items-center justify-center p-4"
                   >
                     <ClosingDedication
                       onBackToArtist={handleBackToArtist}
@@ -496,80 +503,151 @@ export function SonicBloomScene() {
                   </motion.div>
                 ) : (
                   <motion.div
-                    key={activePanel}
-                    initial={{ opacity: 0, y: 7 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -7 }}
-                    transition={{ duration: 0.2 }}
+                    key="lyrics-active"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="h-full min-h-0"
                   >
-                    {activePanel === 'songs' && (
-                      <div className="py-1">
-                        <div className="mb-3 flex items-center justify-between px-1">
-                          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Tracklist</span>
-                          <span className="text-[10px] text-slate-500">Select any song</span>
-                        </div>
-                        <TrackSelector
-                          tracks={sonicBloomSongs}
-                          activeTrackIndex={activeTrackIndex}
-                          onSelectTrack={handleSelectTrack}
-                          isPlaying={isPlaying}
-                        />
-                      </div>
-                    )}
-
-                    {activePanel === 'lyrics' && (
-                      <LyricsPanel
-                        track={activeTrack}
-                        currentTime={currentTime}
-                        isPlaying={isPlaying}
-                        onSeek={handleSeek}
-                      />
-                    )}
-
-                    {activePanel === 'note' && (
-                      <div className="relative flex min-h-[340px] flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.07] bg-[#080a13]/75 p-5 sm:min-h-[420px] sm:p-7">
-                        <div className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full blur-3xl" style={{ background: `${activeTrack.colors.primary}17` }} />
-                        <div className="relative">
-                          <div className="mb-5 grid h-12 w-12 place-items-center rounded-2xl border" style={{ color: activeTrack.colors.primary, background: `${activeTrack.colors.primary}12`, borderColor: `${activeTrack.colors.primary}30` }}>
-                            <Heart className="h-5 w-5" />
-                          </div>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: activeTrack.colors.primary }}>A note from me to you</p>
-                          <h3 className="mt-2 text-xl font-bold leading-snug text-white sm:text-2xl">{activeTrack.theme}</h3>
-                          <p className="mt-5 text-base leading-relaxed text-slate-200 sm:text-lg">“{activeTrack.personalNote}”</p>
-                        </div>
-                        <div className="relative mt-8 flex items-center justify-between border-t border-white/[0.08] pt-4">
-                          <p className="text-xs text-slate-500">A tiny reminder, whenever you need it.</p>
-                          <span className="text-xl" aria-hidden="true">♡</span>
-                        </div>
-                      </div>
-                    )}
+                    <LyricsPanel
+                      track={activeTrack}
+                      currentTime={currentTime}
+                      isPlaying={isPlaying}
+                      onSeek={handleSeek}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
-          </section>
-        </main>
+            </section>
+          </div>
+        ) : (
+          /* MOBILE LAYOUT (Stacked, Single Screen, No whole-page scroll) */
+          <div className="flex h-full min-h-0 flex-col gap-2">
+            {/* Top Mini Track Card with Rotating Vinyl Disc */}
+            <div className="shrink-0 flex items-center justify-between gap-3 rounded-xl border border-white/[0.08] bg-[#12151f]/90 p-2.5 shadow-md">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[#0a0c10] border border-white/10"
+                  aria-hidden="true"
+                >
+                  <Disc3
+                    className={`h-6 w-6 ${isPlaying ? 'animate-spin' : ''}`}
+                    style={{ color: primaryAccent, animationDuration: '4s' }}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-bold text-white font-['Manrope']">
+                    {activeTrack.title}
+                  </p>
+                  <p className="truncate text-[10px] text-slate-400">
+                    {[activeTrack.film, activeTrack.theme].filter(Boolean).join(' · ')}
+                  </p>
+                </div>
+              </div>
 
-        {/* Docked player: familiar controls stay together while she explores the songs and lyrics. */}
-        <div className="relative z-30 mt-auto pb-1 pt-2">
-          <AudioPlayerShell
-            activeTrack={activeTrack}
-            activeTrackIndex={activeTrackIndex}
-            totalTracks={sonicBloomSongs.length}
-            isPlaying={isPlaying}
-            currentTime={currentTime}
-            duration={duration}
-            onTogglePlay={handleTogglePlay}
-            onSeek={handleSeek}
-            onPreviousTrack={handlePreviousTrack}
-            onNextTrack={handleNextTrack}
-            onPreviewEnding={() => setIsClosingState(true)}
-          />
-          <p className="mt-3 flex items-center justify-center gap-2 text-center text-[9px] text-slate-600 sm:text-[10px]">
-            <Sparkles className="h-3 w-3" />
-            Made with love, for your ears and your heart.
-          </p>
-        </div>
+              <button
+                type="button"
+                onClick={() => setMobileQueueOpen(true)}
+                className="shrink-0 rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[10px] font-medium text-slate-300"
+              >
+                Change song
+              </button>
+            </div>
+
+            {/* Main Lyrics Area (Takes the vast majority of mobile screen) */}
+            <div className="flex-1 min-h-0">
+              <AnimatePresence mode="wait">
+                {isClosingState ? (
+                  <motion.div
+                    key="mobile-closing"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="flex h-full min-h-0 items-center justify-center p-2"
+                  >
+                    <ClosingDedication
+                      onBackToArtist={handleBackToArtist}
+                      onContinueToUs={handleContinueToUs}
+                      onReturnToTracks={() => setIsClosingState(false)}
+                    />
+                  </motion.div>
+                ) : (
+                  <LyricsPanel
+                    track={activeTrack}
+                    currentTime={currentTime}
+                    isPlaying={isPlaying}
+                    onSeek={handleSeek}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Mobile Queue Drawer Modal */}
+            <AnimatePresence>
+              {mobileQueueOpen && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-50 flex flex-col justify-end bg-black/70 backdrop-blur-md"
+                  onClick={() => setMobileQueueOpen(false)}
+                >
+                  <motion.div
+                    initial={{ y: '100%' }}
+                    animate={{ y: 0 }}
+                    exit={{ y: '100%' }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 250 }}
+                    className="max-h-[75vh] flex flex-col rounded-t-3xl border-t border-white/10 bg-[#12151f] p-4 shadow-2xl"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="mb-3 flex items-center justify-between border-b border-white/[0.08] pb-3">
+                      <div>
+                        <h4 className="text-sm font-bold text-white font-['Manrope']">
+                          Six Songs for Kutty
+                        </h4>
+                        <p className="text-[10px] text-slate-400">Select any song to listen & sing</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setMobileQueueOpen(false)}
+                        className="grid h-8 w-8 place-items-center rounded-full text-slate-400 hover:text-white"
+                        aria-label="Close track queue"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    <div className="flex-1 min-h-0 overflow-y-auto">
+                      <TrackSelector
+                        tracks={sonicBloomSongs}
+                        activeTrackIndex={activeTrackIndex}
+                        onSelectTrack={handleSelectTrack}
+                        isPlaying={isPlaying}
+                      />
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+      </main>
+
+      {/* ── PERSISTENT DOCKED AUDIO PLAYER ── */}
+      <div className="relative z-20 shrink-0 px-3 pb-2 pt-1 sm:px-6 sm:pb-3">
+        <AudioPlayerShell
+          activeTrack={activeTrack}
+          activeTrackIndex={activeTrackIndex}
+          totalTracks={sonicBloomSongs.length}
+          isPlaying={isPlaying}
+          currentTime={currentTime}
+          duration={duration}
+          onTogglePlay={handleTogglePlay}
+          onSeek={handleSeek}
+          onPreviousTrack={handlePreviousTrack}
+          onNextTrack={handleNextTrack}
+          onPreviewEnding={() => setIsClosingState(true)}
+        />
       </div>
     </div>
   );

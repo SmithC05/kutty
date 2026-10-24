@@ -32,9 +32,9 @@ export default {
         cursive: ['"Alex Brush"', '"Dancing Script"', 'cursive'],
         quote: ['"Playfair Display"', 'serif'],
         numbers: ['"Playfair Display"', 'serif'],
-        'sonic-heading': ['Syne', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
-        'sonic-body': ['"DM Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
-        'sonic-mono': ['"Space Mono"', '"SFMono-Regular"', 'Consolas', 'Menlo', 'monospace'],
+        'sonic-heading': ['Manrope', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+        'sonic-body': ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+        'sonic-mono': ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',

@@ -50,7 +50,7 @@ html.lenis, html.lenis body {
   pointer-events: none;
 }
 
-/* ── SONIC BLOOM: Concert Atmosphere Animations ───────────────────────────── */
+/* ── KUTTY RADIO: Concert Atmosphere & Lighting Animations ────────────────── */
 
 /* Spotlight beam 1: sweeps left-to-right from top-left */
 @keyframes sb-beam-1 {
@@ -98,7 +98,7 @@ html.lenis, html.lenis body {
   100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
 }
 
-/* Opening bloom ring */
+/* Concert sound wave pulse ring */
 @keyframes sb-bloom-ring {
   0%   { transform: scale(0.3); opacity: 0.8; }
   60%  { opacity: 0.4; }
@@ -118,3 +118,4 @@ html.lenis, html.lenis body {
     opacity: 0 !important;
   }
 }
+

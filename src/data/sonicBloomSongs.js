@@ -1,9 +1,8 @@
+import { kuttyRadioLyrics } from './kuttyRadioLyrics';
+
 /**
- * SONIC BLOOM — Six Songs, the Way I See You
- * Central data store for the six-song birthday experience.
- *
- * All personal notes and metadata are centralized here for easy refinement
- * without altering visual or layout components.
+ * KUTTY RADIO — Six Songs, the Way I See You
+ * Central data store for the six-song music experience.
  */
 
 export const sonicBloomConfig = {
@@ -28,20 +27,18 @@ export const sonicBloomSongs = [
     trackNumber: '01',
     title: 'Unnale',
     film: 'Raja Rani',
-    // theme: short human label shown in track list
     theme: 'Her favourite, first of course',
     personalNote: 'Your favourite song had to be the first one, Kutty. ❤️',
     colors: {
-      primary: '#0ff0c0',     // Brighter teal-mint — playful energy
-      secondary: '#ff6b6b',   // Warm coral — warmth & recognition
-      glow: 'rgba(15, 240, 192, 0.40)',
-      accent: '#ffd166',      // Butter-yellow spark
-      core: '#e0fff5',
+      primary: '#a3e635',     // Sage-lime primary accent
+      secondary: '#a78bfa',   // Muted lavender
+      glow: 'rgba(163, 230, 53, 0.28)',
+      accent: '#fde047',      // Warm amber sparkle
+      core: '#f7fee7',
     },
     motion: {
       energy: 1.15,
-      particleSpeed: 1.2,
-      petalSpread: 1.1,
+      particleSpeed: 1.1,
       style: 'playful',
     },
     audio: {
@@ -51,6 +48,7 @@ export const sonicBloomSongs = [
       excerptEnd: 422,
       isConfigured: true,
     },
+    lyrics: kuttyRadioLyrics.unnale,
   },
   {
     id: 'chella-magale',
@@ -60,16 +58,15 @@ export const sonicBloomSongs = [
     theme: 'How precious you are to me',
     personalNote: 'I hope you always know how precious you are to the people who care about you.',
     colors: {
-      primary: '#b57bee',     // Warm lavender — flowing, gentle
-      secondary: '#5eead4',   // Soft teal
-      glow: 'rgba(181, 123, 238, 0.38)',
+      primary: '#c084fc',     // Soft lavender
+      secondary: '#2dd4bf',   // Soft teal
+      glow: 'rgba(192, 132, 252, 0.28)',
       accent: '#e9d5ff',
-      core: '#f5f0ff',
+      core: '#faf5ff',
     },
     motion: {
       energy: 0.85,
       particleSpeed: 0.8,
-      petalSpread: 1.05,
       style: 'gentle',
     },
     audio: {
@@ -79,26 +76,26 @@ export const sonicBloomSongs = [
       excerptEnd: 35,
       isConfigured: true,
     },
+    lyrics: kuttyRadioLyrics['chella-magale'],
   },
   {
     id: 'magale',
     trackNumber: '03',
     title: 'Magale',
-    film: null, // film credit unverified — left blank
+    film: null,
     theme: 'You make me feel understood',
     personalNote:
       "You have a way of making me feel understood, even on days when I don't quite understand myself.",
     colors: {
-      primary: '#7c8ff8',     // Periwinkle-indigo — layered, contemplative
-      secondary: '#c4b5fd',   // Pale lilac shimmer
-      glow: 'rgba(124, 143, 248, 0.42)',
-      accent: '#a5b4fc',
-      core: '#eef2ff',
+      primary: '#818cf8',     // Periwinkle-indigo
+      secondary: '#c084fc',   // Soft lilac
+      glow: 'rgba(129, 140, 248, 0.28)',
+      accent: '#c7d2fe',
+      core: '#f5f3ff',
     },
     motion: {
       energy: 0.9,
       particleSpeed: 0.85,
-      petalSpread: 1.0,
       style: 'layered',
     },
     audio: {
@@ -108,6 +105,7 @@ export const sonicBloomSongs = [
       excerptEnd: 31,
       isConfigured: true,
     },
+    lyrics: kuttyRadioLyrics.magale,
   },
   {
     id: 'alakolava',
@@ -118,16 +116,15 @@ export const sonicBloomSongs = [
     personalNote:
       "Out of all the people who come into our lives, some quietly become irreplaceable. You're one of those people to me. ❤️",
     colors: {
-      primary: '#9d3fe8',     // Rich violet — intricate, important
-      secondary: '#ff7c5c',   // Tangerine-coral
-      glow: 'rgba(157, 63, 232, 0.46)',
-      accent: '#f43f5e',
+      primary: '#a855f7',     // Violet dusk
+      secondary: '#fb923c',   // Warm amber coral
+      glow: 'rgba(168, 85, 247, 0.30)',
+      accent: '#f472b6',
       core: '#faf5ff',
     },
     motion: {
       energy: 1.05,
       particleSpeed: 1.0,
-      petalSpread: 0.95,
       style: 'intimate',
     },
     audio: {
@@ -137,26 +134,26 @@ export const sonicBloomSongs = [
       excerptEnd: 33,
       isConfigured: true,
     },
+    lyrics: kuttyRadioLyrics.alakolava,
   },
   {
     id: 'engey-andha-vennnila',
     trackNumber: '05',
     title: 'Engey Andha Vennnila',
-    film: null, // film credit unverified — left blank
+    film: null,
     theme: 'Where I find comfort',
     personalNote:
       "When life feels heavy, you're someone I wish I could sit beside and talk to. You make me feel safe in a way that's difficult to explain.",
     colors: {
-      primary: '#4aa8d8',     // Quiet midnight sky blue
-      secondary: '#6d7fe8',   // Periwinkle dusk
-      glow: 'rgba(74, 168, 216, 0.32)',
-      accent: '#93c5fd',
+      primary: '#38bdf8',     // Midnight sky blue
+      secondary: '#818cf8',   // Periwinkle dusk
+      glow: 'rgba(56, 189, 248, 0.24)',
+      accent: '#bae6fd',
       core: '#f0f9ff',
     },
     motion: {
       energy: 0.62,
       particleSpeed: 0.55,
-      petalSpread: 0.9,
       style: 'quiet',
     },
     audio: {
@@ -166,6 +163,7 @@ export const sonicBloomSongs = [
       excerptEnd: 35,
       isConfigured: true,
     },
+    lyrics: kuttyRadioLyrics['engey-andha-vennnila'],
   },
   {
     id: 'life-of-pazham',
@@ -176,24 +174,24 @@ export const sonicBloomSongs = [
     personalNote:
       "You've probably motivated me in ways you don't even realise, Kutty. I'm really glad you're part of my life. ❤️",
     colors: {
-      primary: '#06c9ac',     // Uplifting bright cyan-teal
-      secondary: '#ff6040',   // Energetic coral-red
-      glow: 'rgba(6, 201, 172, 0.50)',
-      accent: '#fbbf24',      // Warm amber — brightness, life
-      core: '#fffbeb',
+      primary: '#2dd4bf',     // Luminous teal
+      secondary: '#fb7185',   // Warm rose coral
+      glow: 'rgba(45, 212, 191, 0.30)',
+      accent: '#fde047',      // Warm champagne amber
+      core: '#f0fdfa',
     },
     motion: {
       energy: 1.25,
-      particleSpeed: 1.2,
-      petalSpread: 1.2,
+      particleSpeed: 1.15,
       style: 'harmonious',
     },
     audio: {
       src: '/audio/sonic-bloom/06-life-of-pazham.mp3',
-      duration: 209,
+      duration: 42,
       excerptStart: 0,
-      excerptEnd: 209,
+      excerptEnd: 42,
       isConfigured: true,
     },
+    lyrics: kuttyRadioLyrics['life-of-pazham'],
   },
 ];

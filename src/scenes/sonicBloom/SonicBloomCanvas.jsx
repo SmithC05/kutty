@@ -41,8 +41,8 @@ function SceneCameraController({ reducedMotion = false }) {
  * Movement is very slow — no laser-light-show effect.
  */
 function CelebrationDust({
-  primaryColor = '#0ff0c0',
-  accentColor = '#ff6b6b',
+  primaryColor = '#a3e635',
+  accentColor = '#a78bfa',
   reducedMotion = false,
   isQuiet = false,
 }) {
@@ -157,7 +157,7 @@ function SongMoodLighting({ activeTrack, isClosingState, audioReactivity }) {
 
   // Each song has a distinct lighting configuration
   const mood = isClosingState
-    ? { key: '#9d3fe8', fill: '#ff6040', rim: '#06c9ac', keyIntensity: 2.4, fillIntensity: 1.8 }
+    ? { key: '#a3e635', fill: '#c084fc', rim: '#2dd4bf', keyIntensity: 2.2, fillIntensity: 1.6 }
     : {
         key: activeTrack.colors.primary,
         fill: activeTrack.colors.secondary,
