@@ -1,11 +1,47 @@
-import React, { useRef } from 'react';
-import { AudioLines, Check, Play } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Music2, Play } from 'lucide-react';
+
+function QueueThumbnail({ track, isActive }) {
+  const [hasError, setHasError] = useState(false);
+  const primary = track.colors?.primary || '#f59e0b';
+  const imageSrc = !hasError && (track.thumbnail || track.artwork)
+    ? (track.thumbnail || track.artwork)
+    : null;
+
+  return (
+    <div
+      className="relative h-9 w-14 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-[#161a24] shadow-sm sm:h-10 sm:w-16"
+      style={{
+        borderColor: isActive ? `${primary}60` : 'rgba(255,255,255,0.1)',
+      }}
+    >
+      {imageSrc ? (
+        <img
+          src={imageSrc}
+          alt={track.title}
+          onError={() => setHasError(true)}
+          className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+        />
+      ) : (
+        <div
+          className="flex h-full w-full items-center justify-center"
+          style={{
+            background: `radial-gradient(circle at 50% 50%, ${primary}30, #0f1219)`,
+          }}
+        >
+          <Music2 className="h-4 w-4" style={{ color: primary }} />
+        </div>
+      )}
+      <div className="pointer-events-none absolute inset-0 bg-black/20" />
+    </div>
+  );
+}
 
 /**
- * TrackSelector — Space-efficient track list for Kutty Radio
+ * TrackSelector — Six-Song Playlist Queue
  *
- * Renders the 6-song queue with compact rows, smooth hover states,
- * keyboard accessibility (ArrowUp/Down, Home, End), and clear active/playing state.
+ * Exact match to reference screenshot with track number, thumbnail, metadata,
+ * and animated golden equalizer on the active track.
  */
 export function TrackSelector({
   tracks = [],
@@ -15,6 +51,29 @@ export function TrackSelector({
   className = '',
 }) {
   const containerRef = useRef(null);
+  const itemRefs = useRef([]);
+
+  // Auto-scroll newly active track to the top of the internal queue container
+  React.useEffect(() => {
+    const activeEl = itemRefs.current[activeTrackIndex];
+    if (!activeEl) return;
+
+    const scrollContainer =
+      activeEl.closest('[data-queue-scrollable]') ||
+      activeEl.parentElement?.parentElement;
+
+    if (scrollContainer) {
+      const containerTop = scrollContainer.getBoundingClientRect().top;
+      const elementTop = activeEl.getBoundingClientRect().top;
+      const currentScrollTop = scrollContainer.scrollTop;
+      const targetScroll = currentScrollTop + (elementTop - containerTop) - 6;
+
+      scrollContainer.scrollTo({
+        top: Math.max(0, targetScroll),
+        behavior: 'smooth',
+      });
+    }
+  }, [activeTrackIndex]);
 
   const handleKeyDown = (event, index) => {
     if (!tracks.length) return;
@@ -52,79 +111,88 @@ export function TrackSelector({
     >
       {tracks.map((track, index) => {
         const isActive = index === activeTrackIndex;
-        const primary = track.colors?.primary || '#a3e635';
+        const trackPrimary = track.colors?.primary || '#f59e0b';
+        const trackAccent = track.colors?.accent || trackPrimary;
 
         return (
           <div role="listitem" key={track.id}>
             <button
+              ref={(el) => (itemRefs.current[index] = el)}
               type="button"
               data-kutty-track-index={index}
               aria-current={isActive ? 'true' : undefined}
               onClick={() => onSelectTrack?.(index)}
               onKeyDown={(event) => handleKeyDown(event, index)}
-              className={`group flex w-full items-center gap-3 rounded-xl px-2.5 py-1.5 sm:py-2 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-[#0e1118] ${
+              className={`group flex w-full items-center gap-2.5 rounded-2xl p-2 sm:gap-3 text-left transition-all duration-300 focus:outline-none ${
                 isActive
-                  ? 'border border-white/[0.12] bg-white/[0.08] shadow-sm'
-                  : 'border border-transparent bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.05]'
+                  ? 'shadow-md border'
+                  : 'border border-transparent bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.06]'
               }`}
               style={{
-                '--tw-ring-color': primary,
+                backgroundColor: isActive ? `${trackPrimary}18` : undefined,
+                borderColor: isActive ? `${trackPrimary}55` : undefined,
+                boxShadow: isActive ? `0 4px 20px ${trackPrimary}20` : undefined,
               }}
             >
-              {/* Track number / playing indicator */}
+              {/* 1. Track Number Pill */}
               <span
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-xs font-semibold tabular-nums transition-colors"
-                style={{
-                  background: isActive ? `${primary}20` : 'rgba(255,255,255,0.04)',
-                  color: isActive ? primary : '#9ca3af',
-                }}
-                aria-hidden="true"
+                className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl text-xs font-semibold tabular-nums transition-colors duration-300 ${
+                  isActive ? 'border' : 'text-slate-400'
+                }`}
+                style={
+                  isActive
+                    ? {
+                        backgroundColor: `${trackPrimary}26`,
+                        borderColor: `${trackPrimary}45`,
+                        color: trackAccent,
+                      }
+                    : undefined
+                }
               >
-                {isActive && isPlaying ? (
-                  <AudioLines className="h-4 w-4 animate-pulse" style={{ color: primary }} />
-                ) : (
-                  track.trackNumber
-                )}
+                {track.trackNumber}
               </span>
 
-              {/* Title & metadata */}
+              {/* 2. Artwork Thumbnail */}
+              <QueueThumbnail
+                track={track}
+                isActive={isActive}
+              />
+
+              {/* 3. Title & metadata */}
               <span className="min-w-0 flex-1">
-                <span className="flex items-center gap-2">
-                  <span
-                    className={`block truncate text-xs sm:text-[13px] font-semibold font-['Outfit',sans-serif] transition-colors ${
-                      isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'
-                    }`}
-                  >
-                    {track.title}
-                  </span>
-                  {isActive && (
-                    <span
-                      className="shrink-0 text-[9px] font-semibold uppercase tracking-wider"
-                      style={{ color: primary }}
-                    >
-                      {isPlaying ? 'Playing' : 'Selected'}
-                    </span>
-                  )}
+                <span
+                  className={`block truncate text-xs sm:text-[13px] font-['Outfit',sans-serif] transition-colors ${
+                    isActive ? 'font-bold text-white' : 'font-semibold text-slate-300 group-hover:text-white'
+                  }`}
+                >
+                  {track.title}
                 </span>
-                <span className="mt-0.5 block truncate text-[10px] text-slate-400">
-                  {[track.film, track.theme].filter(Boolean).join(' · ')}
+                <span className="mt-0.5 block truncate text-[10px] sm:text-[11px] text-slate-400">
+                  {[track.film, track.theme].filter(Boolean).join(' • ')}
                 </span>
               </span>
 
-              {/* Trailing check or play button */}
-              <span
-                className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-slate-500 transition-all group-hover:text-white"
-                aria-hidden="true"
-              >
-                {isActive ? (
-                  <span
-                    className="grid h-6 w-6 place-items-center rounded-full"
-                    style={{ background: `${primary}18`, color: primary }}
-                  >
-                    <Check className="h-3 w-3" />
+              {/* 4. Active Equalizer or Circular Play Button */}
+              <span className="flex shrink-0 items-center justify-end pr-1 text-right">
+                {isActive && isPlaying ? (
+                  <span className="flex h-4 w-4 items-end justify-center gap-0.5" aria-label="Playing">
+                    <span className="w-0.5 rounded-full animate-pulse h-3" style={{ backgroundColor: trackAccent }} />
+                    <span className="w-0.5 rounded-full animate-pulse h-4" style={{ backgroundColor: trackAccent, animationDelay: '0.2s' }} />
+                    <span className="w-0.5 rounded-full animate-pulse h-2" style={{ backgroundColor: trackAccent, animationDelay: '0.4s' }} />
+                  </span>
+                ) : isActive ? (
+                  <span className="flex h-4 w-4 items-end justify-center gap-0.5" aria-label="Selected">
+                    <span className="w-0.5 rounded-full h-2.5" style={{ backgroundColor: trackAccent }} />
+                    <span className="w-0.5 rounded-full h-3.5" style={{ backgroundColor: trackAccent }} />
+                    <span className="w-0.5 rounded-full h-2" style={{ backgroundColor: trackAccent }} />
                   </span>
                 ) : (
-                  <Play className="h-3.5 w-3.5 translate-x-px opacity-0 transition-opacity group-hover:opacity-100" />
+                  <span
+                    className="grid h-7 w-7 place-items-center rounded-full border border-white/20 text-slate-400 transition-all group-hover:border-white/40 group-hover:text-white"
+                    aria-hidden="true"
+                  >
+                    <Play className="ml-0.5 h-3 w-3 fill-current" />
+                  </span>
                 )}
               </span>
             </button>
@@ -134,3 +202,4 @@ export function TrackSelector({
     </div>
   );
 }
+

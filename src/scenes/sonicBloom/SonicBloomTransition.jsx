@@ -13,6 +13,7 @@ export function SonicBloomTransition({ onComplete, reducedMotion = false }) {
   const discRef = useRef(null);
   const ringRef = useRef(null);
   const titleRef = useRef(null);
+  const heartbeatRef = useRef(null);
 
   useEffect(() => {
     if (reducedMotion) {
@@ -20,10 +21,25 @@ export function SonicBloomTransition({ onComplete, reducedMotion = false }) {
       return () => clearTimeout(timer);
     }
 
+    // Initialize heartbeat audio effect
+    const heartbeatAudio = new Audio('/audio/sound-effects/heartbeat.mp3');
+    heartbeatAudio.volume = 0.45;
+    heartbeatRef.current = heartbeatAudio;
+
+    heartbeatAudio.play().catch((err) => {
+      // Browser autoplay restriction or audio loading issue handled gracefully
+      console.warn('[KuttyRadio] Heartbeat intro sfx skipped or deferred:', err);
+    });
+
     const ctx = gsap.context(() => {
       const bars = gsap.utils.toArray('.kr-eq-bar', containerRef.current);
       const timeline = gsap.timeline({
-        onComplete: () => onComplete?.(),
+        onComplete: () => {
+          if (heartbeatRef.current) {
+            heartbeatRef.current.pause();
+          }
+          onComplete?.();
+        },
       });
 
       gsap.set(containerRef.current, { opacity: 1 });
@@ -41,11 +57,27 @@ export function SonicBloomTransition({ onComplete, reducedMotion = false }) {
           ease: 'power2.out',
         }, 0.05)
         .to(ringRef.current, {
-          scale: 1.3,
-          opacity: 0.45,
+          scale: 1.35,
+          opacity: 0.55,
           duration: 0.45,
           ease: 'power2.out',
         }, 0.1)
+        // Subtle emotional heartbeat pulse
+        .to(discRef.current, {
+          scale: 1.08,
+          duration: 0.12,
+          yoyo: true,
+          repeat: 1,
+          ease: 'power1.inOut',
+        }, 0.45)
+        .to(ringRef.current, {
+          scale: 1.45,
+          opacity: 0.65,
+          duration: 0.15,
+          yoyo: true,
+          repeat: 1,
+          ease: 'power1.inOut',
+        }, 0.45)
         .to(bars, {
           scaleY: () => 0.4 + Math.random() * 0.7,
           opacity: 0.9,
@@ -56,10 +88,23 @@ export function SonicBloomTransition({ onComplete, reducedMotion = false }) {
           ease: 'sine.inOut',
         }, 0.2)
         .to(titleRef.current, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.3)
-        .to(containerRef.current, { opacity: 0, duration: 0.35, ease: 'power2.inOut' }, 1.0);
+        // Heartbeat fades out smoothly before the music begins
+        .to(heartbeatAudio, {
+          volume: 0,
+          duration: 0.35,
+          ease: 'power2.out',
+        }, 0.85)
+        .to(containerRef.current, { opacity: 0, duration: 0.35, ease: 'power2.inOut' }, 1.05);
     }, containerRef);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      if (heartbeatRef.current) {
+        heartbeatRef.current.pause();
+        heartbeatRef.current.removeAttribute('src');
+        heartbeatRef.current = null;
+      }
+    };
   }, [onComplete, reducedMotion]);
 
   return (

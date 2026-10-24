@@ -22,14 +22,14 @@ const SONG_MOODS = [
   { beamSpeed1: '14s', beamSpeed2: '18s', beamSpeed3: '22s', hazeAlpha: 0.18, beamAlpha: 0.24 },
   // 02 Chella Magale: lavender & pale cyan, slower beams, softer atmosphere
   { beamSpeed1: '22s', beamSpeed2: '28s', beamSpeed3: '32s', hazeAlpha: 0.14, beamAlpha: 0.19 },
-  // 03 Magale: deeper blue & violet, layered overlapping light trails
-  { beamSpeed1: '25s', beamSpeed2: '30s', beamSpeed3: '34s', hazeAlpha: 0.16, beamAlpha: 0.20 },
-  // 04 Alakolava: rich violet & coral tones, intimate stage
-  { beamSpeed1: '19s', beamSpeed2: '24s', beamSpeed3: '28s', hazeAlpha: 0.19, beamAlpha: 0.22 },
+  // 03 Magale: peaceful twilight lavender & rose, gentle slow haze
+  { beamSpeed1: '28s', beamSpeed2: '34s', beamSpeed3: '38s', hazeAlpha: 0.20, beamAlpha: 0.16 },
+  // 04 Alakolava: sunlit courtyard, gentle daylight & sage beams
+  { beamSpeed1: '24s', beamSpeed2: '30s', beamSpeed3: '36s', hazeAlpha: 0.13, beamAlpha: 0.15 },
   // 05 Engey Andha Vennnila: quietest atmosphere, deep midnight blue, slow movement
   { beamSpeed1: '34s', beamSpeed2: '40s', beamSpeed3: '44s', hazeAlpha: 0.09, beamAlpha: 0.13 },
-  // 06 Life of Pazham: celebratory energy, cyan, coral & violet moving together
-  { beamSpeed1: '13s', beamSpeed2: '17s', beamSpeed3: '21s', hazeAlpha: 0.22, beamAlpha: 0.26 },
+  // 06 Life of Pazham: uplifting natural daylight, warm sage & soft cream ambient sweeps
+  { beamSpeed1: '20s', beamSpeed2: '26s', beamSpeed3: '30s', hazeAlpha: 0.16, beamAlpha: 0.18 },
 ];
 
 export function ConcertAtmosphere({

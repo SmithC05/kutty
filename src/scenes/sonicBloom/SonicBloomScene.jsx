@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Disc3, Heart, ListMusic, Music2, X } from 'lucide-react';
+import { ArrowLeft, Heart, ListMusic, MoreHorizontal, Music2, Play, X } from 'lucide-react';
 import { useScene } from '../../context/SceneContext';
 import { useAudio } from '../../context';
 import { SCENES } from '../../constants';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { sonicBloomSongs } from '../../data/sonicBloomSongs';
-import { SonicBloomCanvas } from './SonicBloomCanvas';
-import { SonicBloomFallback2D } from './SonicBloomFallback2D';
+import { CinematicArtworkCard } from './CinematicArtworkCard';
 import { SonicBloomTransition } from './SonicBloomTransition';
 import { TrackSelector } from './TrackSelector';
 import { AudioPlayerShell } from './AudioPlayerShell';
@@ -15,20 +14,7 @@ import { ClosingDedication } from './ClosingDedication';
 import { LyricsPanel } from './LyricsPanel';
 import { ConcertAtmosphere } from './ConcertAtmosphere';
 import { ConcertPyrotechnics } from './ConcertPyrotechnics';
-import { TrackBurst } from './TrackBurst';
 import { triggerDevPyrotechnic, SonicBloomAudioEngine } from './audioAnalyzer';
-
-function checkWebGLSupport() {
-  try {
-    const canvas = document.createElement('canvas');
-    return Boolean(
-      window.WebGLRenderingContext &&
-        (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
-    );
-  } catch {
-    return false;
-  }
-}
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(() =>
@@ -56,10 +42,10 @@ export function SonicBloomScene() {
     stopBgm(500);
   }, [stopBgm]);
 
-  const [hasWebGL, setHasWebGL] = useState(true);
   const [activeTrackIndex, setActiveTrackIndex] = useState(0);
   const [isTransitionActive, setIsTransitionActive] = useState(!reducedMotion);
-  const handleTransitionComplete = useCallback(() => setIsTransitionActive(false), []);
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
+  const autoStartedRef = useRef(false);
   const [isClosingState, setIsClosingState] = useState(false);
   const [mobileQueueOpen, setMobileQueueOpen] = useState(false);
 
@@ -81,6 +67,43 @@ export function SonicBloomScene() {
     isSustainedHigh: false,
   });
 
+  const startFirstSong = useCallback(() => {
+    if (autoStartedRef.current) return;
+    autoStartedRef.current = true;
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const initialTrack = sonicBloomSongs[0];
+    if (!audio.src && initialTrack?.audio?.src) {
+      audio.src = initialTrack.audio.src;
+    }
+    audio.currentTime = 0;
+    engineRef.current?.connectAudioElement(audio);
+    engineRef.current?.resume();
+    audio
+      .play()
+      .then(() => {
+        isPlayingRef.current = true;
+        setIsPlaying(true);
+        setAutoplayBlocked(false);
+      })
+      .catch((err) => {
+        console.info('[KuttyRadio] Autoplay policy prevented immediate playback:', err);
+        setAutoplayBlocked(true);
+      });
+  }, []);
+
+  const handleTransitionComplete = useCallback(() => {
+    setIsTransitionActive(false);
+    startFirstSong();
+  }, [startFirstSong]);
+
+  useEffect(() => {
+    if (reducedMotion && !autoStartedRef.current) {
+      startFirstSong();
+    }
+  }, [reducedMotion, startFirstSong]);
+
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
@@ -89,6 +112,7 @@ export function SonicBloomScene() {
   useEffect(() => {
     const engine = new SonicBloomAudioEngine();
     const audio = new Audio();
+    audio.crossOrigin = 'anonymous';
     engineRef.current = engine;
     audioRef.current = audio;
     audio.preload = 'metadata';
@@ -146,6 +170,21 @@ export function SonicBloomScene() {
     };
   }, []);
 
+  // Resume AudioContext on any user interaction (click, tap, key) to satisfy browser autoplay policies
+  useEffect(() => {
+    const unlockAudio = () => {
+      engineRef.current?.resume();
+    };
+    window.addEventListener('click', unlockAudio, { passive: true });
+    window.addEventListener('touchstart', unlockAudio, { passive: true });
+    window.addEventListener('keydown', unlockAudio, { passive: true });
+    return () => {
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
+    };
+  }, []);
+
   // Switch tracks
   useEffect(() => {
     const audio = audioRef.current;
@@ -163,20 +202,21 @@ export function SonicBloomScene() {
 
     if (shouldContinue) {
       engineRef.current?.connectAudioElement(audio);
+      engineRef.current?.resume();
       audio.play().catch((error) => {
         console.warn('[KuttyRadio] Playback failed:', error);
       });
     }
   }, [activeTrackIndex]);
 
-  // Audio analysis frame loop
+  // Audio analysis frame loop (60fps smooth analysis)
   useEffect(() => {
     let animationFrame;
     let lastTime = performance.now();
 
     const update = (now) => {
       const delta = now - lastTime;
-      if (delta >= 32) {
+      if (delta >= 16) {
         lastTime = now;
         if (engineRef.current) setAudioReactivity(engineRef.current.update(delta));
       }
@@ -188,6 +228,7 @@ export function SonicBloomScene() {
   }, []);
 
   const handleTogglePlay = useCallback(() => {
+    setAutoplayBlocked(false);
     const audio = audioRef.current;
     if (!audio) return;
 
@@ -201,6 +242,7 @@ export function SonicBloomScene() {
     if (!audio.src && track?.audio?.src) audio.src = track.audio.src;
     if (audio.ended || audio.currentTime >= (audio.duration || Infinity)) audio.currentTime = 0;
     engineRef.current?.connectAudioElement(audio);
+    engineRef.current?.resume();
     audio.play().catch((error) => {
       console.warn('[KuttyRadio] Audio playback failed:', error);
     });
@@ -215,9 +257,6 @@ export function SonicBloomScene() {
     setCurrentTime(nextTime);
   }, []);
 
-  useEffect(() => {
-    setHasWebGL(checkWebGLSupport());
-  }, []);
 
   // Shift + P for dev testing of pyrotechnics
   useEffect(() => {
@@ -236,18 +275,24 @@ export function SonicBloomScene() {
 
   const handleSelectTrack = useCallback((index) => {
     if (index < 0 || index >= sonicBloomSongs.length) return;
+    setAutoplayBlocked(false);
     setIsClosingState(false);
+    autoAdvanceRef.current = true;
     setActiveTrackIndex(index);
     setMobileQueueOpen(false);
   }, []);
 
   const handlePreviousTrack = useCallback(() => {
     setIsClosingState(false);
+    setAutoplayBlocked(false);
+    autoAdvanceRef.current = true;
     setActiveTrackIndex((previous) => Math.max(0, previous - 1));
   }, []);
 
   const handleNextTrack = useCallback(() => {
     setIsClosingState(false);
+    setAutoplayBlocked(false);
+    autoAdvanceRef.current = true;
     setActiveTrackIndex((previous) => Math.min(sonicBloomSongs.length - 1, previous + 1));
   }, []);
 
@@ -263,18 +308,31 @@ export function SonicBloomScene() {
     transitionTo(SCENES.MEMORY_JOURNEY_TOGETHER);
   }, [transitionTo]);
 
-  // Background gradient: subtle, cohesive dark listening room
+  // Background gradient: dynamic, cohesive listening room adapting to active track theme
   const primaryAccent = activeTrack.colors.primary;
+  const secondaryAccent = activeTrack.colors.secondary || '#fb7185';
+  const panelBg = activeTrack.colors.panelBg || '#0d0f15';
+  const bgMidnight = activeTrack.colors.bgMidnight || '#07080c';
+  const isAlakolava = activeTrack.id === 'alakolava';
+  const isVennila = activeTrack.id === 'engey-andha-vennnila';
+  const isPazham = activeTrack.id === 'life-of-pazham';
   const bgGradient = isClosingState
-    ? 'radial-gradient(ellipse at 42% 32%, rgba(163,230,53,0.12) 0%, rgba(14,16,22,0.96) 62%, #090b10 100%)'
-    : `radial-gradient(ellipse at 40% 28%, ${primaryAccent}15 0%, rgba(14,16,22,0.96) 60%, #090b10 100%)`;
+    ? 'radial-gradient(ellipse at 42% 32%, rgba(245,158,11,0.12) 0%, rgba(13,15,20,0.96) 62%, #08090d 100%)'
+    : isAlakolava
+    ? 'radial-gradient(ellipse at 75% 15%, rgba(254, 250, 224, 0.18) 0%, transparent 52%), radial-gradient(ellipse at 20% 25%, rgba(244, 114, 182, 0.14) 0%, transparent 55%), radial-gradient(ellipse at 80% 80%, rgba(107, 143, 113, 0.12) 0%, transparent 50%), radial-gradient(circle at 50% 50%, #221f1dee 0%, #171513 100%)'
+    : isVennila
+    ? 'radial-gradient(ellipse at 30% 18%, rgba(129, 140, 248, 0.18) 0%, rgba(96, 165, 250, 0.08) 35%, transparent 65%), radial-gradient(ellipse at 85% 75%, rgba(203, 213, 225, 0.08) 0%, transparent 50%), radial-gradient(circle at 50% 50%, #0e1726ee 0%, #070c18 100%)'
+    : isPazham
+    ? 'radial-gradient(ellipse at 18% 22%, rgba(254, 250, 224, 0.16) 0%, transparent 50%), radial-gradient(ellipse at 78% 70%, rgba(107, 158, 120, 0.16) 0%, transparent 55%), radial-gradient(ellipse at 50% 15%, rgba(135, 152, 106, 0.10) 0%, transparent 50%), radial-gradient(circle at 50% 50%, #142018ee 0%, #0c1510 100%)'
+    : `radial-gradient(ellipse at 25% 20%, ${primaryAccent}18 0%, transparent 60%), radial-gradient(ellipse at 75% 75%, ${secondaryAccent}12 0%, transparent 55%), radial-gradient(circle at 50% 50%, ${panelBg}ee 0%, ${bgMidnight} 100%)`;
 
   return (
     <div
-      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden text-white font-['DM_Sans',sans-serif] select-none flex flex-col bg-[#090b10]"
+      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden text-white font-['DM_Sans',sans-serif] select-none flex flex-col transition-colors duration-700 ease-in-out"
       style={{
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)',
+        backgroundColor: bgMidnight,
       }}
     >
       {/* ── Transition ── */}
@@ -318,7 +376,7 @@ export function SonicBloomScene() {
         }}
       />
 
-      {/* ── TOP HEADER BAR (Clean, Elegant) ── */}
+      {/* ── TOP HEADER BAR (Exact match to reference mockup) ── */}
       <header className="relative z-20 shrink-0 flex items-center justify-between border-b border-white/[0.06] px-4 py-2 sm:px-6 sm:py-2.5">
         <div className="flex items-center gap-3">
           <button
@@ -334,19 +392,68 @@ export function SonicBloomScene() {
 
           <div className="flex items-center gap-2">
             <div
-              className="grid h-7 w-7 place-items-center rounded-lg text-[#0a0d08]"
+              className="grid h-7 w-7 place-items-center rounded-lg shadow-sm transition-colors duration-500"
               style={{
-                background: `linear-gradient(135deg, ${primaryAccent}, #84cc16)`,
+                backgroundColor: activeTrack.colors?.headerIconBg || '#a3e635',
+                color: activeTrack.colors?.headerIconColor || '#000000',
               }}
               aria-hidden="true"
             >
               <Music2 className="h-4 w-4" />
             </div>
-            <span className="text-base font-bold tracking-tight text-white font-['Outfit',sans-serif]">
-              Kutty Radio
+            <span className="flex items-center gap-1.5 text-base font-bold tracking-tight text-white font-['Outfit',sans-serif]">
+              <span>Kutty Radio</span>
+              <span className="text-rose-400 font-normal text-sm">♡</span>
             </span>
+
+            {/* Subtle audio-reactive mini equalizer next to identity */}
+            <div className="flex items-end gap-0.5 ml-1 h-3.5" aria-hidden="true">
+              {[0.4, 0.8, 0.5, 0.9, 0.6].map((mult, i) => {
+                const barHeight = isPlaying
+                  ? Math.max(3, Math.min(13, (audioReactivity.amplitude * 0.7 + mult * 0.3) * 13))
+                  : 3;
+                return (
+                  <span
+                    key={i}
+                    className="w-0.5 rounded-full transition-all duration-150"
+                    style={{
+                      height: `${barHeight}px`,
+                      backgroundColor: activeTrack.colors?.accent || primaryAccent,
+                      opacity: isPlaying ? 0.85 : 0.35,
+                    }}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
+
+        {/* Center: Subtle Audio Waveform + Tagline (Desktop) */}
+        {!isMobile && (
+          <div className="hidden md:flex items-center gap-2.5 opacity-90">
+            <div className="flex items-end gap-0.5 h-4" aria-hidden="true">
+              {[20, 35, 15, 60, 40, 75, 25, 50, 30].map((baseH, i) => {
+                const dynamicH = isPlaying
+                  ? Math.max(3, Math.min(15, (baseH * 0.15 + audioReactivity.amplitude * 6)))
+                  : 3;
+                return (
+                  <span
+                    key={i}
+                    className="w-0.5 rounded-full transition-all duration-150"
+                    style={{
+                      height: `${dynamicH}px`,
+                      backgroundColor: `${primaryAccent}bb`,
+                      opacity: isPlaying ? 0.85 : 0.3,
+                    }}
+                  />
+                );
+              })}
+            </div>
+            <p className="font-cursive text-lg lg:text-xl text-[#f5d9bb] tracking-wide select-none drop-shadow">
+              Some songs feel like you ... ♡
+            </p>
+          </div>
+        )}
 
         <div className="flex items-center gap-2">
           {/* Mobile Queue Toggle button */}
@@ -362,23 +469,32 @@ export function SonicBloomScene() {
           )}
 
           <span
-            className="inline-flex min-h-8 items-center gap-1.5 rounded-full border px-2.5 text-[10px] font-semibold tabular-nums tracking-wide"
+            className="inline-flex min-h-8 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold tabular-nums backdrop-blur-md transition-all duration-500"
             style={{
-              color: primaryAccent,
-              borderColor: `${primaryAccent}30`,
-              background: `${primaryAccent}0e`,
+              borderColor: `${primaryAccent}45`,
+              backgroundColor: 'rgba(0,0,0,0.55)',
+              color: activeTrack.colors?.accent || primaryAccent,
             }}
           >
             <span
-              className={
-                isPlaying
-                  ? 'h-1.5 w-1.5 animate-pulse rounded-full'
-                  : 'h-1.5 w-1.5 rounded-full'
-              }
-              style={{ background: primaryAccent }}
+              className="h-1.5 w-1.5 rounded-full transition-all duration-200"
+              style={{
+                backgroundColor: activeTrack.colors?.accent || primaryAccent,
+                transform: isPlaying ? `scale(${1 + audioReactivity.amplitude * 0.4})` : 'scale(1)',
+                boxShadow: isPlaying ? `0 0 8px ${activeTrack.colors?.accent || primaryAccent}` : 'none',
+              }}
             />
             {String(activeTrackIndex + 1).padStart(2, '0')} / 06
           </span>
+
+          <button
+            type="button"
+            onClick={() => setIsClosingState(true)}
+            aria-label="Playlist options"
+            className="hidden sm:grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-slate-400 transition hover:bg-white/[0.08] hover:text-white"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
         </div>
       </header>
 
@@ -387,63 +503,23 @@ export function SonicBloomScene() {
         {/* DESKTOP LAYOUT (2 Columns) */}
         {!isMobile ? (
           <div className="grid h-full min-h-0 grid-cols-12 gap-5 items-stretch">
-            {/* Left Column (5 Cols): Visualizer + Queue + Note */}
+            {/* Left Column (7 Cols ~ 58-62%): Hero Cinematic Artwork + Queue + Note */}
             <section
-              aria-label="Vinyl visualizer and playlist"
-              className="col-span-5 flex h-full min-h-0 flex-col gap-3"
+              aria-label="Cinematic song artwork and playlist queue"
+              className="col-span-7 flex h-full min-h-0 flex-col gap-2.5 sm:gap-3"
             >
-              {/* Compact Visualizer Card */}
-              <div className="relative shrink-0 h-[210px] w-full overflow-hidden rounded-2xl border border-white/[0.08] bg-[#11141c]/90 shadow-lg">
-                <div className="absolute inset-0">
-                  {hasWebGL ? (
-                    <SonicBloomCanvas
-                      activeTrackIndex={activeTrackIndex}
-                      audioReactivity={audioReactivity}
-                      reducedMotion={reducedMotion}
-                      isClosingState={isClosingState}
-                    />
-                  ) : (
-                    <SonicBloomFallback2D
-                      activeTrackIndex={activeTrackIndex}
-                      reducedMotion={reducedMotion}
-                    />
-                  )}
-                </div>
+              {/* Large Hero Cinematic Artwork Card */}
+              <CinematicArtworkCard
+                activeTrack={activeTrack}
+                isPlaying={isPlaying}
+                onTogglePlay={handleTogglePlay}
+                reducedMotion={reducedMotion}
+                className="shrink-0"
+              />
 
-                {!isTransitionActive && (
-                  <TrackBurst
-                    activeTrackIndex={activeTrackIndex}
-                    reducedMotion={reducedMotion}
-                  />
-                )}
-
-                {/* Overlaid Badge */}
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="truncate text-base font-semibold text-white font-['Outfit',sans-serif]">
-                        {activeTrack.title}
-                      </p>
-                      <p className="truncate text-[11px] text-slate-300">
-                        {[activeTrack.film, activeTrack.theme].filter(Boolean).join(' · ')}
-                      </p>
-                    </div>
-                    <span
-                      className="shrink-0 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border"
-                      style={{
-                        color: primaryAccent,
-                        borderColor: `${primaryAccent}40`,
-                        background: `${primaryAccent}15`,
-                      }}
-                    >
-                      {isPlaying ? 'Playing' : 'Paused'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 6-Song Track Queue (Scrollable internally if needed) */}
+              {/* 6-Song Track Queue (Scrollable internally with auto-scroll) */}
               <div
+                data-queue-scrollable="true"
                 className="flex-1 min-h-0 overflow-y-auto pr-1"
                 style={{
                   scrollbarWidth: 'thin',
@@ -451,10 +527,10 @@ export function SonicBloomScene() {
                 }}
               >
                 <div className="mb-1.5 flex items-center justify-between px-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Your Queue · 6 Songs
+                  <span className="text-xs font-bold text-white/90 font-['Outfit',sans-serif]">
+                    Playlist · 6 Songs
                   </span>
-                  <span className="text-[10px] text-slate-500">Tap to select</span>
+                  <span className="text-[10px] text-slate-400">Tap to select</span>
                 </div>
                 <TrackSelector
                   tracks={sonicBloomSongs}
@@ -465,21 +541,34 @@ export function SonicBloomScene() {
               </div>
 
               {/* Personal Note Card */}
-              <div className="shrink-0 rounded-xl border border-white/[0.07] bg-[#12151f]/80 p-2.5">
-                <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                  <Heart className="h-3 w-3 text-rose-300" />
-                  <span>Why this song?</span>
+              <div
+                className="shrink-0 rounded-2xl border p-3 shadow-sm backdrop-blur-md transition-all duration-500"
+                style={{
+                  backgroundColor: activeTrack.colors?.panelBg ? `${activeTrack.colors.panelBg}ee` : 'rgba(13, 15, 21, 0.85)',
+                  borderColor: activeTrack.colors?.borderLight || `${primaryAccent}20`,
+                  boxShadow: `0 8px 24px -6px rgba(0,0,0,0.5), 0 0 20px ${primaryAccent}0a`,
+                }}
+              >
+                <div
+                  className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider transition-colors duration-500"
+                  style={{ color: activeTrack.colors?.accent || primaryAccent }}
+                >
+                  <Heart className="h-3 w-3" style={{ color: secondaryAccent }} />
+                  <span>Why this song for Kutty?</span>
                 </div>
-                <p className="mt-1 text-xs leading-relaxed text-slate-200 italic">
+                <p
+                  className="mt-1 text-xs leading-relaxed italic font-['DM_Sans',sans-serif] transition-colors duration-500"
+                  style={{ color: activeTrack.colors?.core || '#e2e8f0' }}
+                >
                   “{activeTrack.personalNote}”
                 </p>
               </div>
             </section>
 
-            {/* Right Column (7 Cols): Lyrics Panel (Continuously Visible!) */}
+            {/* Right Column (5 Cols ~ 38-42%): Compact Lyrics Panel Companion */}
             <section
               aria-label="Song Lyrics"
-              className="col-span-7 flex h-full min-h-0 flex-col"
+              className="col-span-5 flex h-full min-h-0 flex-col"
             >
               <AnimatePresence mode="wait">
                 {isClosingState ? (
@@ -508,6 +597,7 @@ export function SonicBloomScene() {
                       track={activeTrack}
                       currentTime={currentTime}
                       isPlaying={isPlaying}
+                      audioReactivity={audioReactivity}
                       onSeek={handleSeek}
                     />
                   </motion.div>
@@ -518,17 +608,24 @@ export function SonicBloomScene() {
         ) : (
           /* MOBILE LAYOUT (Stacked, Single Screen, No whole-page scroll) */
           <div className="flex h-full min-h-0 flex-col gap-2">
-            {/* Top Mini Track Card with Rotating Vinyl Disc */}
-            <div className="shrink-0 flex items-center justify-between gap-3 rounded-xl border border-white/[0.08] bg-[#12151f]/90 p-2.5 shadow-md">
+            {/* Top Mini Track Card with Cinematic Thumbnail */}
+            <div className="shrink-0 flex items-center justify-between gap-3 rounded-2xl border border-white/[0.08] bg-[#0e1118]/90 p-2.5 shadow-md">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[#0a0c10] border border-white/10"
+                  className="relative h-11 w-14 shrink-0 overflow-hidden rounded-lg bg-[#141822] border border-white/10"
                   aria-hidden="true"
                 >
-                  <Disc3
-                    className={`h-6 w-6 ${isPlaying ? 'animate-spin' : ''}`}
-                    style={{ color: primaryAccent, animationDuration: '4s' }}
-                  />
+                  {activeTrack?.artwork ? (
+                    <img
+                      src={activeTrack.artwork}
+                      alt={activeTrack.title}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="grid h-full w-full place-items-center">
+                      <Music2 className="h-5 w-5" style={{ color: primaryAccent }} />
+                    </div>
+                  )}
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-xs font-semibold text-white font-['Outfit',sans-serif]">
@@ -543,9 +640,9 @@ export function SonicBloomScene() {
               <button
                 type="button"
                 onClick={() => setMobileQueueOpen(true)}
-                className="shrink-0 rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[10px] font-medium text-slate-300"
+                className="shrink-0 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-[11px] font-medium text-slate-200"
               >
-                Change song
+                Queue (6)
               </button>
             </div>
 
@@ -571,6 +668,7 @@ export function SonicBloomScene() {
                     track={activeTrack}
                     currentTime={currentTime}
                     isPlaying={isPlaying}
+                    audioReactivity={audioReactivity}
                     onSeek={handleSeek}
                   />
                 )}
@@ -597,7 +695,7 @@ export function SonicBloomScene() {
                   >
                     <div className="mb-3 flex items-center justify-between border-b border-white/[0.08] pb-3">
                       <div>
-                        <h4 className="text-sm font-bold text-white font-['Manrope']">
+                        <h4 className="text-sm font-bold text-white font-['Outfit',sans-serif]">
                           Six Songs for Kutty
                         </h4>
                         <p className="text-[10px] text-slate-400">Select any song to listen & sing</p>
@@ -612,7 +710,7 @@ export function SonicBloomScene() {
                       </button>
                     </div>
 
-                    <div className="flex-1 min-h-0 overflow-y-auto">
+                    <div data-queue-scrollable="true" className="flex-1 min-h-0 overflow-y-auto">
                       <TrackSelector
                         tracks={sonicBloomSongs}
                         activeTrackIndex={activeTrackIndex}
@@ -627,6 +725,36 @@ export function SonicBloomScene() {
           </div>
         )}
       </main>
+
+      {/* ── AUTOPLAY BLOCKED FALLBACK PROMPT ── */}
+      {autoplayBlocked && !isPlaying && (
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 15 }}
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40"
+        >
+          <button
+            type="button"
+            onClick={handleTogglePlay}
+            className="flex items-center gap-2 rounded-full border px-5 py-2.5 text-xs font-semibold shadow-2xl backdrop-blur-xl transition-all transform hover:scale-105 active:scale-95"
+            style={{
+              backgroundColor: 'rgba(15, 18, 26, 0.95)',
+              borderColor: `${primaryAccent}60`,
+              color: activeTrack.colors?.accent || '#ffffff',
+              boxShadow: `0 10px 30px rgba(0,0,0,0.6), 0 0 25px ${primaryAccent}33`,
+            }}
+          >
+            <span
+              className="grid h-5 w-5 place-items-center rounded-full text-black"
+              style={{ backgroundColor: activeTrack.colors?.accent || primaryAccent }}
+            >
+              <Play className="h-3 w-3 fill-current ml-0.5" />
+            </span>
+            <span>Tap to Play Kutty Radio ♡</span>
+          </button>
+        </motion.div>
+      )}
 
       {/* ── PERSISTENT DOCKED AUDIO PLAYER ── */}
       <div className="relative z-20 shrink-0 px-3 pb-2 pt-1 sm:px-6 sm:pb-3">

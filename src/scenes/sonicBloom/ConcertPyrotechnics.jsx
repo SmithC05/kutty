@@ -97,6 +97,66 @@ export function ConcertPyrotechnics({
         return;
       }
 
+      // ── Magale Special Mode: Soft, slow-expanding emotional bloom, zero aggressive spark bursts ──
+      if (track.id === 'magale') {
+        blooms.push({
+          x: originX,
+          y: originY,
+          radius: 20,
+          maxRadius: isMobileRef.current ? 80 : 130,
+          alpha: 0.25,
+          color: colors[0],
+          decay: 0.007,
+        });
+        startLoop();
+        return;
+      }
+
+      // ── Alakolava Special Mode: Calm sunlit warmth bloom, zero aggressive spark bursts or fireworks ──
+      if (track.id === 'alakolava') {
+        blooms.push({
+          x: originX,
+          y: originY,
+          radius: 18,
+          maxRadius: isMobileRef.current ? 70 : 110,
+          alpha: 0.18,
+          color: '#fefae0', // warm cream sunlight bloom
+          decay: 0.006,
+        });
+        startLoop();
+        return;
+      }
+
+      // ── Engey Andha Vennnila Special Mode: Calm moonlit rooftop glow, zero fireworks or sparks ──
+      if (track.id === 'engey-andha-vennnila') {
+        blooms.push({
+          x: originX,
+          y: originY,
+          radius: 16,
+          maxRadius: isMobileRef.current ? 65 : 105,
+          alpha: 0.16,
+          color: '#cbd5e1', // soft moonlight silver bloom
+          decay: 0.005,
+        });
+        startLoop();
+        return;
+      }
+
+      // ── Life of Pazham Special Mode: Uplifting natural study-room sunlight & sage warmth, zero fireworks or sparks ──
+      if (track.id === 'life-of-pazham') {
+        blooms.push({
+          x: originX,
+          y: originY,
+          radius: 20,
+          maxRadius: isMobileRef.current ? 80 : 125,
+          alpha: 0.22,
+          color: '#fefae0', // warm natural sunlight bloom
+          decay: 0.007,
+        });
+        startLoop();
+        return;
+      }
+
       // ── Standard Mode: Layered spark particles + brief background bloom ──
       const isAccent = event.type === 'accent';
       const isSustained = event.type === 'sustained_sparkle';

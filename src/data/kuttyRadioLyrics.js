@@ -1,91 +1,134 @@
 /**
  * kuttyRadioLyrics.js
  *
- * Exact lyrics provided for all six songs in Kutty Radio.
- * Line timestamps are mapped to each audio clip for smooth karaoke synchronization
- * and tap-to-seek interactions.
+ * Exact Tamil lyrics supplied for all six songs in Kutty Radio.
+ *
+ * Synchronization Architecture:
+ * - Song ID mapped collection
+ * - Ordered lyric lines preserving exact wording, spelling, and line breaks
+ * - Line-level start/end timestamps
+ * - Unicode-safe word tokenization with word-level start/end timestamps
+ * - Timing calibration status (isEstimated: true until studio calibrated)
  */
 
+function buildTimedLine(id, text, start, end, isEstimated = true) {
+  // Tokenize by whitespace to preserve complex Tamil graphemes (consonant + vowel signs + pulli)
+  const words = text
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const duration = Math.max(0.1, end - start);
+  const wordDuration = duration / Math.max(1, words.length);
+
+  const timedWords = words.map((word, index) => {
+    const wStart = Number((start + index * wordDuration).toFixed(2));
+    const wEnd = Number((start + (index + 1) * wordDuration).toFixed(2));
+    return {
+      word,
+      start: wStart,
+      end: wEnd,
+    };
+  });
+
+  return {
+    id,
+    text,
+    start,
+    end,
+    isEstimated,
+    words: timedWords,
+  };
+}
+
 export const kuttyRadioLyrics = {
-  // Song 01: Unnale (Raja Rani) — Vandhana Srinivasan
+  // ── Song 01: Unnale ────────────────────────────────────────────────────────
   unnale: [
-    { time: 0.0, text: 'Unnalae meimarandhu nindrenae', part: 'female' },
-    { time: 5.2, text: 'Mai vizhiyil maiyaludan vandhenae', part: 'female' },
-    { time: 10.8, text: 'Idai vidaadha nerukkangal', part: 'female' },
-    { time: 15.5, text: 'Thodarumaa uyirae', part: 'female' },
-    { time: 20.2, text: 'Mozhi illaamal thavikiren', part: 'female' },
-    { time: 25.8, text: 'Mounamaa ingae', part: 'female' },
-    { time: 31.4, text: 'Ulagathukke kadhapadaippom', part: 'female' },
-    { time: 36.8, text: 'Neeyum naanum', part: 'female' },
-    { time: 42.0, text: 'Kekaamale unakena thara uyir irukkudhu', part: 'female' },
+    buildTimedLine('unnale-1', 'உன்னாலே மெய் மறந்து நின்றேனே', 0.0, 5.0),
+    buildTimedLine('unnale-2', 'மை விழியில் மையலுடன் வந்தேனே', 5.0, 10.0),
+    buildTimedLine('unnale-3', 'இடை விடாத நெருங்கங்கள்', 10.0, 15.0),
+    buildTimedLine('unnale-4', 'தொடருமா உயிரே', 15.0, 20.0),
+    buildTimedLine('unnale-5', 'மொழி இல்லாமல் தவிக்கிறேன்', 20.0, 25.0),
+    buildTimedLine('unnale-6', 'மௌனமாய் இங்கே', 25.0, 30.0),
+    buildTimedLine('unnale-7', 'உன் தோளில் சாய்ந்து கொள்ள வந்தேனே', 30.0, 36.0),
+    buildTimedLine('unnale-8', 'இது போதும்...', 36.0, 40.0),
+    buildTimedLine('unnale-9', 'ஓஓஓஓ.....', 40.0, 45.0),
+    buildTimedLine('unnale-10', 'எப்போதும்', 45.0, 48.0),
+    buildTimedLine('unnale-11', 'ஓஓஓஓ.....', 48.0, 55.0),
   ],
 
-  // Song 02: Chella Magale (Jana Nayagan)
+  // ── Song 02: Chella Magale ──────────────────────────────────────────────────
   'chella-magale': [
-    { time: 0.8, text: 'Kanne maniyae kann imaiyae', part: 'male' },
-    { time: 6.2, text: 'En kai kulla malarnthavalae', part: 'male' },
-    { time: 11.8, text: 'Endhan nenjil kudi irukkum', part: 'male' },
-    { time: 17.5, text: 'Naan eeradha en uyire', part: 'male' },
-    { time: 23.0, text: 'Needhaane enakkellame', part: 'male' },
-    { time: 28.5, text: 'En chella magale', part: 'male' },
+    buildTimedLine('chella-1', 'உலகத்துக்கே கத வடைப்போம் நீயும் நானும்', 0.5, 4.5),
+    buildTimedLine('chella-2', 'கேட்காமலே உனக்குன்னு தர உயிர் இருக்குது', 4.5, 8.5),
+    buildTimedLine('chella-3', 'கண்ணே மணியே கண்ணிமையே', 8.5, 12.5),
+    buildTimedLine('chella-4', 'என் கைக்குள்ள மலர்ந்தவளே', 12.5, 16.5),
+    buildTimedLine('chella-5', 'எந்தன் நெஞ்சில் குடியிருக்கும்', 16.5, 20.5),
+    buildTimedLine('chella-6', 'நான் ஈராத என் உயிரே', 20.5, 24.5),
+    buildTimedLine('chella-7', 'நீதானே எனக்கெல்லாமே', 24.5, 28.5),
+    buildTimedLine('chella-8', 'என் செல்ல மகளே', 28.5, 31.5),
+    buildTimedLine('chella-9', 'கண்ணே மணியே', 31.5, 35.0),
   ],
 
-  // Song 03: Magale
+  // ── Song 03: Magale ────────────────────────────────────────────────────────
   magale: [
-    { time: 0.5, text: 'Ethana thanima vattum bothum', part: 'female' },
-    { time: 3.2, text: 'Enakkul ketkkum geetham nee', part: 'female' },
-    { time: 5.8, text: 'Thuyaram thaakkum bothum', part: 'female' },
-    { time: 8.5, text: 'Un sirippil mayakkum saami nee', part: 'female' },
-    { time: 11.2, text: 'Kuraigal ulla ennai', part: 'male' },
-    { time: 13.8, text: 'Viyandhu rasikkum idhayam nee', part: 'male' },
-    { time: 16.5, text: 'Nanae verukkum ennai', part: 'male' },
-    { time: 19.2, text: 'Vaari anaikkum jeevan nee', part: 'male' },
-    { time: 22.0, text: 'Chellame magale', part: 'male' },
-    { time: 24.2, text: 'Sandhana agale', part: 'male' },
-    { time: 26.5, text: 'Sondhmae uyire', part: 'male' },
-    { time: 28.8, text: 'Thaen mozhi', part: 'male' },
+    buildTimedLine('magale-1', 'எத்தனை தனிமை வாட்டும் போதும்', 0.5, 3.0),
+    buildTimedLine('magale-2', 'எனக்குள் கேட்கும் கீதம் நீ', 3.0, 5.5),
+    buildTimedLine('magale-3', 'துயரம் தாக்கும் போதும்', 5.5, 8.0),
+    buildTimedLine('magale-4', 'உன் சிரிப்பில் மயக்கும் சாமி நீ', 8.0, 10.5),
+    buildTimedLine('magale-5', 'குறைகள் உள்ள என்னை', 10.5, 13.0),
+    buildTimedLine('magale-6', 'வியந்து ரசிக்கும் இதயம் நீ', 13.0, 15.5),
+    buildTimedLine('magale-7', 'நானே வெறுக்கும் என்னை', 15.5, 18.0),
+    buildTimedLine('magale-8', 'வாரி அணைக்கும் ஜீவன் நீ', 18.0, 20.5),
+    buildTimedLine('magale-9', 'செல்லமே மகளே', 20.5, 23.0),
+    buildTimedLine('magale-10', 'சந்தன அகலே', 23.0, 25.5),
+    buildTimedLine('magale-11', 'சொந்தமே உயிரே', 25.5, 28.0),
+    buildTimedLine('magale-12', 'தேன்மொழி', 28.0, 31.0),
   ],
 
-  // Song 04: Alakolava (OM Chapter 1)
+  // ── Song 04: Alakolava ──────────────────────────────────────────────────────
   alakolava: [
-    { time: 0.5, text: 'All time-um anbarukkum', part: 'female' },
-    { time: 3.2, text: 'En thangame', part: 'female' },
-    { time: 5.8, text: 'Enakaaga kaathirukkum', part: 'female' },
-    { time: 8.4, text: 'En sondhame', part: 'female' },
-    { time: 11.0, text: 'Athu pothum vidamatten', part: 'female' },
-    { time: 13.8, text: 'Eppothum eppothumae', part: 'female' },
-    { time: 16.5, text: 'Rasikira kannaana kanmaniyae', part: 'male' },
-    { time: 19.4, text: 'En chellame', part: 'male' },
-    { time: 22.0, text: 'Ulagaala vazhanum-nnu', part: 'male' },
-    { time: 24.6, text: 'Manam sollumae', part: 'male' },
-    { time: 27.4, text: 'Marakaama irupenae', part: 'male' },
-    { time: 30.2, text: 'Pasama epodhumae', part: 'male' },
+    buildTimedLine('alakolava-1', 'ஆல் டைம் -மும் அன்பருக்கும்', 0.5, 2.5),
+    buildTimedLine('alakolava-2', 'என் தங்கமே', 2.5, 4.5),
+    buildTimedLine('alakolava-3', 'எனக்காக காத்திருக்கும்', 4.5, 6.5),
+    buildTimedLine('alakolava-4', 'என் சொந்தமே', 6.5, 8.5),
+    buildTimedLine('alakolava-5', 'அது போதும் விடமாட்டேன்', 8.5, 10.5),
+    buildTimedLine('alakolava-6', 'எப்போதும் எப்போதுமே', 10.5, 12.5),
+    buildTimedLine('alakolava-7', 'ரசிக்கிற கண்ணான கண்மணியே', 12.5, 14.5),
+    buildTimedLine('alakolava-8', 'என் செல்லமே', 14.5, 16.5),
+    buildTimedLine('alakolava-9', 'உலகால வாழனும்-ன்னு', 16.5, 18.5),
+    buildTimedLine('alakolava-10', 'மனம் சொல்லுமே', 18.5, 20.5),
+    buildTimedLine('alakolava-11', 'மறக்காம இருப்பேனே', 20.5, 22.5),
+    buildTimedLine('alakolava-12', 'பாசமா எப்போதுமே', 22.5, 24.5),
+    buildTimedLine('alakolava-13', 'கோனே லேரே சூரே', 24.5, 26.5),
+    buildTimedLine('alakolava-14', 'ஊரே அலறணும் கேட்டா', 26.5, 28.5),
+    buildTimedLine('alakolava-15', 'நம்மளோட ஸௌண்ட', 28.5, 30.0),
+    buildTimedLine('alakolava-16', 'வெய்ட்-டா டைய்ட்-டா கொய்ட்-டா', 30.0, 31.5),
+    buildTimedLine('alakolava-17', 'பேட்டா வெளக்குதா', 31.5, 33.0),
   ],
 
-  // Song 05: Engey Andha Vennila
+  // ── Song 05: Engey Andha Vennnila ──────────────────────────────────────────
   'engey-andha-vennnila': [
-    { time: 0.8, text: 'Thaagam engiren neerai varugiraai', part: 'female' },
-    { time: 5.5, text: 'Sogam engiren thaaiyaai varugiraai', part: 'female' },
-    { time: 10.5, text: 'Nadhigalil meengal neendhuthama', part: 'male' },
-    { time: 15.2, text: 'Athil nadhikoru vazhiyum illaiyama', part: 'male' },
-    { time: 20.0, text: 'Un ninaivugal idhayathil neendhuthama', part: 'male' },
-    { time: 25.0, text: 'Athil enakoru vazhiyum illaiyama', part: 'male' },
-    { time: 30.0, text: 'Nee irunthaal enna pirinthaal enna', part: 'male' },
+    buildTimedLine('vennila-1', 'தாகம் என்கிறேன் நீராய் வருகிறாய்', 0.8, 4.5),
+    buildTimedLine('vennila-2', 'சோகம் என்கிறேன் தாயாய் வருகிறாய்', 4.5, 8.5),
+    buildTimedLine('vennila-3', 'நதிகளில் மீன்கள்', 8.5, 12.0),
+    buildTimedLine('vennila-4', 'நீந்துதம்மா அதில் நதிக்கொரு', 12.0, 16.0),
+    buildTimedLine('vennila-5', 'வலியும் இல்லையம்மா உன்', 16.0, 20.0),
+    buildTimedLine('vennila-6', 'நினைவுகள் இதயத்தில் நீந்துதம்மா', 20.0, 24.5),
+    buildTimedLine('vennila-7', 'அதில் எனக்கொரு வலியும் இல்லையம்மா', 24.5, 28.5),
+    buildTimedLine('vennila-8', 'நீ இருந்தால்', 28.5, 31.5),
+    buildTimedLine('vennila-9', 'என்ன பிரிந்தால் என்ன', 31.5, 35.0),
   ],
 
-  // Song 06: Life of Pazham (Thiruchitrambalam)
+  // ── Song 06: Life of Pazham ────────────────────────────────────────────────
   'life-of-pazham': [
-    { time: 0.5, text: 'Nee vandhadhaal', part: 'female' },
-    { time: 3.5, text: 'Idhuvum dhoosaguthu', part: 'female' },
-    { time: 6.8, text: 'Onnaladhaan manasu lesaaguthu', part: 'female' },
-    { time: 10.2, text: 'En vazhkai idhu dhaan', part: 'female' },
-    { time: 13.5, text: 'Kadhaiyaaga solla', part: 'female' },
-    { time: 17.0, text: 'Un peru illamaa oru pakkam illa', part: 'female' },
-    { time: 20.5, text: 'Enakaaga uruga', part: 'male' },
-    { time: 24.0, text: 'En kaadha thiruga', part: 'male' },
-    { time: 27.5, text: 'Vazhi padha nilavaa', part: 'male' },
-    { time: 31.0, text: 'Nee venum neduga', part: 'male' },
-    { time: 34.5, text: 'Theeratha theeyaga naan aana podhum', part: 'male' },
-    { time: 38.0, text: 'Thiriyoram nee dhaan di ena yethina', part: 'male' },
+    buildTimedLine('pazham-1', 'நீ வந்ததால் இதுவும் தூசாகுது', 0.5, 5.5),
+    buildTimedLine('pazham-2', 'உன்னால தான் மனசு லேசாகுது', 5.5, 10.5),
+    buildTimedLine('pazham-3', 'என் வாழ்க்க இது தான்னு கதையாக சொல்ல', 10.5, 15.5),
+    buildTimedLine('pazham-4', 'உன் பேரு இல்லமா ஒரு பக்கம் இல்ல', 15.5, 21.0),
+    buildTimedLine('pazham-5', 'எனக்காக உருக எனக்காக பெருக', 21.0, 26.5),
+    buildTimedLine('pazham-6', 'வழி பாத நிலவா நீ வேண்டும் நெடுக', 26.5, 32.0),
+    buildTimedLine('pazham-7', 'தீராத தீயாக நான் ஆன போதும்', 32.0, 37.0),
+    buildTimedLine('pazham-8', 'நெஞ்சோரம் நீதாண்டி என ஏத்துன', 37.0, 42.0),
   ],
 };

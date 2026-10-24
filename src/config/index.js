@@ -29,6 +29,6 @@ export const themeConfig = {
 
 export const devMode = {
   enabled: true,
-  startScene: null,
+  startScene: 'SONIC_BLOOM',
   bypassDate: false,
 };
