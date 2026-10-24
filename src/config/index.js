@@ -10,7 +10,7 @@ export const birthdayConfig = {
 };
 
 export const vaultConfig = {
-  secretPin: "3010",
+  secretPin: "1030",
 };
 
 export const animationTimings = {
