@@ -8,18 +8,18 @@
 
 export const sonicBloomConfig = {
   header: {
-    wordmark: 'SONIC BLOOM',
-    subtitleBadge: 'Six Songs, the Way I See You',
-    mainHeading: 'Six Songs, the Way I See You.',
-    supportingLine: 'Six songs. Six little pieces of what you mean to me, Kutty. ❤️',
+    wordmark: 'KUTTY RADIO',
+    subtitleBadge: 'A playlist made just for you',
+    mainHeading: 'Six songs. All the things I can’t say.',
+    supportingLine: 'Six songs picked with a little thought of you, Kutty. ❤️',
   },
   closing: {
-    title: 'The Full Bloom',
+    title: 'One playlist. Six little feelings.',
     message:
-      'Six songs could never say everything, but each one carries a little piece of what you mean to me, Kutty. ❤️',
+      'Six songs could never say everything. I hope each one reminds you how much you mean to me, Kutty. ❤️',
     backActionText: 'Back to the Birthday',
   },
-  sculptureCaption: 'Six songs. Six little pieces of you.',
+  sculptureCaption: 'Six songs. One very special person.',
 };
 
 export const sonicBloomSongs = [
