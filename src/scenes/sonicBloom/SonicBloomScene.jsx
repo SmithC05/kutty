@@ -67,6 +67,7 @@ export function SonicBloomScene() {
   const [activeTrackIndex, setActiveTrackIndex] = useState(0);
   const [activePanel, setActivePanel] = useState('songs');
   const [isTransitionActive, setIsTransitionActive] = useState(!reducedMotion);
+  const handleTransitionComplete = useCallback(() => setIsTransitionActive(false), []);
   const [isClosingState, setIsClosingState] = useState(false);
 
   const audioRef = useRef(null);
@@ -183,8 +184,10 @@ export function SonicBloomScene() {
 
     const update = (now) => {
       const delta = now - lastTime;
-      lastTime = now;
-      if (engineRef.current) setAudioReactivity(engineRef.current.update(delta));
+      if (delta >= 32) {
+        lastTime = now;
+        if (engineRef.current) setAudioReactivity(engineRef.current.update(delta));
+      }
       animationFrame = requestAnimationFrame(update);
     };
 
@@ -201,6 +204,7 @@ export function SonicBloomScene() {
       return;
     }
 
+    setIsClosingState(false);
     const track = sonicBloomSongs[activeTrackIndex];
     if (!audio.src && track?.audio?.src) audio.src = track.audio.src;
     if (audio.ended || audio.currentTime >= (audio.duration || Infinity)) audio.currentTime = 0;
@@ -281,7 +285,7 @@ export function SonicBloomScene() {
     >
       {isTransitionActive && (
         <SonicBloomTransition
-          onComplete={() => setIsTransitionActive(false)}
+          onComplete={handleTransitionComplete}
           reducedMotion={reducedMotion}
         />
       )}
