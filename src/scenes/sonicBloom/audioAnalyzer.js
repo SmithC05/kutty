@@ -140,7 +140,7 @@ export class SonicBloomAudioEngine {
   /**
    * Analyze one frame of audio (called via requestAnimationFrame)
    */
-  update(deltaMs = 16.6) {
+  update(_deltaMs = 16.6) {
     const isPlaying = Boolean(
       this.connectedElement &&
         !this.connectedElement.paused &&
