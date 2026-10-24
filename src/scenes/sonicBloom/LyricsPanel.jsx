@@ -55,7 +55,7 @@ export function LyricsPanel({ track, currentTime = 0, isPlaying = false, onSeek 
         <div className="flex items-center gap-3">
           <div
             className="grid h-10 w-10 place-items-center rounded-xl"
-            style={{ background: `linear-gradient(145deg, ${accent}30, rgba(255,255,255,0.04)`, border: `1px solid ${accent}35` }}
+            style={{ background: `linear-gradient(145deg, ${accent}30, rgba(255,255,255,0.04))`, border: `1px solid ${accent}35` }}
           >
             <Mic2 className="h-5 w-5" style={{ color: accent }} />
           </div>
