@@ -2,13 +2,17 @@ import React, { useEffect, useRef } from 'react';
 import { sonicBloomSongs } from '../../data/sonicBloomSongs';
 
 /**
- * SonicBloomFallback2D — 2D Canvas Vinyl & Sound Wave Visualizer
+ * SonicBloomFallback2D — 2D Canvas Six Distinct Song Visualizers
  *
- * High-performance 2D canvas fallback matching the After-Hours Listening Room concept:
- *   - Dark spinning vinyl record with concentric grooves, reflective sheen, and center label
- *   - Outer concentric sound wave rings with wave ripples
- *   - Orbiting sparkles and dust
+ * Renders 6 genuinely distinct visual compositions matching the 3D visualizer:
+ *   0. Unnale: Warm romantic cinema with golden bokeh discs and champagne sparkles.
+ *   1. Chella Magale: Soft luminous horizon gradient and upward-floating memory pearls.
+ *   2. Magale: Intimate harmonic sound-art resonance sine waves and fine glowing contours.
+ *   3. Alakolava: Stylish dramatic helical spiral ribbons in deep violet and warm coral.
+ *   4. Engey Andha Vennila: Serene night-sky star field and glowing moonlit corona.
+ *   5. Life of Pazham: Joyful energetic radial spectrum equalizer and celebratory particles.
  */
+
 export function SonicBloomFallback2D({
   activeTrackIndex = 0,
   reducedMotion = false,
@@ -41,8 +45,32 @@ export function SonicBloomFallback2D({
     };
 
     window.addEventListener('resize', handleResize);
-
     const startTime = performance.now();
+
+    // ── Pre-generated static items for stable rendering ──
+    const bokehItems = Array.from({ length: 16 }).map((_, i) => ({
+      xRatio: 0.2 + (i * 0.17) % 0.65,
+      yRatio: 0.25 + ((i * 0.23) % 0.55),
+      rRatio: 0.08 + (i % 4) * 0.035,
+      speed: 0.3 + (i % 3) * 0.2,
+      phase: i * 0.7,
+      color: i % 2 === 0 ? '#fde047' : '#fb923c',
+    }));
+
+    const pearlItems = Array.from({ length: 28 }).map((_, i) => ({
+      xRatio: 0.15 + (i * 0.13) % 0.7,
+      baseY: Math.random(),
+      speed: 0.15 + (i % 4) * 0.08,
+      size: 2.2 + (i % 3) * 1.5,
+      color: i % 2 === 0 ? '#c084fc' : '#2dd4bf',
+    }));
+
+    const starItems = Array.from({ length: 50 }).map((_, i) => ({
+      xRatio: (i * 37) % 100 / 100,
+      yRatio: (i * 59) % 100 / 100,
+      size: 1 + (i % 3) * 0.8,
+      alpha: 0.3 + (i % 5) * 0.15,
+    }));
 
     const render = (now) => {
       const elapsed = (now - startTime) * 0.001;
@@ -50,130 +78,230 @@ export function SonicBloomFallback2D({
 
       const cx = width / 2;
       const cy = height / 2;
-      const baseRadius = Math.min(width, height) * 0.36;
-      const primary = activeTrack.colors.primary || '#a3e635';
-      const secondary = activeTrack.colors.secondary || '#a78bfa';
+      const baseR = Math.min(width, height) * 0.36;
 
-      // 1. Ambient Background Glow
-      const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, baseRadius * 1.5);
-      bgGrad.addColorStop(0, `${primary}18`);
-      bgGrad.addColorStop(0.55, `${secondary}08`);
-      bgGrad.addColorStop(1, 'rgba(10, 12, 16, 0)');
-      ctx.fillStyle = bgGrad;
-      ctx.beginPath();
-      ctx.arc(cx, cy, baseRadius * 1.5, 0, Math.PI * 2);
-      ctx.fill();
+      // ─── 0. UNNALE: Warm Romantic Cinema ─────────────────────────────────
+      if (activeTrackIndex === 0) {
+        // Warm ambient background
+        const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, baseR * 1.6);
+        bgGrad.addColorStop(0, 'rgba(217, 119, 6, 0.22)');
+        bgGrad.addColorStop(0.6, 'rgba(245, 158, 11, 0.06)');
+        bgGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, width, height);
 
-      // 2. Concentric Sound Wave Rings
-      const waveCount = 3;
-      for (let w = 0; w < waveCount; w++) {
-        const ringRadius = baseRadius * (1.08 + w * 0.12);
-        const waveColor = w === 0 ? primary : secondary;
+        // Floating warm bokeh orbs
+        bokehItems.forEach((b) => {
+          const dy = reducedMotion ? 0 : Math.sin(elapsed * b.speed + b.phase) * 16;
+          const dx = reducedMotion ? 0 : Math.cos(elapsed * b.speed * 0.8 + b.phase) * 12;
+          const bx = b.xRatio * width + dx;
+          const by = b.yRatio * height + dy;
+          const br = b.rRatio * width;
+
+          const grad = ctx.createRadialGradient(bx, by, 0, bx, by, br);
+          grad.addColorStop(0, `${b.color}40`);
+          grad.addColorStop(0.7, `${b.color}15`);
+          grad.addColorStop(1, 'transparent');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(bx, by, br, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Golden amber record disc in center
         ctx.save();
+        ctx.translate(cx, cy);
+        if (!reducedMotion) ctx.rotate(elapsed * 0.25);
         ctx.beginPath();
-        const segments = 72;
-        for (let s = 0; s <= segments; s++) {
-          const theta = (s / segments) * Math.PI * 2;
-          const ripple = reducedMotion ? 1 : 1 + Math.sin(theta * 6 + elapsed * 2.5 + w) * 0.025;
-          const x = cx + Math.cos(theta) * ringRadius * ripple;
-          const y = cy + Math.sin(theta) * ringRadius * ripple;
-          if (s === 0) ctx.moveTo(x, y);
+        ctx.arc(0, 0, baseR * 0.82, 0, Math.PI * 2);
+        ctx.fillStyle = '#140f09';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(254, 240, 138, 0.18)';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        // Center golden label
+        ctx.beginPath();
+        ctx.arc(0, 0, baseR * 0.28, 0, Math.PI * 2);
+        ctx.fillStyle = '#d97706';
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // ─── 1. CHELLA MAGALE: Soft Horizon & Floating Pearls ────────────────
+      else if (activeTrackIndex === 1) {
+        // Horizon gradient in lower half
+        const horizonGrad = ctx.createLinearGradient(0, height * 0.45, 0, height);
+        horizonGrad.addColorStop(0, 'transparent');
+        horizonGrad.addColorStop(0.5, 'rgba(192, 132, 252, 0.18)');
+        horizonGrad.addColorStop(1, 'rgba(45, 212, 191, 0.12)');
+        ctx.fillStyle = horizonGrad;
+        ctx.fillRect(0, height * 0.45, width, height * 0.55);
+
+        // Undulating horizon wave ribbon
+        ctx.beginPath();
+        ctx.moveTo(0, height * 0.65);
+        for (let x = 0; x <= width; x += 10) {
+          const wave = Math.sin(x * 0.02 + elapsed * 1.5) * 12;
+          ctx.lineTo(x, height * 0.65 + wave);
+        }
+        ctx.strokeStyle = 'rgba(192, 132, 252, 0.45)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Upward floating pearls
+        pearlItems.forEach((p) => {
+          const yProgress = (p.baseY + elapsed * p.speed) % 1;
+          const px = p.xRatio * width + Math.sin(yProgress * Math.PI * 4) * 8;
+          const py = height * (1 - yProgress * 0.85);
+
+          ctx.beginPath();
+          ctx.arc(px, py, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.sin(yProgress * Math.PI) * 0.75;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        });
+      }
+
+      // ─── 2. MAGALE: Intimate Layered Acoustic Sound Art ──────────────────
+      else if (activeTrackIndex === 2) {
+        const layers = 4;
+        for (let l = 0; l < layers; l++) {
+          const lr = baseR * (0.4 + l * 0.22);
+          const segs = 60;
+          ctx.beginPath();
+          for (let s = 0; s <= segs; s++) {
+            const theta = (s / segs) * Math.PI * 2;
+            const harmonic = Math.sin(theta * (4 + l * 2) + elapsed * (1.8 + l * 0.5)) * 0.06;
+            const r = lr * (1 + harmonic);
+            const x = cx + Math.cos(theta) * r;
+            const y = cy + Math.sin(theta) * r;
+            if (s === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+          ctx.strokeStyle = l % 2 === 0 ? '#818cf8' : '#c7d2fe';
+          ctx.globalAlpha = 0.55 - l * 0.1;
+          ctx.lineWidth = 1.6;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+
+        // Concentric acoustic core
+        ctx.beginPath();
+        ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+        ctx.fillStyle = '#818cf8';
+        ctx.globalAlpha = 0.6;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      // ─── 3. ALAKOLAVA: Stylish Dramatic Helical Spiral ───────────────────
+      else if (activeTrackIndex === 3) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        const coils = 3;
+        const totalPts = 120;
+
+        // Helix 1: Violet
+        ctx.beginPath();
+        for (let i = 0; i <= totalPts; i++) {
+          const t = i / totalPts;
+          const angle = t * Math.PI * 2 * coils + elapsed * 0.8;
+          const r = baseR * (0.3 + t * 0.65);
+          const x = Math.cos(angle) * r;
+          const y = (t - 0.5) * height * 0.55;
+          if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        ctx.closePath();
-        ctx.strokeStyle = waveColor;
-        ctx.globalAlpha = 0.35 - w * 0.08;
-        ctx.lineWidth = 1.4;
+        ctx.strokeStyle = '#a855f7';
+        ctx.lineWidth = 2.2;
+        ctx.stroke();
+
+        // Helix 2: Warm coral
+        ctx.beginPath();
+        for (let i = 0; i <= totalPts; i++) {
+          const t = i / totalPts;
+          const angle = t * Math.PI * 2 * coils + Math.PI + elapsed * 0.8;
+          const r = baseR * (0.3 + t * 0.65);
+          const x = Math.cos(angle) * r;
+          const y = (t - 0.5) * height * 0.55;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = '#fb923c';
+        ctx.lineWidth = 2.2;
         ctx.stroke();
         ctx.restore();
       }
 
-      // 3. Spinning Vinyl Record Disc
-      const spinAngle = reducedMotion ? 0 : elapsed * 0.5;
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(spinAngle);
+      // ─── 4. ENGEY ANDHA VENNILA: Moonlit Calm & Starry Night ─────────────
+      else if (activeTrackIndex === 4) {
+        // Deep midnight sky background
+        const nightGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, baseR * 1.6);
+        nightGrad.addColorStop(0, 'rgba(56, 189, 248, 0.12)');
+        nightGrad.addColorStop(0.6, 'rgba(129, 140, 248, 0.05)');
+        nightGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = nightGrad;
+        ctx.fillRect(0, 0, width, height);
 
-      // Record body
-      const recordGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, baseRadius);
-      recordGrad.addColorStop(0, '#101319');
-      recordGrad.addColorStop(0.4, '#0a0c10');
-      recordGrad.addColorStop(0.85, '#121620');
-      recordGrad.addColorStop(1, '#080a0e');
-      ctx.fillStyle = recordGrad;
-      ctx.beginPath();
-      ctx.arc(0, 0, baseRadius, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Record outer border
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      // Concentric Vinyl Micro-Grooves
-      const grooveCount = 10;
-      for (let g = 0; g < grooveCount; g++) {
-        const gr = baseRadius * (0.42 + (g / grooveCount) * 0.52);
-        ctx.beginPath();
-        ctx.arc(0, 0, gr, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-
-      // Subtle Anisotropic Specular Light Sheen (Vinyl reflection)
-      const sheenGrad = ctx.createLinearGradient(-baseRadius, -baseRadius, baseRadius, baseRadius);
-      sheenGrad.addColorStop(0, 'rgba(255, 255, 255, 0.07)');
-      sheenGrad.addColorStop(0.45, 'transparent');
-      sheenGrad.addColorStop(0.55, 'rgba(255, 255, 255, 0.05)');
-      sheenGrad.addColorStop(1, 'transparent');
-      ctx.fillStyle = sheenGrad;
-      ctx.beginPath();
-      ctx.arc(0, 0, baseRadius - 2, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Center Label
-      const labelRadius = baseRadius * 0.36;
-      ctx.beginPath();
-      ctx.arc(0, 0, labelRadius, 0, Math.PI * 2);
-      ctx.fillStyle = primary;
-      ctx.globalAlpha = 0.9;
-      ctx.fill();
-      ctx.globalAlpha = 1;
-
-      // Center Label border ring
-      ctx.beginPath();
-      ctx.arc(0, 0, labelRadius - 3, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      // Spindle Center Hole
-      ctx.beginPath();
-      ctx.arc(0, 0, 7, 0, Math.PI * 2);
-      ctx.fillStyle = '#06070a';
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      ctx.restore();
-
-      // 4. Orbital Particles around the record
-      if (!reducedMotion) {
-        const pCount = 16;
-        for (let p = 0; p < pCount; p++) {
-          const pAngle = elapsed * (0.3 + (p % 3) * 0.1) + (p / pCount) * Math.PI * 2;
-          const pRadius = baseRadius * (1.02 + Math.sin(p * 2 + elapsed) * 0.15);
-          const px = cx + Math.cos(pAngle) * pRadius;
-          const py = cy + Math.sin(pAngle) * pRadius;
+        // Twinkling stars
+        starItems.forEach((st) => {
+          const twinkle = Math.sin(elapsed * 2 + st.xRatio * 10) * 0.2;
           ctx.beginPath();
-          ctx.arc(px, py, p % 2 === 0 ? 2 : 1.4, 0, Math.PI * 2);
-          ctx.fillStyle = p % 2 === 0 ? primary : secondary;
-          ctx.globalAlpha = 0.5 + Math.sin(elapsed * 2 + p) * 0.3;
+          ctx.arc(st.xRatio * width, st.yRatio * height, st.size, 0, Math.PI * 2);
+          ctx.fillStyle = '#bae6fd';
+          ctx.globalAlpha = Math.max(0.15, st.alpha + twinkle);
           ctx.fill();
           ctx.globalAlpha = 1;
+        });
+
+        // Glowing moon disc with corona
+        const moonR = baseR * 0.42;
+        // Outer corona
+        const coronaGrad = ctx.createRadialGradient(cx, cy, moonR * 0.8, cx, cy, moonR * 1.5);
+        coronaGrad.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
+        coronaGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = coronaGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, moonR * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Moon disc
+        ctx.beginPath();
+        ctx.arc(cx, cy, moonR, 0, Math.PI * 2);
+        ctx.fillStyle = '#f0f9ff';
+        ctx.fill();
+      }
+
+      // ─── 5. LIFE OF PAZHAM: Joyful Celebratory Spectrum Equalizer ─────────
+      else if (activeTrackIndex === 5) {
+        const barCount = 36;
+        ctx.save();
+        ctx.translate(cx, cy);
+        if (!reducedMotion) ctx.rotate(elapsed * 0.4);
+
+        for (let i = 0; i < barCount; i++) {
+          const angle = (i / barCount) * Math.PI * 2;
+          const barHeight = 12 + Math.sin(i * 0.6 + elapsed * 4) * 16 + (i % 2 === 0 ? 8 : 0);
+          const col = i % 3 === 0 ? '#2dd4bf' : i % 3 === 1 ? '#fb7185' : '#fde047';
+
+          ctx.save();
+          ctx.rotate(angle);
+          ctx.fillStyle = col;
+          ctx.fillRect(-2, baseR * 0.55, 4, barHeight);
+          ctx.restore();
         }
+
+        // Central energetic core
+        ctx.beginPath();
+        ctx.arc(0, 0, baseR * 0.35, 0, Math.PI * 2);
+        ctx.fillStyle = '#2dd4bf';
+        ctx.globalAlpha = 0.85;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.restore();
       }
 
       if (!reducedMotion) {
@@ -197,7 +325,7 @@ export function SonicBloomFallback2D({
     <canvas
       ref={canvasRef}
       className={`block w-full h-full ${className}`}
-      aria-label={`Vinyl record visualizer for ${activeTrack.title}`}
+      aria-label={`Visualizer for ${activeTrack.title}`}
     />
   );
 }

@@ -31,7 +31,7 @@ export function ClosingDedication({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className={`w-full max-w-md mx-auto px-4 py-6 text-center select-none rounded-3xl border border-white/[0.08] bg-[#12151f]/90 backdrop-blur-xl shadow-2xl ${className}`}
+      className={`w-full max-w-md mx-auto px-4 py-6 text-center select-none rounded-3xl border border-white/[0.08] bg-[#12151f]/90 backdrop-blur-xl shadow-2xl font-['DM_Sans',sans-serif] ${className}`}
     >
       {/* Colour accent line */}
       <div
@@ -44,7 +44,7 @@ export function ClosingDedication({
       />
 
       {/* Title */}
-      <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight font-['Manrope']">
+      <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2 tracking-tight font-['Outfit',sans-serif]">
         {title}
       </h2>
 

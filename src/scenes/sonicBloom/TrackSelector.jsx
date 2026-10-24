@@ -48,7 +48,7 @@ export function TrackSelector({
       ref={containerRef}
       role="list"
       aria-label="Songs in Kutty Radio"
-      className={`flex flex-col gap-1.5 ${className}`}
+      className={`flex flex-col gap-1.5 font-['DM_Sans',sans-serif] ${className}`}
     >
       {tracks.map((track, index) => {
         const isActive = index === activeTrackIndex;
@@ -91,7 +91,7 @@ export function TrackSelector({
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-2">
                   <span
-                    className={`block truncate text-xs sm:text-[13px] font-semibold transition-colors ${
+                    className={`block truncate text-xs sm:text-[13px] font-semibold font-['Outfit',sans-serif] transition-colors ${
                       isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'
                     }`}
                   >

@@ -271,7 +271,7 @@ export function SonicBloomScene() {
 
   return (
     <div
-      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden text-white font-['Inter'] select-none flex flex-col bg-[#090b10]"
+      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden text-white font-['DM_Sans',sans-serif] select-none flex flex-col bg-[#090b10]"
       style={{
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)',
@@ -318,7 +318,7 @@ export function SonicBloomScene() {
         }}
       />
 
-      {/* ── TOP HEADER BAR (Compact) ── */}
+      {/* ── TOP HEADER BAR (Clean, Elegant) ── */}
       <header className="relative z-20 shrink-0 flex items-center justify-between border-b border-white/[0.06] px-4 py-2 sm:px-6 sm:py-2.5">
         <div className="flex items-center gap-3">
           <button
@@ -342,14 +342,9 @@ export function SonicBloomScene() {
             >
               <Music2 className="h-4 w-4" />
             </div>
-            <div>
-              <span className="text-sm font-bold tracking-tight text-white font-['Manrope']">
-                Kutty Radio
-              </span>
-              <span className="ml-2 hidden text-[11px] text-slate-400 sm:inline">
-                After-Hours Listening Room
-              </span>
-            </div>
+            <span className="text-base font-bold tracking-tight text-white font-['Outfit',sans-serif]">
+              Kutty Radio
+            </span>
           </div>
         </div>
 
@@ -426,7 +421,7 @@ export function SonicBloomScene() {
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
                   <div className="flex items-baseline justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="truncate text-base font-bold text-white font-['Manrope']">
+                      <p className="truncate text-base font-semibold text-white font-['Outfit',sans-serif]">
                         {activeTrack.title}
                       </p>
                       <p className="truncate text-[11px] text-slate-300">
@@ -536,7 +531,7 @@ export function SonicBloomScene() {
                   />
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate text-xs font-bold text-white font-['Manrope']">
+                  <p className="truncate text-xs font-semibold text-white font-['Outfit',sans-serif]">
                     {activeTrack.title}
                   </p>
                   <p className="truncate text-[10px] text-slate-400">

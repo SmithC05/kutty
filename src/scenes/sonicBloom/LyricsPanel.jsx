@@ -9,11 +9,10 @@ function formatTime(seconds) {
 }
 
 /**
- * LyricsPanel — After-Hours Karaoke Lounge
+ * LyricsPanel — Compact, Sing-Along Karaoke Lounge
  *
- * Always-visible sing-along lyrics panel.
- * Follows audio playback in real time, auto-scrolls the active line to center,
- * highlights current words with sage-lime / track accent, and supports tap-to-seek.
+ * Refined visual footprint (~10% more compact) with DM Sans typography,
+ * smooth auto-centering, clear active-line emphasis, and tap-to-seek.
  */
 export function LyricsPanel({ track, currentTime = 0, isPlaying = false, onSeek, className = '' }) {
   const activeLineRef = useRef(null);
@@ -39,13 +38,12 @@ export function LyricsPanel({ track, currentTime = 0, isPlaying = false, onSeek,
     return index;
   }, [lyrics, currentTime]);
 
-  // Handle user manual scroll: pause auto-scroll briefly so user can read ahead
   const handleScroll = () => {
     isUserScrollingRef.current = true;
     if (userScrollTimeoutRef.current) clearTimeout(userScrollTimeoutRef.current);
     userScrollTimeoutRef.current = setTimeout(() => {
       isUserScrollingRef.current = false;
-    }, 2800);
+    }, 2500);
   };
 
   useEffect(() => {
@@ -63,64 +61,62 @@ export function LyricsPanel({ track, currentTime = 0, isPlaying = false, onSeek,
   return (
     <section
       aria-label={hasLyrics ? `Lyrics for ${track?.title || 'the current song'}` : 'Sing-along lyrics'}
-      className={`relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0e1118]/85 backdrop-blur-xl shadow-xl shadow-black/30 sm:rounded-3xl ${className}`}
+      className={`relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0e1118]/90 backdrop-blur-xl font-['DM_Sans',sans-serif] ${className}`}
       style={{
-        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.06), 0 16px 40px rgba(0,0,0,0.35)`,
+        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.05), 0 12px 35px rgba(0,0,0,0.32)`,
       }}
     >
-      {/* Subtle top ambient light glow */}
+      {/* Top subtle glow */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full blur-3xl"
-        style={{ background: `${primaryAccent}15` }}
+        className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full blur-3xl"
+        style={{ background: `${primaryAccent}12` }}
       />
 
-      {/* Header bar */}
-      <div className="relative flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.07] px-4 py-3 sm:px-6 sm:py-3.5">
-        <div className="flex items-center gap-3">
+      {/* Header bar (Compact) */}
+      <div className="relative flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-2.5 sm:px-5 sm:py-3">
+        <div className="flex items-center gap-2.5">
           <div
-            className="grid h-8 w-8 place-items-center rounded-lg sm:h-9 sm:w-9"
+            className="grid h-7 w-7 place-items-center rounded-lg sm:h-8 sm:w-8"
             style={{
-              background: `linear-gradient(145deg, ${primaryAccent}25, rgba(255,255,255,0.04))`,
-              border: `1px solid ${primaryAccent}35`,
+              background: `linear-gradient(135deg, ${primaryAccent}22, rgba(255,255,255,0.03))`,
+              border: `1px solid ${primaryAccent}30`,
             }}
           >
-            <Mic2 className="h-4 w-4" style={{ color: primaryAccent }} />
+            <Mic2 className="h-3.5 w-3.5" style={{ color: primaryAccent }} />
           </div>
           <div className="min-w-0">
-            <h3 className="truncate text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 sm:text-[13px]">
+            <h3 className="truncate text-xs font-semibold tracking-wide text-white/90">
               Sing Along · {track?.title}
             </h3>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <span
+          className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-medium"
+          style={{
+            color: primaryAccent,
+            borderColor: `${primaryAccent}30`,
+            background: `${primaryAccent}0d`,
+          }}
+        >
           <span
-            className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-wide"
-            style={{
-              color: primaryAccent,
-              borderColor: `${primaryAccent}35`,
-              background: `${primaryAccent}10`,
-            }}
-          >
-            <span
-              className={isPlaying ? 'h-1.5 w-1.5 animate-pulse rounded-full' : 'h-1.5 w-1.5 rounded-full'}
-              style={{ backgroundColor: primaryAccent }}
-            />
-            {isPlaying ? 'Live Lyrics' : 'Paused'}
-          </span>
-        </div>
+            className={isPlaying ? 'h-1.5 w-1.5 animate-pulse rounded-full' : 'h-1.5 w-1.5 rounded-full'}
+            style={{ backgroundColor: primaryAccent }}
+          />
+          {isPlaying ? 'Live' : 'Paused'}
+        </span>
       </div>
 
-      {/* Main Lyrics Body: Scrollable, Auto-centering */}
+      {/* Main Lyrics Body: Compact, Comfortable Sing-Along */}
       {hasLyrics ? (
         <div
           ref={scrollContainerRef}
           onScroll={handleScroll}
-          className="relative flex-1 min-h-0 overflow-y-auto px-4 py-8 sm:px-8 sm:py-12 space-y-4 sm:space-y-5"
+          className="relative flex-1 min-h-0 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 space-y-2.5 sm:space-y-3"
           style={{
             scrollbarWidth: 'thin',
-            scrollbarColor: 'rgba(255,255,255,0.15) transparent',
+            scrollbarColor: 'rgba(255,255,255,0.12) transparent',
           }}
           aria-live="polite"
           aria-atomic="true"
@@ -135,16 +131,16 @@ export function LyricsPanel({ track, currentTime = 0, isPlaying = false, onSeek,
               <div
                 key={`${timestamp}-${index}`}
                 ref={active ? activeLineRef : null}
-                className="transition-all duration-300"
+                className="transition-all duration-200"
               >
-                {/* Optional Vocal Part Marker (e.g. Male Part) */}
+                {/* Vocal Part Marker */}
                 {line.part === 'male' && (index === 0 || lyrics[index - 1]?.part !== 'male') && (
-                  <span className="mb-2 inline-block text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  <span className="mb-1.5 inline-block text-[9.5px] font-semibold uppercase tracking-wider text-slate-400">
                     Male Part
                   </span>
                 )}
                 {line.part === 'female' && (index === 0 || lyrics[index - 1]?.part !== 'female') && (
-                  <span className="mb-2 inline-block text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  <span className="mb-1.5 inline-block text-[9.5px] font-semibold uppercase tracking-wider text-slate-400">
                     Female Part
                   </span>
                 )}
@@ -152,39 +148,39 @@ export function LyricsPanel({ track, currentTime = 0, isPlaying = false, onSeek,
                 <button
                   type="button"
                   onClick={() => Number.isFinite(timestamp) && onSeek?.(timestamp)}
-                  className={`group flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-[#0e1118] ${
+                  className={`group flex w-full items-start gap-2.5 rounded-xl px-2.5 py-2 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-[#0e1118] ${
                     active
-                      ? 'bg-white/[0.06] shadow-sm shadow-black/20'
-                      : 'hover:bg-white/[0.03]'
+                      ? 'bg-white/[0.06] shadow-sm'
+                      : 'hover:bg-white/[0.025]'
                   }`}
                   style={{
-                    borderLeft: active ? `3px solid ${primaryAccent}` : '3px solid transparent',
+                    borderLeft: active ? `2.5px solid ${primaryAccent}` : '2.5px solid transparent',
                     '--tw-ring-color': primaryAccent,
                   }}
                   aria-current={active ? 'true' : undefined}
                 >
                   <span
-                    className={`mt-1.5 inline-flex w-10 shrink-0 items-center gap-1 text-[10px] tabular-nums transition-colors ${
-                      active ? 'font-semibold text-slate-300' : 'text-slate-600'
+                    className={`mt-1 inline-flex w-9 shrink-0 items-center gap-1 text-[9.5px] tabular-nums transition-colors ${
+                      active ? 'font-medium text-slate-300' : 'text-slate-400'
                     }`}
                   >
-                    <Clock3 className="h-3 w-3 shrink-0" />
+                    <Clock3 className="h-2.5 w-2.5 shrink-0" />
                     {formatTime(timestamp)}
                   </span>
 
                   <span
-                    className={`min-w-0 flex-1 leading-snug tracking-tight transition-all duration-300 ${
+                    className={`min-w-0 flex-1 leading-snug transition-all duration-200 ${
                       active
-                        ? 'text-lg font-bold text-white sm:text-2xl'
+                        ? 'text-base sm:text-lg md:text-xl font-semibold text-white'
                         : isFar
-                        ? 'text-sm font-medium text-slate-500 opacity-60 hover:text-slate-300 hover:opacity-90 sm:text-base'
-                        : 'text-base font-semibold text-slate-300 opacity-85 hover:text-white sm:text-lg'
+                        ? 'text-xs sm:text-sm font-normal text-slate-400 opacity-60 hover:text-slate-300 hover:opacity-90'
+                        : 'text-xs sm:text-sm font-medium text-slate-300 opacity-85 hover:text-white'
                     }`}
                     style={
                       active
                         ? {
                             color: '#ffffff',
-                            textShadow: `0 0 20px ${primaryAccent}55`,
+                            textShadow: `0 0 16px ${primaryAccent}45`,
                           }
                         : {}
                     }
@@ -194,10 +190,10 @@ export function LyricsPanel({ track, currentTime = 0, isPlaying = false, onSeek,
 
                   {active && (
                     <span
-                      className="ml-auto mt-2 h-2 w-2 shrink-0 rounded-full"
+                      className="ml-auto mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
                       style={{
                         backgroundColor: primaryAccent,
-                        boxShadow: `0 0 10px ${primaryAccent}`,
+                        boxShadow: `0 0 8px ${primaryAccent}`,
                       }}
                     />
                   )}
@@ -207,19 +203,19 @@ export function LyricsPanel({ track, currentTime = 0, isPlaying = false, onSeek,
           })}
         </div>
       ) : (
-        <div className="relative flex flex-1 items-center justify-center p-6 text-center">
-          <div className="max-w-xs space-y-3">
-            <Mic2 className="mx-auto h-8 w-8 text-slate-500" />
-            <p className="text-sm font-medium text-slate-300">Sing-along lyrics</p>
-            <p className="text-xs text-slate-500">Lyrics for this song will appear here as it plays.</p>
+        <div className="relative flex flex-1 items-center justify-center p-4 text-center">
+          <div className="max-w-xs space-y-2">
+            <Mic2 className="mx-auto h-7 w-7 text-slate-400" />
+            <p className="text-xs font-medium text-slate-300">Sing-along lyrics</p>
+            <p className="text-[11px] text-slate-400">Lyrics for this song will appear here as it plays.</p>
           </div>
         </div>
       )}
 
-      {/* Footer hint */}
-      <div className="flex shrink-0 items-center justify-between border-t border-white/[0.07] px-4 py-2 text-[10px] text-slate-500 sm:px-6">
-        <span className="inline-flex items-center gap-1.5">
-          <Music2 className="h-3.5 w-3.5" /> Tap any line to jump
+      {/* Footer bar (Compact) */}
+      <div className="flex shrink-0 items-center justify-between border-t border-white/[0.06] px-4 py-2 text-[9.5px] text-slate-400 sm:px-5">
+        <span className="inline-flex items-center gap-1">
+          <Music2 className="h-3 w-3" /> Tap any line to seek
         </span>
         <span>{lyrics.length} lines</span>
       </div>

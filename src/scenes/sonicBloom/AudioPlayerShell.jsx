@@ -36,7 +36,7 @@ export function AudioPlayerShell({
   return (
     <footer
       aria-label="Music player"
-      className={`relative w-full overflow-hidden rounded-2xl border border-white/[0.09] bg-[#11141c]/95 px-3 py-2.5 shadow-2xl shadow-black/40 backdrop-blur-2xl sm:px-5 sm:py-3 ${className}`}
+      className={`relative w-full overflow-hidden rounded-2xl border border-white/[0.09] bg-[#11141c]/95 px-3 py-2.5 shadow-2xl shadow-black/40 backdrop-blur-2xl font-['DM_Sans',sans-serif] sm:px-5 sm:py-3 ${className}`}
       style={{
         boxShadow: `0 -10px 40px rgba(0,0,0,0.35), 0 0 25px ${primary}0a`,
       }}
@@ -59,7 +59,7 @@ export function AudioPlayerShell({
             )}
           </div>
           <div className="min-w-0">
-            <p className="truncate text-xs sm:text-sm font-semibold text-white">
+            <p className="truncate text-xs sm:text-sm font-semibold text-white font-['Outfit',sans-serif]">
               {activeTrack?.title || 'Choose a song'}
             </p>
             <p className="truncate text-[10px] sm:text-[11px] text-slate-400">
