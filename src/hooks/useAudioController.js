@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Howl, Howler } from 'howler';
 import playlistData from '../data/playlist.json';
 
@@ -246,14 +246,17 @@ export function useAudioController() {
     };
   }, [playTrack]);
 
-  return {
-    isPlaying,
-    isMuted,
-    currentTrackId,
-    playTrack,
-    stopBgm,
-    pauseTrack,
-    toggleMute,
-    playSfx,
-  };
+  return useMemo(
+    () => ({
+      isPlaying,
+      isMuted,
+      currentTrackId,
+      playTrack,
+      stopBgm,
+      pauseTrack,
+      toggleMute,
+      playSfx,
+    }),
+    [isPlaying, isMuted, currentTrackId, playTrack, stopBgm, pauseTrack, toggleMute, playSfx]
+  );
 }
