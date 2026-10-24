@@ -17,9 +17,11 @@ function formatTime(seconds) {
  */
 export function LyricsPanel({ track, currentTime = 0, isPlaying = false, onSeek }) {
   const activeLineRef = useRef(null);
-  const lyrics = Array.isArray(track?.lyrics)
-    ? track.lyrics.filter((line) => line && (line.text || line.lyric))
-    : [];
+  const rawLyrics = track?.lyrics;
+  const lyrics = useMemo(
+    () => Array.isArray(rawLyrics) ? rawLyrics.filter((line) => line && (line.text || line.lyric)) : [],
+    [rawLyrics]
+  );
 
   const activeLineIndex = useMemo(() => {
     if (!lyrics.length) return -1;
