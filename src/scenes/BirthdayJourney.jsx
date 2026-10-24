@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import gsap from 'gsap';
 import { useAudio, useScene } from '../context';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { SCENES } from '../constants';
 
 /* ═══════════════════════════════════════════════════════════════════════════
    BIRTHDAY JOURNEY — Bold Editorial Spotlight
@@ -559,7 +560,7 @@ function useCelebrationCanvas(canvasRef, reducedMotion) {
 /* ── Main Birthday Reveal Component ──────────────────────────────────────── */
 export function BirthdayJourney() {
   const { playSfx, playTrack } = useAudio();
-  const { next }               = useScene();
+  const { transitionTo }       = useScene();
   const reducedMotion          = useReducedMotion();
 
   const sceneRef       = useRef(null);
@@ -605,10 +606,10 @@ export function BirthdayJourney() {
       ease: 'power2.inOut',
       onComplete: () => {
         canvasRef.current?._stop?.();
-        next();
+        transitionTo(SCENES.SECRET_VAULT);
       },
     });
-  }, [next, playSfx]);
+  }, [transitionTo, playSfx]);
 
   /* Keyboard shortcut (Enter / Space) to proceed if desired */
   const handleKeyDown = useCallback((e) => {

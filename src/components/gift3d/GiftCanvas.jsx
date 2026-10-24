@@ -75,6 +75,7 @@ export function GiftCanvas({
           isOpening={isOpening}
           isIdleAnimating={isIdleAnimating}
           onOpenStart={onOpenStart}
+          onFreezeEnd={onFreezeEnd}
           onOpenComplete={onOpenComplete}
         />
       </div>

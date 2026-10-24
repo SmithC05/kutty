@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useScene, useAudio } from '../context';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { vaultConfig, birthdayConfig } from '../config';
+import { SCENES } from '../constants';
 
 const KEYPAD = [
   ['1', '2', '3'],
@@ -199,7 +200,7 @@ function KeyButton({ label, onPress, disabled, reducedMotion }) {
    Main Secret Vault Component
    ───────────────────────────────────────────────────────────── */
 export function SecretVault() {
-  const { next } = useScene();
+  const { transitionTo } = useScene();
   const { playSfx, playTrack } = useAudio();
   const reducedMotion = useReducedMotion();
 
@@ -257,8 +258,8 @@ export function SecretVault() {
           playSfx('sparkle');
           playSfx('heartbeat');
 
-          // Transition to Bus Love Pt 2 on successful PIN entry
-          playTrack('bus_love');
+          // Transition to Deva Deva Instrumental on successful PIN entry
+          playTrack('deva_deva');
 
           /* Short delightful celebration before dissolve */
           registerTimeout(() => {
@@ -267,7 +268,7 @@ export function SecretVault() {
             registerTimeout(() => {
               if (!navigatingRef.current) {
                 navigatingRef.current = true;
-                next();
+                transitionTo(SCENES.LORD_SHIVA_BLESSING);
               }
             }, 1600);
           }, 1500);
@@ -284,7 +285,7 @@ export function SecretVault() {
         }
       }
     },
-    [pin, status, next, playSfx, playTrack, registerTimeout]
+    [pin, status, transitionTo, playSfx, playTrack, registerTimeout]
   );
 
   /* Keyboard entry support (0-9, Backspace) */

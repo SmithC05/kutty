@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useScene } from '../../context/SceneContext';
@@ -238,19 +238,19 @@ export function SonicBloomScene() {
     setActiveTrackIndex((prev) => Math.min(sonicBloomSongs.length - 1, prev + 1));
   }, []);
 
-  const handleBackToBirthday = useCallback(() => {
+  const handleBackToArtist = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
     }
-    transitionTo(SCENES.FINAL_MESSAGE);
+    transitionTo(SCENES.ARTIST_CHAPTER);
   }, [transitionTo]);
 
-  const handleContinueToWhoIsShe = useCallback(() => {
+  const handleContinueToUs = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-    transitionTo(SCENES.WHO_IS_SHE_TO_ME);
+    transitionTo(SCENES.MEMORY_JOURNEY_TOGETHER);
   }, [transitionTo]);
 
   // Background base gradient — shifts per song
@@ -328,9 +328,9 @@ export function SonicBloomScene() {
           <div className="flex items-center space-x-3">
             <button
               type="button"
-              onClick={handleBackToBirthday}
+              onClick={handleBackToArtist}
               className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.11] border border-white/[0.08] font-sonic-body text-xs text-slate-300 hover:text-white transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 min-h-[44px]"
-              aria-label="Back to Birthday celebration"
+              aria-label="Back to the portrait"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back</span>
@@ -465,8 +465,8 @@ export function SonicBloomScene() {
                   className="w-full my-auto flex flex-col items-center justify-center py-2"
                 >
                   <ClosingDedication
-                    onBackToBirthday={handleBackToBirthday}
-                    onContinueToWhoIsShe={handleContinueToWhoIsShe}
+                    onBackToArtist={handleBackToArtist}
+                    onContinueToUs={handleContinueToUs}
                     onReturnToTracks={() => setIsClosingState(false)}
                   />
                 </motion.div>

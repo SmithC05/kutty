@@ -1,20 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Heart } from 'lucide-react';
-import { useScene } from '../context/SceneContext';
+import { useScene, useAudio } from '../context';
 import { SCENES } from '../constants';
 
 /**
  * Who Is She to Me?
  *
- * Reserved final scene. The sentence-combination experience will be designed
- * in a later pass after scene ordering and existing bugs are addressed.
+ * Placed immediately after Us (Chapter 2) and before the Final Birthday Celebration.
+ * The sentence-combination generator experience will be designed in a separate pass.
  */
 export function WhoIsSheScene() {
   const { transitionTo } = useScene();
+  const { playTrack } = useAudio();
 
-  const handleBackToSongs = () => transitionTo(SCENES.SONIC_BLOOM);
-  const handleBackToBirthday = () => transitionTo(SCENES.FINAL_MESSAGE);
+  // Continue Friendship Anthem smoothly across the transition from Us
+  useEffect(() => {
+    playTrack('friendship');
+  }, [playTrack]);
+
+  const handleBackToUs = () => transitionTo(SCENES.MEMORY_JOURNEY_TOGETHER);
+  const handleContinueToCelebration = () => transitionTo(SCENES.FINAL_MESSAGE);
 
   return (
     <main className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-[#080914] text-white">
@@ -33,12 +39,12 @@ export function WhoIsSheScene() {
       <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5 sm:px-6">
         <button
           type="button"
-          onClick={handleBackToSongs}
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm text-slate-200 transition hover:bg-white/[0.1] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
-          aria-label="Back to the six songs"
+          onClick={handleBackToUs}
+          className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm text-slate-200 transition hover:bg-white/[0.1] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 cursor-pointer"
+          aria-label="Back to Us"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to the songs
+          Back to Us
         </button>
         <span className="font-sonic-mono text-[10px] font-bold tracking-[0.22em] text-violet-200/80 sm:text-xs">
           ONE MORE THING
@@ -78,18 +84,18 @@ export function WhoIsSheScene() {
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <button
               type="button"
-              onClick={handleBackToSongs}
-              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-violet-200/20 bg-violet-300/[0.08] px-5 py-3 text-sm font-semibold text-violet-100 transition hover:bg-violet-300/[0.14] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+              onClick={handleBackToUs}
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-violet-200/20 bg-violet-300/[0.08] px-5 py-3 text-sm font-semibold text-violet-100 transition hover:bg-violet-300/[0.14] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 cursor-pointer"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to the songs
+              Back to Us
             </button>
             <button
               type="button"
-              onClick={handleBackToBirthday}
-              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              onClick={handleContinueToCelebration}
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
             >
-              Back to the Birthday
+              Continue to the Celebration
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useScene, useAudio } from '../context';
+import { SCENES } from '../constants';
 import { chapter1Data, chapter2Data } from '../data/memories';
 import { MemoryBook } from '../components/memory-engine/MemoryBook';
 import { ScrapbookExperience } from '../components/memory-engine/ScrapbookExperience';
@@ -253,14 +254,14 @@ function ChapterTransitionScreen({ onContinue }) {
 // Memory Journey Orchestrator
 // ─────────────────────────────────────────────────────────────────────────────
 export function MemoryJourney({ chapterIndex: propChapterIndex }) {
-  const { next, currentScene } = useScene();
+  const { transitionTo, currentScene } = useScene();
   const { playTrack } = useAudio();
 
   // Resolve active chapter index
   const activeChapterIndex =
     propChapterIndex !== undefined
       ? propChapterIndex
-      : currentScene === 'MEMORY_JOURNEY_TOGETHER'
+      : currentScene === SCENES.MEMORY_JOURNEY_TOGETHER
       ? 1
       : 0;
 
@@ -279,21 +280,21 @@ export function MemoryJourney({ chapterIndex: propChapterIndex }) {
     }
   }, [activeChapterIndex, playTrack]);
 
-  // If Chapter 2 is active and transition screen has already completed, ensure friendship anthem is playing
+  // Chapter 2 (Us): Ensure friendship anthem is active on mount and throughout
   useEffect(() => {
-    if (activeChapterIndex === 1 && !showChapter2Transition) {
+    if (activeChapterIndex === 1) {
       playTrack('friendship');
     }
-  }, [activeChapterIndex, showChapter2Transition, playTrack]);
+  }, [activeChapterIndex, playTrack]);
 
-  // Handle Chapter 1 completion -> navigate to Chapter 2
+  // Handle Chapter 1 completion -> navigate directly to The Artist's Hand (Pencil Portrait)
   const handleChapter1Complete = () => {
-    next();
+    transitionTo(SCENES.ARTIST_CHAPTER);
   };
 
-  // Handle Chapter 2 completion -> continue to ArtistChapter
+  // Handle Chapter 2 completion -> continue to Who Is She to Me?
   const handleChapter2Complete = () => {
-    next();
+    transitionTo(SCENES.WHO_IS_SHE_TO_ME);
   };
 
   // Triggered when Keerthana clicks "Enter Our Story →" (or the transition card) to enter Us

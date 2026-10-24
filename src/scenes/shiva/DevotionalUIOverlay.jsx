@@ -199,7 +199,7 @@ export function DevotionalUIOverlay({
                   backgroundColor: 'rgba(16,43,72,0.6)',
                 }}
               >
-                Continue to Your Celebration →
+                Continue to Just You →
               </motion.button>
             </motion.div>
           )}

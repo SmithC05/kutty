@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useScene, useAudio } from '../context';
+import { SCENES } from '../constants';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -844,12 +845,12 @@ function StudioReveal({ onComplete, reducedMotion }) {
 
 // ─── Root Orchestrator: ArtistChapter ─────────────────────────────────────────
 export function ArtistChapter() {
-  const { next } = useScene();
+  const { transitionTo } = useScene();
   const { playTrack } = useAudio();
   const reducedMotion = useReducedMotion();
   const [act, setAct] = useState('studio'); // 'studio' | 'reveal'
 
-  // Fade out Friendship Anthem and start Dheema for the pencil portrait experience
+  // Fade out Bus Love and start Dheema for the pencil portrait experience
   useEffect(() => {
     playTrack('dheema');
   }, [playTrack]);
@@ -859,8 +860,8 @@ export function ArtistChapter() {
   }, []);
 
   const handleComplete = useCallback(() => {
-    next();
-  }, [next]);
+    transitionTo(SCENES.SONIC_BLOOM);
+  }, [transitionTo]);
 
   return (
     <AnimatePresence mode="wait">

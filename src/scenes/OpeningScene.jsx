@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAudio, useScene, useTime } from '../context';
+import { SCENES } from '../constants';
 import { devMode } from '../config';
 import { GiftBox } from '../components/ui/GiftBox';
 import { Typography } from '../components/core/Typography';
@@ -12,23 +13,17 @@ import { Typography } from '../components/core/Typography';
  */
 export function OpeningScene() {
   const { playTrack, playSfx } = useAudio();
-  const { next, setIsBackgroundPaused } = useScene();
+  const { transitionTo, setIsBackgroundPaused, isDevUnlocked } = useScene();
   const timeState = useTime();
 
   const [isOpening, setIsOpening] = useState(false);
   const [isAliveState, setIsAliveState] = useState(false);
-  const [isDevUnlocked, setIsDevUnlocked] = useState(false);
 
   const sceneRef = useRef(null);
 
-  useEffect(() => {
-    const handleUnlock = () => setIsDevUnlocked(true);
-    window.addEventListener('developer-unlock', handleUnlock);
-    return () => window.removeEventListener('developer-unlock', handleUnlock);
-  }, []);
-
-  const isBirthdayRoute =
-    timeState.isUnlocked || isDevUnlocked || (devMode.enabled && devMode.bypassDate);
+  const isBirthdayUnlocked = Boolean(
+    timeState?.isUnlocked || isDevUnlocked || (devMode.enabled && devMode.bypassDate)
+  );
 
   // The Gift "Alive" Attention Pulse (every 25 seconds)
   useEffect(() => {
@@ -57,15 +52,17 @@ export function OpeningScene() {
     // 2. Unfreeze background particles and trigger audio
     setIsBackgroundPaused(false);
     playSfx('heartbeat');
-    // Start remo.mp3 on user gift interaction strictly on the birthday route
-    if (isBirthdayRoute) {
+    // Advance journey plays intro.mp3; birthday journey (or dev unlocked) plays remo.mp3
+    if (isBirthdayUnlocked) {
       playTrack('remo');
+    } else {
+      playTrack('intro');
     }
   };
 
   const handleOpenComplete = () => {
     // Proceed to Handwriting sequence
-    next();
+    transitionTo(SCENES.HANDWRITING);
   };
 
   return (

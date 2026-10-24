@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { useScene, useAudio } from '../context';
+import { SCENES } from '../constants';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { ShivaScene3D } from './shiva/ShivaScene3D';
 import { DevotionalUIOverlay } from './shiva/DevotionalUIOverlay';
@@ -21,7 +22,7 @@ import { SHIVA_DEPICTION_CONFIG } from './shiva/shivaAssets';
  *   II  — Sacred Stillness (moonlight, mountains, and mist settle)
  *   III — Lord Shiva's Reveal (divine halo illuminates, contemplation pause)
  *   IV  — Receive Blessings (golden light blooms across mist and sanctuary)
- *   V   — Next Journey ("Continue to Your Celebration →")
+ *   V   — Next Journey ("Continue to Just You →")
  */
 
 function checkWebGLSupport() {
@@ -37,7 +38,7 @@ function checkWebGLSupport() {
 }
 
 export function LordShivaBlessing() {
-  const { next } = useScene();
+  const { transitionTo } = useScene();
   const { playTrack } = useAudio();
   const reducedMotion = useReducedMotion();
 
@@ -122,7 +123,7 @@ export function LordShivaBlessing() {
     });
   }, [act, reducedMotion]);
 
-  // ACT V: Continue to Birthday Celebration
+  // ACT V: Continue to Just You
   const handleContinue = useCallback(() => {
     if (actionFiredRef.current) return;
     actionFiredRef.current = true;
@@ -130,9 +131,9 @@ export function LordShivaBlessing() {
 
     // Give a subtle golden wash before next scene
     setTimeout(() => {
-      next();
+      transitionTo(SCENES.MEMORY_JOURNEY_SOLO);
     }, 600);
-  }, [next]);
+  }, [transitionTo]);
 
   // Fallback if device has no WebGL support
   if (!hasWebGL) {

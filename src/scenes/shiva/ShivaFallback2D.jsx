@@ -126,7 +126,7 @@ export function ShivaFallback2D({
                 className="py-2.5 px-6 rounded-full text-xs uppercase tracking-[0.24em] font-medium border border-sky-300/30 text-sky-200/90 hover:text-sky-100 transition-all cursor-pointer shadow-md bg-slate-900/50 backdrop-blur-md active:scale-95"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
               >
-                Continue to Your Celebration →
+                Continue to Just You →
               </button>
             </motion.div>
           )}

@@ -7,7 +7,7 @@ import gsap from 'gsap';
  * Completely code-generated with CSS 3D transforms, satin gold gradients, and physical panels.
  * Never uses PNG or image artwork.
  */
-export function CSSGiftFallback({ isOpening, onOpenStart, onOpenComplete, isIdleAnimating }) {
+export function CSSGiftFallback({ isOpening, onOpenStart, onFreezeEnd, onOpenComplete, isIdleAnimating }) {
   const [hasInteracted, setHasInteracted] = useState(false);
   const containerRef = useRef(null);
   const lidRef = useRef(null);
@@ -35,6 +35,7 @@ export function CSSGiftFallback({ isOpening, onOpenStart, onOpenComplete, isIdle
     if (hasInteracted || isOpening) return;
     setHasInteracted(true);
     if (onOpenStart) onOpenStart();
+    if (onFreezeEnd) onFreezeEnd();
 
     const tl = gsap.timeline({
       onComplete: () => {
