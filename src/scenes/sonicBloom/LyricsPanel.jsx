@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Clock3, Mic2, Music2, Sparkles } from 'lucide-react';
+import { Clock3, Mic2, Music2 } from 'lucide-react';
 
 function formatTime(seconds) {
   const safeSeconds = Number.isFinite(Number(seconds)) ? Math.max(0, Number(seconds)) : 0;

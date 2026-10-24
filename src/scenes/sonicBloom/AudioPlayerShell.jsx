@@ -1,5 +1,5 @@
 import React from 'react';
-import { AudioLines, Check, Disc3, Pause, Play, SkipBack, SkipForward } from 'lucide-react';
+import { Check, Disc3, Pause, Play, SkipBack, SkipForward } from 'lucide-react';
 
 function formatTime(seconds) {
   const safe = Number.isFinite(Number(seconds)) ? Math.max(0, Number(seconds)) : 0;

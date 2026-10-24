@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Disc3, Heart, ListMusic, Music2, Sparkles, X } from 'lucide-react';
+import { ArrowLeft, Disc3, Heart, ListMusic, Music2, X } from 'lucide-react';
 import { useScene } from '../../context/SceneContext';
 import { useAudio } from '../../context';
 import { SCENES } from '../../constants';

@@ -182,7 +182,7 @@ export function SonicSculpture3D({
       waveGeos.forEach((geo, waveIndex) => {
         const posAttr = geo.attributes.position;
         const arr = posAttr.array;
-        const { basePositions, radius, segments } = geo.userData;
+        const { radius, segments } = geo.userData;
         const freqWeight = waveIndex === 0 ? low : waveIndex === 1 ? mid : high;
         const waveAmp = isPlaying ? 0.04 + freqWeight * 0.16 : 0.02;
 
