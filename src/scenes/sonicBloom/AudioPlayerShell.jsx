@@ -1,19 +1,16 @@
 import React from 'react';
-import { Play, Pause, SkipBack, SkipForward, Music } from 'lucide-react';
+import { AudioLines, Check, Music2, Pause, Play, SkipBack, SkipForward } from 'lucide-react';
 
 function formatTime(seconds) {
-  if (!seconds || isNaN(seconds)) return '0:00';
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  const safe = Number.isFinite(Number(seconds)) ? Math.max(0, Number(seconds)) : 0;
+  const mins = Math.floor(safe / 60);
+  const secs = Math.floor(safe % 60);
+  return `${mins}:${String(secs).padStart(2, '0')}`;
 }
 
 /**
- * AudioPlayerShell
- *
- * A calm, integral player interface.
- * Shows selected song state and live playback progress.
- * Navigation between songs and interactive audio playback are fully live.
+ * Docked streaming-style player for Kutty Radio.
+ * Playback and seek state are controlled by SonicBloomScene.
  */
 export function AudioPlayerShell({
   activeTrack,
@@ -29,179 +26,140 @@ export function AudioPlayerShell({
   onPreviewEnding,
   className = '',
 }) {
-  const primaryColor = activeTrack?.colors?.primary || '#0ff0c0';
+  const primary = activeTrack?.colors?.primary || '#a3e635';
+  const secondary = activeTrack?.colors?.secondary || '#a78bfa';
+  const totalDuration = duration || activeTrack?.audio?.duration || 30;
+  const safeCurrentTime = Math.min(totalDuration, Math.max(0, Number(currentTime) || 0));
+  const progress = totalDuration > 0 ? (safeCurrentTime / totalDuration) * 100 : 0;
   const isLastTrack = activeTrackIndex === totalTracks - 1;
-  const effectiveDuration = duration || activeTrack?.audio?.duration || 30;
-  const progressPercent = Math.min(100, Math.max(0, (currentTime / effectiveDuration) * 100));
-
-  const handleProgressBarClick = (e) => {
-    if (!onSeek) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const ratio = Math.max(0, Math.min(1, clickX / rect.width));
-    onSeek(ratio * effectiveDuration);
-  };
 
   return (
-    <div
-      className={`relative w-full rounded-xl sm:rounded-2xl p-2.5 sm:p-3 select-none ${className}`}
+    <section
+      aria-label="Music player"
+      className={`relative w-full overflow-hidden rounded-2xl border border-white/[0.1] px-3 py-3 shadow-2xl shadow-black/30 backdrop-blur-2xl sm:px-5 sm:py-4 ${className}`}
       style={{
-        background: 'rgba(2, 3, 14, 0.70)',
-        border: '1px solid rgba(255,255,255,0.07)',
-        backdropFilter: 'blur(16px)',
+        background: 'linear-gradient(115deg, rgba(17,19,31,0.96), rgba(8,10,18,0.95))',
+        boxShadow: `0 -12px 50px rgba(0,0,0,0.20), 0 0 32px ${primary}0c`,
       }}
     >
-      {/* Song identity line */}
-      <div className="flex items-center justify-between mb-2 gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <span
-            className="text-[9px] font-sonic-mono font-bold tracking-[0.22em] uppercase flex-shrink-0 flex items-center gap-1.5"
-            style={{ color: `${primaryColor}cc` }}
-          >
-            {isPlaying && (
-              <span
-                className="inline-block w-1.5 h-1.5 rounded-full animate-pulse"
-                style={{ backgroundColor: primaryColor }}
-              />
-            )}
-            {isPlaying ? 'PLAYING' : 'YOUR PICK'}
-          </span>
-          <span className="text-slate-600 text-[10px]">·</span>
-          <span className="font-sonic-body text-[12px] sm:text-[13px] font-medium text-slate-200 truncate">
-            {activeTrack?.title || 'Song'}
-          </span>
-          {activeTrack?.film && (
-            <span className="font-sonic-body text-[11px] text-slate-500 truncate hidden sm:inline">
-              — {activeTrack.film}
-            </span>
-          )}
-        </div>
-
-        {/* Explore ending — only on track 6 */}
-        {isLastTrack && onPreviewEnding && (
-          <button
-            type="button"
-            onClick={onPreviewEnding}
-            aria-label="See the full bloom"
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-sonic-mono tracking-wide transition-all cursor-pointer focus:outline-none focus-visible:ring-2 flex-shrink-0"
-            style={{
-              background: `${primaryColor}15`,
-              border: `1px solid ${primaryColor}35`,
-              color: `${primaryColor}cc`,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = `${primaryColor}25`;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = `${primaryColor}15`;
-            }}
-          >
-            <Music className="w-3 h-3" />
-            <span className="hidden sm:inline">Full Bloom</span>
-          </button>
-        )}
-      </div>
-
-      {/* Interactive Progress track */}
-      <div className="space-y-1 mb-2.5">
-        <div
-          role="slider"
-          aria-label="Audio progress"
-          aria-valuenow={Math.round(progressPercent)}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          onClick={handleProgressBarClick}
-          className="relative w-full h-[5px] sm:h-[4px] hover:h-[6px] rounded-full overflow-hidden cursor-pointer transition-all"
-          style={{ background: 'rgba(255,255,255,0.08)' }}
-          title="Click to seek"
-        >
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 md:grid-cols-[minmax(0,1fr)_minmax(250px,1.15fr)_minmax(0,1fr)] md:gap-6">
+        {/* Current song identity */}
+        <div className="flex min-w-0 items-center gap-3">
           <div
-            className="h-full rounded-full pointer-events-none"
-            style={{
-              width: `${progressPercent}%`,
-              background: `linear-gradient(to right, ${primaryColor}80, ${primaryColor})`,
-              boxShadow: `0 0 8px ${primaryColor}60`,
-              transition: isPlaying ? 'none' : 'width 0.2s ease',
-            }}
-          />
+            className="relative grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl sm:h-14 sm:w-14"
+            style={{ background: `linear-gradient(145deg, ${primary}70, ${secondary}45 60%, #10121c)` }}
+            aria-hidden="true"
+          >
+            <span className="absolute inset-0" style={{ background: 'radial-gradient(circle at 20% 15%, rgba(255,255,255,.38), transparent 55%)' }} />
+            {isPlaying ? (
+              <AudioLines className="relative h-6 w-6 text-white" />
+            ) : (
+              <Music2 className="relative h-6 w-6 text-white" />
+            )}
+            <span className="absolute bottom-0 inset-x-0 h-[2px]" style={{ background: primary }} />
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-white">{activeTrack?.title || 'Choose a song'}</p>
+            <p className="mt-1 truncate text-[11px] text-slate-400">
+              {activeTrack?.film || 'A song picked for Kutty'}
+            </p>
+            <p className="mt-1 flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.12em]" style={{ color: primary }}>
+              <span className={isPlaying ? 'h-1.5 w-1.5 animate-pulse rounded-full' : 'h-1.5 w-1.5 rounded-full'} style={{ background: primary }} />
+              {isPlaying ? 'Now playing' : 'Ready when you are'}
+            </p>
+          </div>
         </div>
-        <div className="flex justify-between font-sonic-mono text-[9px] text-slate-500">
-          <span>{formatTime(currentTime)}</span>
-          <span style={{ color: `${primaryColor}88` }}>
-            {formatTime(effectiveDuration)}
-          </span>
-        </div>
-      </div>
 
-      {/* Controls row */}
-      <div className="flex items-center justify-between">
-        {/* Track number on the left */}
-        <span className="font-sonic-mono text-[9.5px] text-slate-600 w-14">
-          {activeTrack?.trackNumber || '01'} / {String(totalTracks).padStart(2, '0')}
-        </span>
-
-        {/* Centre: Previous · Play/Pause · Next */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* Playback controls */}
+        <div className="flex items-center justify-end gap-1 sm:gap-2 md:justify-center">
           <button
             type="button"
             onClick={onPreviousTrack}
-            disabled={activeTrackIndex === 0}
+            disabled={activeTrackIndex <= 0}
             aria-label="Previous song"
-            className="p-1.5 sm:p-2 rounded-full text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:hover:text-slate-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
-            style={{ '--tw-ring-color': primaryColor }}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-slate-400 transition hover:bg-white/[0.06] hover:text-white focus:outline-none focus-visible:ring-2 disabled:opacity-30 sm:h-11 sm:w-11"
+            style={{ '--tw-ring-color': primary }}
           >
-            <SkipBack className="w-4 h-4" />
+            <SkipBack className="h-4 w-4" />
           </button>
-
-          {/* Central play/pause button */}
           <button
             type="button"
             onClick={onTogglePlay}
             aria-label={isPlaying ? 'Pause song' : 'Play song'}
-            className="relative p-3 rounded-full transition-all transform hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-[#10120d] shadow-lg transition hover:scale-[1.04] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e1019] sm:h-13 sm:w-13"
             style={{
-              background: `radial-gradient(circle at 40% 38%, ${primaryColor}30 0%, ${primaryColor}10 65%, transparent 100%)`,
-              border: `1.5px solid ${primaryColor}50`,
-              boxShadow: `0 0 18px ${primaryColor}20, inset 0 1px 0 ${primaryColor}18`,
-              '--tw-ring-color': primaryColor,
-              transition: 'all 0.5s ease',
+              background: `linear-gradient(145deg, ${primary}, ${primary}d9)`,
+              boxShadow: `0 0 25px ${primary}24`,
+              '--tw-ring-color': primary,
             }}
           >
-            {isPlaying ? (
-              <Pause
-                className="w-4 h-4"
-                style={{ color: primaryColor, transition: 'color 0.5s ease' }}
-              />
-            ) : (
-              <Play
-                className="w-4 h-4 ml-0.5"
-                style={{ color: primaryColor, transition: 'color 0.5s ease' }}
-              />
-            )}
+            {isPlaying ? <Pause className="h-5 w-5 fill-current" /> : <Play className="ml-0.5 h-5 w-5 fill-current" />}
           </button>
-
           <button
             type="button"
             onClick={onNextTrack}
-            disabled={activeTrackIndex === totalTracks - 1}
+            disabled={activeTrackIndex >= totalTracks - 1}
             aria-label="Next song"
-            className="p-1.5 sm:p-2 rounded-full text-slate-500 hover:text-slate-200 disabled:opacity-25 disabled:hover:text-slate-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer disabled:cursor-not-allowed"
-            style={{ '--tw-ring-color': primaryColor }}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-slate-400 transition hover:bg-white/[0.06] hover:text-white focus:outline-none focus-visible:ring-2 disabled:opacity-30 sm:h-11 sm:w-11"
+            style={{ '--tw-ring-color': primary }}
           >
-            <SkipForward className="w-4 h-4" />
+            <SkipForward className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Right: repeat symbol */}
-        <div className="w-14 flex justify-end">
-          <span
-            className="font-sonic-mono text-[8.5px] tracking-wider opacity-30"
-            style={{ color: primaryColor }}
-          >
-            ∞
-          </span>
+        {/* Context action */}
+        <div className="hidden justify-end md:flex">
+          {isLastTrack && onPreviewEnding ? (
+            <button
+              type="button"
+              onClick={onPreviewEnding}
+              className="inline-flex min-h-10 items-center gap-2 rounded-full border px-3.5 text-xs font-semibold transition hover:bg-white/[0.06] focus:outline-none focus-visible:ring-2"
+              style={{ borderColor: `${primary}45`, color: primary, '--tw-ring-color': primary }}
+            >
+              <Check className="h-3.5 w-3.5" />
+              Finish playlist
+            </button>
+          ) : (
+            <div className="text-right">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Curated for</p>
+              <p className="mt-1 text-sm font-medium text-slate-200">Kutty <span aria-hidden="true">♡</span></p>
+            </div>
+          )}
+        </div>
+
+        {/* Accessible seek slider spans the bottom */}
+        <div className="col-span-2 flex min-w-0 items-center gap-2 md:col-span-3 md:gap-3">
+          <span className="w-9 shrink-0 text-right text-[10px] tabular-nums text-slate-500">{formatTime(safeCurrentTime)}</span>
+          <input
+            type="range"
+            min="0"
+            max={Math.max(1, totalDuration)}
+            step="0.1"
+            value={safeCurrentTime}
+            onChange={(event) => onSeek?.(Number(event.target.value))}
+            aria-label="Seek through current song"
+            aria-valuetext={formatTime(safeCurrentTime)}
+            className="h-1.5 min-w-0 flex-1 cursor-pointer appearance-none rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e1019]"
+            style={{
+              accentColor: primary,
+              background: `linear-gradient(to right, ${primary} ${progress}%, rgba(255,255,255,0.13) ${progress}%)`,
+              '--tw-ring-color': primary,
+            }}
+          />
+          <span className="w-9 shrink-0 text-[10px] tabular-nums text-slate-500">{formatTime(totalDuration)}</span>
+          {isLastTrack && onPreviewEnding && (
+            <button
+              type="button"
+              onClick={onPreviewEnding}
+              aria-label="Finish playlist"
+              className="ml-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border md:hidden"
+              style={{ borderColor: `${primary}45`, color: primary }}
+            >
+              <Check className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
-    </div>
+    </section>
   );
 }
