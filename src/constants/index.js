@@ -11,6 +11,7 @@ export const SCENES = {
   LORD_SHIVA_BLESSING: 'LORD_SHIVA_BLESSING', // Phase 11: Sacred Himalayan Blessings
   FINAL_MESSAGE: 'FINAL_MESSAGE', // Phase 12: Grand Finale
   SONIC_BLOOM: 'SONIC_BLOOM', // Phase 13: Sonic Bloom — Six Songs, the Way I See You
+  WHO_IS_SHE_TO_ME: 'WHO_IS_SHE_TO_ME', // Phase 14: Who Is She to Me? — placeholder for the new personal scene
 };
 
 import { birthdayConfig } from '../config';

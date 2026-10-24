@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { sonicBloomConfig } from '../../data/sonicBloomSongs';
 
@@ -10,7 +10,7 @@ import { sonicBloomConfig } from '../../data/sonicBloomSongs';
  * have been explored. Concludes the experience with gratitude.
  * Returns cleanly to the birthday celebration without restarting it.
  */
-export function ClosingDedication({ onBackToBirthday, onReturnToTracks, className = '' }) {
+export function ClosingDedication({ onBackToBirthday, onContinueToWhoIsShe, onReturnToTracks, className = '' }) {
   const {
     title = 'The Full Bloom',
     message = 'Six songs could never say everything, but each one carries a little piece of what you mean to me, Kutty. ❤️',
@@ -61,6 +61,18 @@ export function ClosingDedication({ onBackToBirthday, onReturnToTracks, classNam
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span>{backActionText}</span>
         </button>
+
+        {onContinueToWhoIsShe && (
+          <button
+            type="button"
+            onClick={onContinueToWhoIsShe}
+            aria-label="Continue to Who Is She to Me?"
+            className="group inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full border border-violet-300/25 bg-violet-400/[0.08] hover:bg-violet-400/[0.14] font-sonic-body font-semibold text-[13px] tracking-wide text-violet-100 transition-all hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 min-h-[44px] cursor-pointer"
+          >
+            <span>Who Is She to Me? →</span>
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+          </button>
+        )}
 
         {onReturnToTracks && (
           <button

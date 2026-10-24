@@ -11,6 +11,7 @@ import { ArtistChapter } from './scenes/ArtistChapter';
 import { LordShivaBlessing } from './scenes/LordShivaBlessing';
 import { FinalBirthdayCelebration } from './scenes/FinalBirthdayCelebration';
 import { SonicBloomScene } from './scenes/sonicBloom/SonicBloomScene';
+import { WhoIsSheScene } from './scenes/WhoIsSheScene';
 import { Loader } from './components/ui/Loader';
 import { Background } from './components/ui/Background';
 import { useMediaLoading } from './hooks/useMediaLoading';
@@ -83,6 +84,11 @@ function App() {
         {/* Phase 13: SONIC BLOOM — Six Songs, the Way I See You */}
         {isLoaded && currentScene === SCENES.SONIC_BLOOM && (
           <SonicBloomScene key="sonic-bloom" />
+        )}
+
+        {/* Phase 14: Who Is She to Me? — reserved placeholder for the new final scene */}
+        {isLoaded && currentScene === SCENES.WHO_IS_SHE_TO_ME && (
+          <WhoIsSheScene key="who-is-she-to-me" />
         )}
       </AnimatePresence>
     </>

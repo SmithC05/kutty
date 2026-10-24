@@ -32,7 +32,8 @@ export function useSceneManager() {
       SCENES.ARTIST_CHAPTER,
       SCENES.LORD_SHIVA_BLESSING,
       SCENES.FINAL_MESSAGE,
-      SCENES.SONIC_BLOOM
+      SCENES.SONIC_BLOOM,
+      SCENES.WHO_IS_SHE_TO_ME
     ];
     const currentIndex = order.indexOf(currentScene);
     if (currentIndex >= 0 && currentIndex < order.length - 1) {
@@ -48,6 +49,7 @@ export function useSceneManager() {
         SCENES.LORD_SHIVA_BLESSING,
         SCENES.FINAL_MESSAGE,
         SCENES.SONIC_BLOOM,
+        SCENES.WHO_IS_SHE_TO_ME,
       ];
       if (implementedScenes.includes(nextScene)) {
         preloadNext();

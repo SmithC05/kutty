@@ -245,6 +245,14 @@ export function SonicBloomScene() {
     transitionTo(SCENES.FINAL_MESSAGE);
   }, [transitionTo]);
 
+  const handleContinueToWhoIsShe = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    transitionTo(SCENES.WHO_IS_SHE_TO_ME);
+  }, [transitionTo]);
+
   // Background base gradient — shifts per song
   const bgGradient = isClosingState
     ? 'radial-gradient(ellipse at 40% 35%, rgba(99,60,180,0.32) 0%, rgba(3,4,12,0.92) 55%, #02030d 100%)'
@@ -458,6 +466,7 @@ export function SonicBloomScene() {
                 >
                   <ClosingDedication
                     onBackToBirthday={handleBackToBirthday}
+                    onContinueToWhoIsShe={handleContinueToWhoIsShe}
                     onReturnToTracks={() => setIsClosingState(false)}
                   />
                 </motion.div>
