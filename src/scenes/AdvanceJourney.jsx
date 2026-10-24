@@ -12,7 +12,7 @@ import { fadeIn, easeCinematic } from '../animations/presets';
  */
 export function AdvanceJourney() {
   const timeState = useTime();
-  const { playTrack, stopBgm } = useAudio();
+  const { playTrack } = useAudio();
   const [step, setStep] = useState(0);
 
   const messages = [
@@ -21,13 +21,10 @@ export function AdvanceJourney() {
     "Advance happy birthday, my Kutty! ❤️"
   ];
 
-  // Start intro.mp3 when Advance Journey becomes active, fade out on leave
+  // Keep intro.mp3 playing continuously through all messages and the live countdown
   useEffect(() => {
     playTrack('intro');
-    return () => {
-      stopBgm(800);
-    };
-  }, [playTrack, stopBgm]);
+  }, [playTrack]);
 
   useEffect(() => {
     // Sequence the text messages

@@ -51,6 +51,20 @@ export function useAudioController() {
       },
     });
 
+    // Ensure reliable continuous looping for background tracks even with HTML5 streaming
+    if (trackInfo.loop !== false) {
+      howl.on('end', () => {
+        if (currentTrackIdRef.current === trackId) {
+          try {
+            howl.seek(0);
+            howl.play();
+          } catch {
+            // ignore
+          }
+        }
+      });
+    }
+
     howlsRef.current[trackId] = {
       howl,
       maxVolume: trackInfo.volume ?? 0.45,
@@ -64,10 +78,16 @@ export function useAudioController() {
     (trackId, options = {}) => {
       if (!trackId) return;
 
-      // 1. If this exact track is ALREADY the active requested track and playing, do not restart
+      // 1. If this exact track is ALREADY the active requested track, do not restart or mute
       if (currentTrackIdRef.current === trackId) {
         const currentData = howlsRef.current[trackId];
-        if (currentData?.howl?.playing()) {
+        if (currentData?.howl) {
+          if (currentData.howl.playing()) {
+            return;
+          }
+          clearTimeout(fadeTimersRef.current[trackId]);
+          currentData.howl.play();
+          setIsPlaying(true);
           return;
         }
       }
