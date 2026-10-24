@@ -282,6 +282,41 @@ export function SonicBloomScene() {
     setMobileQueueOpen(false);
   }, []);
 
+  const handleClosingSelectTrack = useCallback((index) => {
+    if (index < 0 || index >= sonicBloomSongs.length) return;
+    setAutoplayBlocked(false);
+    setIsClosingState(false);
+    setMobileQueueOpen(false);
+
+    const audio = audioRef.current;
+    const track = sonicBloomSongs[index];
+
+    if (activeTrackIndex === index) {
+      if (audio && track?.audio?.src) {
+        audio.currentTime = 0;
+        setCurrentTime(0);
+        engineRef.current?.connectAudioElement(audio);
+        engineRef.current?.resume();
+        audio
+          .play()
+          .then(() => {
+            setIsPlaying(true);
+            isPlayingRef.current = true;
+          })
+          .catch((err) => {
+            console.warn('[KuttyRadio] Replay failed:', err);
+          });
+      }
+    } else {
+      autoAdvanceRef.current = true;
+      setActiveTrackIndex(index);
+    }
+  }, [activeTrackIndex]);
+
+  const handleReplayAll = useCallback(() => {
+    handleClosingSelectTrack(0);
+  }, [handleClosingSelectTrack]);
+
   const handlePreviousTrack = useCallback(() => {
     setIsClosingState(false);
     setAutoplayBlocked(false);
@@ -376,8 +411,31 @@ export function SonicBloomScene() {
         }}
       />
 
-      {/* ── TOP HEADER BAR (Exact match to reference mockup) ── */}
-      <header className="relative z-20 shrink-0 flex items-center justify-between border-b border-white/[0.06] px-4 py-2 sm:px-6 sm:py-2.5">
+      {/* ── MAIN VIEW: NORMAL LISTENING INTERFACE vs FULL-SCREEN CLOSING DEDICATION ── */}
+      <AnimatePresence mode="wait">
+        {isClosingState ? (
+          <ClosingDedication
+            key="closing-screen"
+            tracks={sonicBloomSongs}
+            activeTrack={activeTrack}
+            finalTrack={sonicBloomSongs[5]}
+            onSelectTrack={handleClosingSelectTrack}
+            onReplayAll={handleReplayAll}
+            onContinueToUs={handleContinueToUs}
+            onBackToArtist={handleBackToArtist}
+            onReturnToTracks={() => setIsClosingState(false)}
+          />
+        ) : (
+          <motion.div
+            key="listening-interface"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reducedMotion ? 0.15 : 0.4 }}
+            className="relative flex flex-1 min-h-0 flex-col"
+          >
+            {/* ── TOP HEADER BAR (Exact match to reference mockup) ── */}
+            <header className="relative z-20 shrink-0 flex items-center justify-between border-b border-white/[0.06] px-4 py-2 sm:px-6 sm:py-2.5">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -570,39 +628,13 @@ export function SonicBloomScene() {
               aria-label="Song Lyrics"
               className="col-span-5 flex h-full min-h-0 flex-col"
             >
-              <AnimatePresence mode="wait">
-                {isClosingState ? (
-                  <motion.div
-                    key="closing-state"
-                    initial={{ opacity: 0, scale: 0.96 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.96 }}
-                    className="flex h-full min-h-0 items-center justify-center p-4"
-                  >
-                    <ClosingDedication
-                      onBackToArtist={handleBackToArtist}
-                      onContinueToUs={handleContinueToUs}
-                      onReturnToTracks={() => setIsClosingState(false)}
-                    />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="lyrics-active"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="h-full min-h-0"
-                  >
-                    <LyricsPanel
-                      track={activeTrack}
-                      currentTime={currentTime}
-                      isPlaying={isPlaying}
-                      audioReactivity={audioReactivity}
-                      onSeek={handleSeek}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <LyricsPanel
+                track={activeTrack}
+                currentTime={currentTime}
+                isPlaying={isPlaying}
+                audioReactivity={audioReactivity}
+                onSeek={handleSeek}
+              />
             </section>
           </div>
         ) : (
@@ -648,31 +680,13 @@ export function SonicBloomScene() {
 
             {/* Main Lyrics Area (Takes the vast majority of mobile screen) */}
             <div className="flex-1 min-h-0">
-              <AnimatePresence mode="wait">
-                {isClosingState ? (
-                  <motion.div
-                    key="mobile-closing"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="flex h-full min-h-0 items-center justify-center p-2"
-                  >
-                    <ClosingDedication
-                      onBackToArtist={handleBackToArtist}
-                      onContinueToUs={handleContinueToUs}
-                      onReturnToTracks={() => setIsClosingState(false)}
-                    />
-                  </motion.div>
-                ) : (
-                  <LyricsPanel
-                    track={activeTrack}
-                    currentTime={currentTime}
-                    isPlaying={isPlaying}
-                    audioReactivity={audioReactivity}
-                    onSeek={handleSeek}
-                  />
-                )}
-              </AnimatePresence>
+              <LyricsPanel
+                track={activeTrack}
+                currentTime={currentTime}
+                isPlaying={isPlaying}
+                audioReactivity={audioReactivity}
+                onSeek={handleSeek}
+              />
             </div>
 
             {/* Mobile Queue Drawer Modal */}
@@ -772,6 +786,9 @@ export function SonicBloomScene() {
           onPreviewEnding={() => setIsClosingState(true)}
         />
       </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
