@@ -112,10 +112,12 @@ export function SonicBloomScene() {
   useEffect(() => {
     const engine = new SonicBloomAudioEngine();
     const audio = new Audio();
-    audio.crossOrigin = 'anonymous';
     engineRef.current = engine;
     audioRef.current = audio;
     audio.preload = 'metadata';
+
+    // Connect analyzer to audio element from the beginning
+    engine.connectAudioElement(audio);
 
     const initialTrack = sonicBloomSongs[0];
     if (initialTrack?.audio?.src) {
@@ -195,13 +197,14 @@ export function SonicBloomScene() {
     autoAdvanceRef.current = false;
     audio.pause();
     audio.src = track.audio.src;
-    audio.load();
     audio.currentTime = 0;
     setCurrentTime(0);
     setDuration(track.audio.duration || 0);
 
+    // Ensure the analyzer is connected to this audio element
+    engineRef.current?.connectAudioElement(audio);
+
     if (shouldContinue) {
-      engineRef.current?.connectAudioElement(audio);
       engineRef.current?.resume();
       audio.play().catch((error) => {
         console.warn('[KuttyRadio] Playback failed:', error);

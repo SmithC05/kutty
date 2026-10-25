@@ -594,8 +594,6 @@ export function BirthdayJourney() {
     transitioningRef.current = true;
     setIsTransitioning(true);
 
-    playSfx('sparkle');
-
     /* Smooth 1.0s graceful fade of canvas particles & scene content */
     canvasRef.current?._fadeOut?.(1.0);
 
@@ -609,7 +607,7 @@ export function BirthdayJourney() {
         transitionTo(SCENES.SECRET_VAULT);
       },
     });
-  }, [transitionTo, playSfx]);
+  }, [transitionTo]);
 
   /* Keyboard shortcut (Enter / Space) to proceed if desired */
   const handleKeyDown = useCallback((e) => {
@@ -663,7 +661,6 @@ export function BirthdayJourney() {
           '<+0.1'
         );
       }
-      tl.call(() => playSfx('sparkle'), [], '<+=0.7');
 
       /* C: "Happy" + "Birthday," cursive typography stagger */
       if (happyRef.current) {
@@ -701,7 +698,6 @@ export function BirthdayJourney() {
       /* E: Celebratory burst of luminous particles, star glints & light hearts */
       tl.call(() => {
         canvasRef.current?._burst?.();
-        playSfx('sparkle');
         playSfx('heartbeat');
       }, [], '+=0.15');
 

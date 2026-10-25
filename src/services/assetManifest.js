@@ -120,7 +120,6 @@ const APPROX_AUDIO_SIZES = {
   '/audio/music/Happy-Birthday.mp3': 3997288,
   '/audio/music/metro.mp3': 436212,
   '/audio/sound-effects/heartbeat.mp3': 34481,
-  '/audio/sound-effects/sparkle.mp3': 39497,
   '/audio/sonic-bloom/01-unnale.mp3': 3377899,
   '/audio/sonic-bloom/02-chella-magale.mp3': 1400842,
   '/audio/sonic-bloom/03-magale.mp3': 1242994,

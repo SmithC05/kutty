@@ -27,6 +27,7 @@ export function LyricsBeatVisualizer({
 }) {
   const reducedMotion = useReducedMotion();
   const bands = audioReactivity?.bands;
+  const isActuallyPlaying = Boolean(isPlaying || audioReactivity?.isPlaying);
   const numBars = 36;
 
   // 36 bars with real-time frequency heights
@@ -47,31 +48,33 @@ export function LyricsBeatVisualizer({
       className={`relative z-10 flex flex-nowrap shrink-0 items-end justify-center gap-1 sm:gap-1.5 px-4 sm:px-6 pb-2.5 pt-1 h-11 w-full max-w-lg mx-auto select-none overflow-hidden ${className}`}
     >
       {bars.map((val, index) => {
-        // When playing: height ranges dynamically from 12% to 100% based on the real frequency band
-        // When paused: settles into a clean, calm minimum resting height (8% = ~3.5px)
+        // When playing: height ranges dynamically from 12% to 100% based on real frequency/amplitude data
+        // When paused: settles smoothly into calm resting bars (8% = ~3.5px)
         let heightPercent = 8;
-        if (isPlaying) {
+        if (isActuallyPlaying) {
           const rawHeight = Math.max(12, Math.min(100, Math.round(val * 100)));
           heightPercent = reducedMotion ? Math.min(38, Math.round(rawHeight * 0.45)) : rawHeight;
         }
 
-        const opacity = isPlaying
+        const opacity = isActuallyPlaying
           ? Math.min(1.0, 0.45 + val * 0.55)
           : 0.22;
 
-        const hasGlow = isPlaying && !reducedMotion && val > 0.45;
+        const hasGlow = isActuallyPlaying && !reducedMotion && val > 0.45;
 
         return (
           <span
             key={index}
-            className={`flex-1 max-w-[6px] min-w-[2px] rounded-t-full transition-[height,opacity] ${
-              reducedMotion ? 'duration-300 ease-out' : 'duration-100 ease-out'
-            }`}
+            className="flex-1 max-w-[6px] min-w-[2px] rounded-t-full"
             style={{
               height: `${heightPercent}%`,
               background: `linear-gradient(to top, ${primaryColor}ee, ${accentColor})`,
               opacity,
-              boxShadow: hasGlow ? `0 0 8px ${accentColor}88` : 'none',
+              boxShadow: hasGlow ? `0 0 10px ${accentColor}99` : 'none',
+              transition: isActuallyPlaying
+                ? (reducedMotion ? 'height 0.25s ease-out, opacity 0.25s ease-out' : 'none')
+                : 'height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease-out',
+              willChange: isActuallyPlaying ? 'height, opacity' : 'auto',
             }}
           />
         );

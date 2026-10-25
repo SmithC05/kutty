@@ -177,7 +177,7 @@ export class SonicBloomAudioEngine {
       }
 
       // If total energy is non-zero, calculate metrics from the real FFT
-      if (totalFft > 40) {
+      if (totalFft > 12) {
         hasRealFft = true;
 
         const lowEnd = Math.max(1, Math.floor(bins * 0.06));
@@ -199,12 +199,17 @@ export class SonicBloomAudioEngine {
         amplitude = lowFreq * 0.42 + midFreq * 0.36 + highFreq * 0.22;
 
         // Sample 36 bands across the logarithmic spectrum with perceptual frequency tilt
+        // Skip DC offset at bin 0 and distribute across real musical frequencies
+        const minBin = 1;
+        const maxBin = Math.min(bins - 1, Math.floor(bins * 0.75));
+        const binRange = maxBin - minBin;
+
         for (let b = 0; b < this.numBands; b++) {
           const norm = b / this.numBands;
-          const startBin = Math.floor(Math.pow(norm, 1.75) * (bins * 0.70));
+          const startBin = minBin + Math.floor(Math.pow(norm, 1.6) * binRange);
           const endBin = Math.max(
             startBin + 1,
-            Math.floor(Math.pow((b + 1) / this.numBands, 1.75) * (bins * 0.70))
+            minBin + Math.floor(Math.pow((b + 1) / this.numBands, 1.6) * binRange)
           );
           let bSum = 0;
           let bCount = 0;
@@ -214,8 +219,8 @@ export class SonicBloomAudioEngine {
           }
           const val = bCount > 0 ? bSum / (bCount * 255) : 0;
           // Perceptual frequency weighting: boost higher frequency bands for balanced visual distribution
-          const tilt = 1.0 + norm * 1.35;
-          const boosted = Math.pow(val, 0.85) * 1.45 * tilt;
+          const tilt = 1.0 + norm * 1.45;
+          const boosted = Math.pow(val, 0.8) * 1.6 * tilt;
           rawBands[b] = Math.max(0.08, Math.min(1.0, boosted));
         }
       }

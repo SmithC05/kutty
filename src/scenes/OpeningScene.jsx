@@ -37,12 +37,11 @@ export function OpeningScene() {
 
     const idleInterval = setInterval(() => {
       setIsAliveState(true);
-      playSfx('sparkle');
       setTimeout(() => setIsAliveState(false), 2000);
     }, 25000);
 
     return () => clearInterval(idleInterval);
-  }, [isOpening, playSfx]);
+  }, [isOpening]);
 
   const handleOpenStart = () => {
     if (isOpening) return;

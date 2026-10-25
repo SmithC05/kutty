@@ -255,7 +255,6 @@ export function SecretVault() {
           setStatus('correct');
           setBurstHearts(true);
           setIsUnlockedIcon(true);
-          playSfx('sparkle');
           playSfx('heartbeat');
 
           // Transition to Deva Deva Instrumental on successful PIN entry

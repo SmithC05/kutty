@@ -151,6 +151,7 @@ self.addEventListener('fetch', (event) => {
               'Content-Length': String(chunk.byteLength),
               'Content-Type': contentType,
               'Cache-Control': 'public, max-age=31536000',
+              'Access-Control-Allow-Origin': '*',
             },
           });
         } catch (err) {
