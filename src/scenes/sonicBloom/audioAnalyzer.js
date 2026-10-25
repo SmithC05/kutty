@@ -78,7 +78,16 @@ export class SonicBloomAudioEngine {
 
     // 36 frequency bands smoothed with spring physics
     this.numBands = 36;
-    this.smoothBands = new Array(this.numBands).fill(0.06);
+    this.rawBands = new Float32Array(this.numBands);
+    this.smoothBands = new Float32Array(this.numBands);
+    this.bandsArray = new Array(this.numBands);
+    for (let i = 0; i < this.numBands; i++) {
+      this.rawBands[i] = 0.06;
+      this.smoothBands[i] = 0.06;
+      this.bandsArray[i] = 0.06;
+    }
+
+    this.visualizerListeners = new Set();
 
     this.state = {
       amplitude: 0,
@@ -89,7 +98,14 @@ export class SonicBloomAudioEngine {
       isPlaying: false,
       isQuiet: false,
       isSustainedHigh: false,
-      bands: new Array(this.numBands).fill(0.06),
+      bands: this.bandsArray,
+    };
+  }
+
+  subscribeVisualizer(callback) {
+    this.visualizerListeners.add(callback);
+    return () => {
+      this.visualizerListeners.delete(callback);
     };
   }
 
@@ -161,9 +177,8 @@ export class SonicBloomAudioEngine {
     let lowFreq = 0;
     let midFreq = 0;
     let highFreq = 0;
-    let amplitude = 0;
-
-    const rawBands = new Array(this.numBands).fill(0.06);
+    const rawBands = this.rawBands;
+    rawBands.fill(0.06);
 
     // 1. Check if real Web Audio FFT frequency data is actively available
     let hasRealFft = false;
@@ -280,6 +295,7 @@ export class SonicBloomAudioEngine {
     for (let b = 0; b < this.numBands; b++) {
       const target = isPlaying ? rawBands[b] : 0.06;
       this.smoothBands[b] = this.smoothBands[b] + (target - this.smoothBands[b]) * smoothFactor;
+      this.bandsArray[b] = this.smoothBands[b];
     }
 
     // Baseline smoothing for peak pyrotechnics
@@ -313,17 +329,25 @@ export class SonicBloomAudioEngine {
 
     const isQuiet = amplitude < 0.08;
 
-    this.state = {
-      amplitude,
-      lowFreq,
-      midFreq,
-      highFreq,
-      progress,
-      isPlaying,
-      isQuiet,
-      isSustainedHigh: false,
-      bands: [...this.smoothBands],
-    };
+    this.state.amplitude = amplitude;
+    this.state.lowFreq = lowFreq;
+    this.state.midFreq = midFreq;
+    this.state.highFreq = highFreq;
+    this.state.progress = progress;
+    this.state.isPlaying = isPlaying;
+    this.state.isQuiet = isQuiet;
+    this.state.isSustainedHigh = false;
+    this.state.bands = this.bandsArray;
+
+    if (this.visualizerListeners.size > 0) {
+      this.visualizerListeners.forEach((listener) => {
+        try {
+          listener(this.state);
+        } catch (err) {
+          console.warn('[AudioAnalyzer] Visualizer listener error:', err);
+        }
+      });
+    }
 
     return this.state;
   }

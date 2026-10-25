@@ -212,16 +212,34 @@ export function SonicBloomScene() {
     }
   }, [activeTrackIndex]);
 
-  // Audio analysis frame loop (60fps smooth analysis)
+  // Audio analysis frame loop: 60fps for Web Audio processing, throttled React state for UI indicators
   useEffect(() => {
     let animationFrame;
     let lastTime = performance.now();
+    let lastReactStateTime = 0;
 
     const update = (now) => {
       const delta = now - lastTime;
       if (delta >= 16) {
         lastTime = now;
-        if (engineRef.current) setAudioReactivity(engineRef.current.update(delta));
+        if (engineRef.current) {
+          const reactivity = engineRef.current.update(delta);
+          // Throttle React state update to ~25fps to eliminate excessive React reconciliation
+          // while Web Audio FFT and beat visualizer run at full 60fps
+          if (now - lastReactStateTime >= 40) {
+            lastReactStateTime = now;
+            setAudioReactivity({
+              amplitude: reactivity.amplitude,
+              lowFreq: reactivity.lowFreq,
+              midFreq: reactivity.midFreq,
+              highFreq: reactivity.highFreq,
+              progress: reactivity.progress,
+              isPlaying: reactivity.isPlaying,
+              isQuiet: reactivity.isQuiet,
+              isSustainedHigh: reactivity.isSustainedHigh,
+            });
+          }
+        }
       }
       animationFrame = requestAnimationFrame(update);
     };
@@ -635,6 +653,7 @@ export function SonicBloomScene() {
                 track={activeTrack}
                 currentTime={currentTime}
                 isPlaying={isPlaying}
+                audioEngine={engineRef.current}
                 audioReactivity={audioReactivity}
                 onSeek={handleSeek}
               />
@@ -687,6 +706,7 @@ export function SonicBloomScene() {
                 track={activeTrack}
                 currentTime={currentTime}
                 isPlaying={isPlaying}
+                audioEngine={engineRef.current}
                 audioReactivity={audioReactivity}
                 onSeek={handleSeek}
               />

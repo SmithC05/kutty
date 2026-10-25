@@ -37,8 +37,15 @@ export function MagicCursor() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     
+    const ensureRenderRunning = () => {
+      if (!animationFrameId) {
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+
     const handleMouseEnter = () => {
       isInside = true;
+      ensureRenderRunning();
     };
 
     const handleMouseLeave = () => {
@@ -48,17 +55,21 @@ export function MagicCursor() {
     const handleMouseMove = (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
+      isInside = true;
+      ensureRenderRunning();
 
       const distance = Math.hypot(mouseX - previousX, mouseY - previousY);
-      const count = Math.min(4, Math.max(2, Math.ceil(distance / 12)));
+      const count = Math.min(3, Math.max(1, Math.ceil(distance / 16)));
 
-      for (let i = 0; i < count; i++) {
-        particles.push(
-          new Particle(
-            mouseX + (Math.random() - 0.5) * 4,
-            mouseY + (Math.random() - 0.5) * 4
-          )
-        );
+      if (particles.length < 50) {
+        for (let i = 0; i < count; i++) {
+          particles.push(
+            new Particle(
+              mouseX + (Math.random() - 0.5) * 4,
+              mouseY + (Math.random() - 0.5) * 4
+            )
+          );
+        }
       }
 
       previousX = mouseX;
@@ -139,13 +150,21 @@ export function MagicCursor() {
     const render = () => {
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      particles.forEach((particle) => {
-        particle.update();
-        particle.draw();
-      });
+      if (particles.length > 0) {
+        particles.forEach((particle) => {
+          particle.update();
+          particle.draw();
+        });
+        particles = particles.filter((particle) => particle.life > 0);
+      }
 
-      particles = particles.filter((particle) => particle.life > 0);
-      renderCursor();
+      if (isInside) {
+        renderCursor();
+      } else if (particles.length === 0) {
+        // Cursor left window and no lingering particles: sleep until mouse returns
+        animationFrameId = null;
+        return;
+      }
 
       animationFrameId = requestAnimationFrame(render);
     };

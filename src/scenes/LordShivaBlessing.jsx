@@ -100,6 +100,20 @@ export function LordShivaBlessing() {
   }, [reducedMotion]);
 
   // ACT IV: Receive Blessings (Golden Illumination Bloom)
+  const blessingTweenRef = useRef(null);
+  const transitionTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (blessingTweenRef.current) {
+        blessingTweenRef.current.kill();
+      }
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleReceiveBlessings = useCallback(() => {
     if (act === 'blessing' || act === 'complete') return;
     setAct('blessing');
@@ -110,7 +124,8 @@ export function LordShivaBlessing() {
     }
 
     const stateObj = { blessing: 0 };
-    gsap.to(stateObj, {
+    if (blessingTweenRef.current) blessingTweenRef.current.kill();
+    blessingTweenRef.current = gsap.to(stateObj, {
       blessing: 1,
       duration: 2.8,
       ease: 'power2.out',
@@ -130,7 +145,8 @@ export function LordShivaBlessing() {
     setIsTransitioning(true);
 
     // Give a subtle golden wash before next scene
-    setTimeout(() => {
+    if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
+    transitionTimeoutRef.current = setTimeout(() => {
       transitionTo(SCENES.MEMORY_JOURNEY_SOLO);
     }, 600);
   }, [transitionTo]);

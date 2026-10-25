@@ -22,7 +22,7 @@ import { useReducedMotion } from '../../hooks/useReducedMotion';
  *    - Tertiary: Back to the Portrait (transitions to ARTIST_CHAPTER)
  * 5. Respects reduced-motion preferences.
  */
-export function ClosingDedication({
+function ClosingDedicationComponent({
   tracks = sonicBloomSongs,
   activeTrack = sonicBloomSongs[5],
   finalTrack = sonicBloomSongs[5],
@@ -263,4 +263,5 @@ export function ClosingDedication({
   );
 }
 
+export const ClosingDedication = React.memo(ClosingDedicationComponent);
 export default ClosingDedication;

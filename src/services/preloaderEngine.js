@@ -307,6 +307,13 @@ class PreloaderEngine {
           }
           this.completedAssetIds.add(asset.id);
           this.loadedBytes += blob.size;
+          const calculatedPercent = Math.min(
+            99.5,
+            Math.max(0, (this.loadedBytes / this.totalBytes) * 100)
+          );
+          this.progress = Math.round(calculatedPercent * 10) / 10;
+          this.updateStatusText(this.progress);
+          this.notify();
           return;
         }
       } catch (err) {

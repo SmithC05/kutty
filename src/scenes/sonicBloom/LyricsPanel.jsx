@@ -20,11 +20,12 @@ import { LyricsBeatVisualizer } from './LyricsBeatVisualizer';
  *    - Inherits the active song's theme colors
  * 5. Minimal, clean header without the karaoke badge
  */
-export function LyricsPanel({
+function LyricsPanelComponent({
   track,
   currentTime = 0,
   isPlaying = false,
   audioReactivity = null,
+  audioEngine = null,
   className = '',
 }) {
   const rawLyrics = track?.lyrics;
@@ -291,6 +292,7 @@ export function LyricsPanel({
           4. AUDIO-REACTIVE DYNAMIC BEAT VISUALIZER (Real-time spectrum waveform)
           ══════════════════════════════════════════════════════════════════════════ */}
       <LyricsBeatVisualizer
+        audioEngine={audioEngine}
         audioReactivity={audioReactivity}
         isPlaying={isPlaying}
         primaryColor={primary}
@@ -300,4 +302,5 @@ export function LyricsPanel({
   );
 }
 
+export const LyricsPanel = React.memo(LyricsPanelComponent);
 export default LyricsPanel;

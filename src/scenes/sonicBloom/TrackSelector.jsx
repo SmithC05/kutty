@@ -43,7 +43,7 @@ function QueueThumbnail({ track, isActive }) {
  * Exact match to reference screenshot with track number, thumbnail, metadata,
  * and animated golden equalizer on the active track.
  */
-export function TrackSelector({
+function TrackSelectorComponent({
   tracks = [],
   activeTrackIndex = 0,
   onSelectTrack,
@@ -202,4 +202,7 @@ export function TrackSelector({
     </div>
   );
 }
+
+export const TrackSelector = React.memo(TrackSelectorComponent);
+export default TrackSelector;
 

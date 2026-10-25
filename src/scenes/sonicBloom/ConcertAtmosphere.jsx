@@ -32,7 +32,7 @@ const SONG_MOODS = [
   { beamSpeed1: '20s', beamSpeed2: '26s', beamSpeed3: '30s', hazeAlpha: 0.16, beamAlpha: 0.18 },
 ];
 
-export function ConcertAtmosphere({
+function ConcertAtmosphereComponent({
   activeTrackIndex = 0,
   primaryColor = '#a3e635',
   secondaryColor = '#a78bfa',
@@ -173,7 +173,6 @@ export function ConcertAtmosphere({
         }}
       />
 
-      {/* ── Subtle floor glow — anchors the scene ───────── */}
       <div
         style={{
           position: 'absolute',
@@ -188,3 +187,17 @@ export function ConcertAtmosphere({
     </div>
   );
 }
+
+export const ConcertAtmosphere = React.memo(
+  ConcertAtmosphereComponent,
+  (prev, next) =>
+    prev.activeTrackIndex === next.activeTrackIndex &&
+    prev.primaryColor === next.primaryColor &&
+    prev.secondaryColor === next.secondaryColor &&
+    prev.accentColor === next.accentColor &&
+    prev.isClosingState === next.isClosingState &&
+    prev.isMobile === next.isMobile &&
+    Boolean(prev.audioReactivity?.isQuiet) === Boolean(next.audioReactivity?.isQuiet) &&
+    Boolean(prev.audioReactivity?.isSustainedHigh) === Boolean(next.audioReactivity?.isSustainedHigh)
+);
+export default ConcertAtmosphere;

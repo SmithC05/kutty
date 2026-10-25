@@ -8,7 +8,7 @@ import { Music2, Pause, Play, Sparkles } from 'lucide-react';
  * Matches the reference cinematic music player design with floating heart,
  * subtle waveform, and signature calligraphy typography in the bottom right.
  */
-export function CinematicArtworkCard({
+function CinematicArtworkCardComponent({
   activeTrack,
   isPlaying = false,
   onTogglePlay,
@@ -403,3 +403,6 @@ export function CinematicArtworkCard({
     </div>
   );
 }
+
+export const CinematicArtworkCard = React.memo(CinematicArtworkCardComponent);
+export default CinematicArtworkCard;
