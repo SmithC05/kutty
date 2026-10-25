@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { ArrowLeft, ArrowRight, Play, RotateCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { sonicBloomConfig, sonicBloomSongs } from '../../data/sonicBloomSongs';
@@ -10,17 +10,10 @@ import { useReducedMotion } from '../../hooks/useReducedMotion';
  * Requirements satisfied:
  * 1. Full-screen viewport-filling cinematic background with blurred final artwork,
  *    dark translucent overlay, and restrained ambient lighting.
- * 2. Centred dedication with exact copy:
- *    "One playlist. Six little feelings."
- *    "“Six songs could never say everything. I hope each one reminds you how much you mean to me, Kutty. ❤️”"
- * 3. Six song thumbnails in one horizontal row on desktop, touch-friendly scrollable on mobile.
- *    Each includes artwork, song number, title, hover glow, and play icon.
- *    Clicking any thumbnail exits closing state, selects that song, resets to 0, and starts playback.
- * 4. Three clear actions:
- *    - Primary: Continue to Us → (transitions to MEMORY_JOURNEY_TOGETHER)
- *    - Secondary: Listen to All Six Again (restarts from Unnale)
- *    - Tertiary: Back to the Portrait (transitions to ARTIST_CHAPTER)
- * 5. Respects reduced-motion preferences.
+ * 2. Centred dedication with exact copy.
+ * 3. Automatically continues to Us after ~10 seconds of inactivity.
+ * 4. User interaction (pointer move, scroll, keydown) resets the inactivity timer.
+ * 5. Track selection, replay, or Back immediately cancels auto-navigation.
  */
 function ClosingDedicationComponent({
   tracks = sonicBloomSongs,
@@ -34,6 +27,80 @@ function ClosingDedicationComponent({
   className = '',
 }) {
   const reducedMotion = useReducedMotion();
+  const autoContinueTimerRef = useRef(null);
+  const continuedRef = useRef(false);
+
+  const handleContinue = useCallback(() => {
+    if (continuedRef.current) return;
+    continuedRef.current = true;
+    if (autoContinueTimerRef.current) {
+      clearTimeout(autoContinueTimerRef.current);
+      autoContinueTimerRef.current = null;
+    }
+    if (onContinueToUs) onContinueToUs();
+  }, [onContinueToUs]);
+
+  const resetInactivityTimer = useCallback(() => {
+    if (continuedRef.current) return;
+    if (autoContinueTimerRef.current) {
+      clearTimeout(autoContinueTimerRef.current);
+    }
+    autoContinueTimerRef.current = setTimeout(() => {
+      handleContinue();
+    }, 10000);
+  }, [handleContinue]);
+
+  useEffect(() => {
+    resetInactivityTimer();
+
+    const handleUserActivity = () => {
+      resetInactivityTimer();
+    };
+
+    window.addEventListener('pointermove', handleUserActivity, { passive: true });
+    window.addEventListener('pointerdown', handleUserActivity, { passive: true });
+    window.addEventListener('keydown', handleUserActivity, { passive: true });
+    window.addEventListener('touchstart', handleUserActivity, { passive: true });
+    window.addEventListener('wheel', handleUserActivity, { passive: true });
+
+    return () => {
+      if (autoContinueTimerRef.current) {
+        clearTimeout(autoContinueTimerRef.current);
+      }
+      window.removeEventListener('pointermove', handleUserActivity);
+      window.removeEventListener('pointerdown', handleUserActivity);
+      window.removeEventListener('keydown', handleUserActivity);
+      window.removeEventListener('touchstart', handleUserActivity);
+      window.removeEventListener('wheel', handleUserActivity);
+    };
+  }, [resetInactivityTimer]);
+
+  const handleSelectTrack = useCallback(
+    (index) => {
+      if (autoContinueTimerRef.current) {
+        clearTimeout(autoContinueTimerRef.current);
+        autoContinueTimerRef.current = null;
+      }
+      if (onSelectTrack) onSelectTrack(index);
+    },
+    [onSelectTrack]
+  );
+
+  const handleReplayAll = useCallback(() => {
+    if (autoContinueTimerRef.current) {
+      clearTimeout(autoContinueTimerRef.current);
+      autoContinueTimerRef.current = null;
+    }
+    if (onReplayAll) onReplayAll();
+  }, [onReplayAll]);
+
+  const handleBackToArtist = useCallback(() => {
+    if (autoContinueTimerRef.current) {
+      clearTimeout(autoContinueTimerRef.current);
+      autoContinueTimerRef.current = null;
+    }
+    if (onBackToArtist) onBackToArtist();
+  }, [onBackToArtist]);
 
   const {
     title = 'One playlist. Six little feelings.',
@@ -149,7 +216,7 @@ function ClosingDedicationComponent({
               <button
                 key={track.id || index}
                 type="button"
-                onClick={() => onSelectTrack?.(index)}
+                onClick={() => handleSelectTrack(index)}
                 aria-label={`Play song ${track.trackNumber}: ${track.title}`}
                 className="group relative flex flex-col text-left shrink-0 w-36 sm:w-auto snap-start rounded-2xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/20 p-2 transition-all duration-300 transform hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400 cursor-pointer select-none"
                 style={{
@@ -208,7 +275,7 @@ function ClosingDedicationComponent({
         {onContinueToUs && (
           <button
             type="button"
-            onClick={onContinueToUs}
+            onClick={handleContinue}
             aria-label="Continue to Us"
             className="group relative inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full font-bold text-xs sm:text-sm tracking-wide text-[#0a0d08] transition-all transform hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400 shadow-xl cursor-pointer min-h-[44px] w-full sm:w-auto"
             style={{
@@ -225,7 +292,7 @@ function ClosingDedicationComponent({
         {onReplayAll && (
           <button
             type="button"
-            onClick={onReplayAll}
+            onClick={handleReplayAll}
             aria-label="Listen to All Six Again"
             className="group inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-white/15 bg-white/[0.06] hover:bg-white/[0.12] hover:border-white/30 font-semibold text-xs tracking-wide text-white transition-all transform hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 cursor-pointer min-h-[42px] w-full sm:w-auto"
           >
@@ -238,7 +305,7 @@ function ClosingDedicationComponent({
         {onBackToArtist && (
           <button
             type="button"
-            onClick={onBackToArtist}
+            onClick={handleBackToArtist}
             aria-label="Back to the Portrait"
             className="group inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
           >

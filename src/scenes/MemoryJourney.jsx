@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useScene, useAudio } from '../context';
 import { SCENES } from '../constants';
@@ -12,17 +12,32 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
 // Warm ivory base, blush accents, muted rose, restrained champagne, paper grain.
 // Deliberately art-directed: large display title, four-corner hairlines,
 // animated horizontal rule, three-stage identity, explicit Enter button.
-// No auto-dismiss timer — the recipient reads at their own pace.
+// Automates entrance into photo journey after ~3.5s reading time.
 // ─────────────────────────────────────────────────────────────────────────────
 function JournalCoverCard({ onDismiss }) {
   const reducedMotion = useReducedMotion();
+  const dismissedRef = useRef(false);
+
+  const handleDismiss = useCallback(() => {
+    if (dismissedRef.current) return;
+    dismissedRef.current = true;
+    onDismiss();
+  }, [onDismiss]);
+
+  // Automatic progression after reading time (~3.5 seconds)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleDismiss();
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, [handleDismiss]);
 
   // Stagger for the sequential text reveals
   const stagger = reducedMotion ? 0 : 1;
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center select-none"
+      className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center select-none cursor-pointer"
       style={{
         background:
           'radial-gradient(ellipse 110% 90% at 55% 25%, #FFFDFB 0%, #FAF7F2 55%, #F2EBE5 100%)',
@@ -31,6 +46,7 @@ function JournalCoverCard({ onDismiss }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: reducedMotion ? 1 : 1.015 }}
       transition={{ duration: reducedMotion ? 0.3 : 0.9, ease: [0.22, 1, 0.36, 1] }}
+      onClick={handleDismiss}
     >
       {/* Paper grain */}
       <div
@@ -135,7 +151,7 @@ function JournalCoverCard({ onDismiss }) {
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            onDismiss();
+            handleDismiss();
           }}
           className="group relative px-7 sm:px-9 py-3 sm:py-3.5 rounded-full border border-[#45152D]/25 text-[#45152D] text-[11px] sm:text-xs uppercase tracking-[0.28em] font-medium hover:bg-[#45152D] hover:text-[#FFFDF9] active:scale-95 transition-all duration-300 shadow-[0_2px_12px_rgba(69,21,45,0.08)]"
           style={{ fontFamily: "'Manrope', sans-serif" }}
@@ -156,10 +172,25 @@ function JournalCoverCard({ onDismiss }) {
 // 1. Warm portrait-journal colours transition into sky-blue & cream
 // 2. Handwritten message appears:
 //    "Before our story, there was you. Now, a little piece of our story."
-// 3. Smooth entrance into Chapter Two (Us)
+// 3. Smooth automatic entrance into Chapter Two (Us) after ~3.0s reading time
 // ─────────────────────────────────────────────────────────────────────────────
 function ChapterTransitionScreen({ onContinue }) {
   const reducedMotion = useReducedMotion();
+  const continuedRef = useRef(false);
+
+  const handleContinue = useCallback(() => {
+    if (continuedRef.current) return;
+    continuedRef.current = true;
+    onContinue();
+  }, [onContinue]);
+
+  // Automatic transition after reading time (~3.0 seconds)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleContinue();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [handleContinue]);
 
   return (
     <motion.div
@@ -174,7 +205,7 @@ function ChapterTransitionScreen({ onContinue }) {
       }}
       exit={{ opacity: 0, scale: reducedMotion ? 1 : 0.98 }}
       transition={{ duration: reducedMotion ? 0.4 : 1.4, ease: [0.22, 1, 0.36, 1] }}
-      onClick={onContinue}
+      onClick={handleContinue}
     >
       {/* Paper grain */}
       <div
@@ -238,7 +269,7 @@ function ChapterTransitionScreen({ onContinue }) {
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            onContinue();
+            handleContinue();
           }}
           className="mt-8 px-6 py-2.5 rounded-full bg-[#1E293B] text-[#FFFDF9] text-xs uppercase tracking-[0.2em] font-medium shadow-md hover:bg-[#334155] active:scale-95 transition-all flex items-center gap-2"
           style={{ fontFamily: "'Manrope', sans-serif" }}

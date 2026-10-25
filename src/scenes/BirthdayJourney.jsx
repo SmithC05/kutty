@@ -588,10 +588,16 @@ export function BirthdayJourney() {
 
   useCelebrationCanvas(canvasRef, reducedMotion);
 
-  /* Intentional continuation trigger: only executes when Keerthana clicks the button */
+  const autoTransitionTimerRef = useRef(null);
+
+  /* Intentional continuation trigger: executes on button click or automatic timeout */
   const triggerTransition = useCallback(() => {
     if (transitioningRef.current) return;
     transitioningRef.current = true;
+    if (autoTransitionTimerRef.current) {
+      clearTimeout(autoTransitionTimerRef.current);
+      autoTransitionTimerRef.current = null;
+    }
     setIsTransitioning(true);
 
     /* Smooth 1.0s graceful fade of canvas particles & scene content */
@@ -710,7 +716,7 @@ export function BirthdayJourney() {
         );
       }
 
-      /* G: Continuation Button enters smoothly and remains available indefinitely */
+      /* G: Continuation Button enters smoothly and remains available for optional early advance */
       if (ctaRef.current) {
         tl.fromTo(ctaRef.current,
           { opacity: 0, y: 16, scale: 0.95 },
@@ -719,11 +725,21 @@ export function BirthdayJourney() {
         );
       }
 
-      /* Scene now remains resting indefinitely until Keerthana clicks the button.
-         NO automatic timeout, NO delayed transition, NO screen dismiss. */
+      /* Automatic progression: hold completed birthday reveal for ~4.5s then smoothly transition */
+      tl.call(() => {
+        if (!transitioningRef.current) {
+          clearTimeout(autoTransitionTimerRef.current);
+          autoTransitionTimerRef.current = setTimeout(() => {
+            triggerTransition();
+          }, 4500);
+        }
+      });
     }, sceneRef);
 
-    return () => ctx.revert();
+    return () => {
+      clearTimeout(autoTransitionTimerRef.current);
+      ctx.revert();
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [portraitLoaded, reducedMotion]);
 

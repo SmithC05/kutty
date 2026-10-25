@@ -179,9 +179,25 @@ function StudioDust({ active }) {
 
 // ─── ACT I: Studio Entrance ───────────────────────────────────────────────────
 function StudioEntrance({ onBegin, reducedMotion }) {
+  const begunRef = useRef(false);
+
+  const handleBegin = useCallback(() => {
+    if (begunRef.current) return;
+    begunRef.current = true;
+    onBegin();
+  }, [onBegin]);
+
+  // Automatically begin portrait reveal after introduction finishes with a brief hold (~3.5s)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleBegin();
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, [handleBegin]);
+
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center select-none overflow-hidden w-screen h-screen min-h-[100dvh]"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center select-none overflow-hidden w-screen h-screen min-h-[100dvh] cursor-pointer"
       style={{
         background:
           'radial-gradient(ellipse 95% 85% at 50% 40%, #231C14 0%, #15110C 50%, #090806 100%)',
@@ -190,6 +206,7 @@ function StudioEntrance({ onBegin, reducedMotion }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: reducedMotion ? 1 : 1.02 }}
       transition={{ duration: reducedMotion ? 0.4 : 0.8 }}
+      onClick={handleBegin}
     >
       <div
         className="absolute inset-0 pointer-events-none"
@@ -268,7 +285,10 @@ function StudioEntrance({ onBegin, reducedMotion }) {
 
         <motion.button
           type="button"
-          onClick={onBegin}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleBegin();
+          }}
           className="mt-9 sm:mt-11 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full font-medium transition-all duration-300 active:scale-95 cursor-pointer shadow-lg"
           style={{
             fontFamily: "'Manrope', sans-serif",
@@ -306,6 +326,38 @@ function StudioReveal({ onComplete, reducedMotion }) {
   const [loadError, setLoadError] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [showShimmer, setShowShimmer] = useState(false);
+  const autoContinueTimerRef = useRef(null);
+  const completedTransitionRef = useRef(false);
+
+  const handleContinue = useCallback(() => {
+    if (completedTransitionRef.current) return;
+    completedTransitionRef.current = true;
+    if (autoContinueTimerRef.current) {
+      clearTimeout(autoContinueTimerRef.current);
+      autoContinueTimerRef.current = null;
+    }
+    onComplete();
+  }, [onComplete]);
+
+  // When drawing completes, hold finished portrait for ~3.5s then auto-transition
+  useEffect(() => {
+    if (isComplete) {
+      clearTimeout(autoContinueTimerRef.current);
+      autoContinueTimerRef.current = setTimeout(() => {
+        handleContinue();
+      }, 3500);
+    } else {
+      if (autoContinueTimerRef.current) {
+        clearTimeout(autoContinueTimerRef.current);
+        autoContinueTimerRef.current = null;
+      }
+    }
+    return () => {
+      if (autoContinueTimerRef.current) {
+        clearTimeout(autoContinueTimerRef.current);
+      }
+    };
+  }, [isComplete, handleContinue]);
 
   // Precomputed graphite thresholds (deterministic, zero NaNs, stable across replays)
   const thresholdsRef = useRef(null);
@@ -468,6 +520,10 @@ function StudioReveal({ onComplete, reducedMotion }) {
 
   // Replay animation handler
   const handleReplay = useCallback(() => {
+    if (autoContinueTimerRef.current) {
+      clearTimeout(autoContinueTimerRef.current);
+      autoContinueTimerRef.current = null;
+    }
     setIsComplete(false);
     setShowShimmer(false);
     startRevealAnimation();
@@ -783,7 +839,7 @@ function StudioReveal({ onComplete, reducedMotion }) {
                 <div className="mt-3">
                   <button
                     type="button"
-                    onClick={onComplete}
+                    onClick={handleContinue}
                     className="text-xs uppercase tracking-[0.26em] font-medium text-amber-200/50 hover:text-amber-200 transition-colors cursor-pointer py-1"
                     style={{ fontFamily: "'Manrope', sans-serif" }}
                   >
@@ -864,7 +920,7 @@ function StudioReveal({ onComplete, reducedMotion }) {
               {/* Prominent, easily reachable Continue action on mobile */}
               <button
                 type="button"
-                onClick={onComplete}
+                onClick={handleContinue}
                 className="w-full max-w-xs py-3 px-6 rounded-full text-xs uppercase tracking-[0.24em] font-semibold text-amber-100 bg-gradient-to-r from-amber-600/35 via-amber-500/45 to-amber-600/35 hover:from-amber-600/50 hover:to-amber-600/50 border border-amber-400/55 shadow-[0_0_18px_rgba(245,158,11,0.22)] active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
                 style={{ fontFamily: "'Manrope', sans-serif" }}
               >

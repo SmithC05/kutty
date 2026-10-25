@@ -16,6 +16,32 @@ import { useReducedMotion } from '../../hooks/useReducedMotion';
  *  - onComplete fires exactly once via ref guard
  *  - All timeouts cleaned up on unmount
  */
+/**
+ * Calculate comfortable reading/viewing duration based on content
+ */
+function getPageDuration(page, isLastPage) {
+  if (!page) return 5500;
+  if (isLastPage) return 8500; // longer hold for final memory page
+
+  const photoCount = page.photos?.length || 1;
+  let textLength = 0;
+  page.photos?.forEach((p) => {
+    if (p.caption) textLength += p.caption.length;
+    if (p.title) textLength += p.title.length;
+    if (p.stageTitle) textLength += p.stageTitle.length;
+  });
+
+  // Multiple photos or captions: ~7-9s
+  if (photoCount > 1 || textLength >= 40) {
+    if (textLength > 100) {
+      return Math.min(11000, 7500 + Math.floor((textLength - 100) * 35));
+    }
+    return 7500;
+  }
+  // Simple portrait or photograph: ~5-6s
+  return 5500;
+}
+
 export function MemoryBook({
   photos = [],
   onComplete,
@@ -27,13 +53,15 @@ export function MemoryBook({
   const [canTap, setCanTap]                 = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [pageTurnFeedback, setPageTurnFeedback] = useState(false);
+  const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
   const reducedMotion = useReducedMotion();
 
-  const isScrapbook      = theme === 'scrapbook';
-  const lockTimerRef     = useRef(null);
-  const transitionRef    = useRef(null);
-  const feedbackRef      = useRef(null);
-  const completedRef     = useRef(false); // guard: onComplete fires once only
+  const isScrapbook         = theme === 'scrapbook';
+  const lockTimerRef        = useRef(null);
+  const transitionRef       = useRef(null);
+  const feedbackRef         = useRef(null);
+  const autoAdvanceTimerRef = useRef(null);
+  const completedRef        = useRef(false); // guard: onComplete fires once only
 
   // 1. Analyze photos → generate layout pages
   useEffect(() => {
@@ -73,12 +101,14 @@ export function MemoryBook({
       clearTimeout(lockTimerRef.current);
       clearTimeout(transitionRef.current);
       clearTimeout(feedbackRef.current);
+      clearTimeout(autoAdvanceTimerRef.current);
     };
   }, []);
 
   // 4. Advance to next page (or fire onComplete on the last page)
   const advance = useCallback(() => {
     if (!canTap || isTransitioning || isAnalyzing) return;
+    clearTimeout(autoAdvanceTimerRef.current);
 
     setIsTransitioning(true);
     setPageTurnFeedback(true);
@@ -110,6 +140,7 @@ export function MemoryBook({
     (e) => {
       if (e) e.stopPropagation();
       if (isTransitioning || isAnalyzing || currentIndex <= 0) return;
+      clearTimeout(autoAdvanceTimerRef.current);
 
       setIsTransitioning(true);
       clearTimeout(transitionRef.current);
@@ -120,6 +151,25 @@ export function MemoryBook({
     },
     [isTransitioning, isAnalyzing, currentIndex]
   );
+
+  // 6. Autoplay loop — advances automatically based on content viewing duration
+  useEffect(() => {
+    if (isAnalyzing || isTransitioning || !canTap || isAutoplayPaused || pages.length === 0) {
+      return;
+    }
+
+    const isLast = currentIndex >= pages.length - 1;
+    const duration = getPageDuration(pages[currentIndex], isLast);
+
+    clearTimeout(autoAdvanceTimerRef.current);
+    autoAdvanceTimerRef.current = setTimeout(() => {
+      advance();
+    }, duration);
+
+    return () => {
+      clearTimeout(autoAdvanceTimerRef.current);
+    };
+  }, [currentIndex, canTap, isAutoplayPaused, pages, isTransitioning, isAnalyzing, advance]);
 
   // 6. Keyboard navigation — skip if focus is on an interactive element
   useEffect(() => {
@@ -276,16 +326,35 @@ export function MemoryBook({
           <div className="w-20 sm:w-24" aria-hidden />
         )}
 
-        {/* Centre: page indicator + turn hint */}
-        <div className="flex flex-col items-center gap-0.5 select-none pointer-events-none">
-          <span
-            className={`text-[11px] sm:text-xs tracking-[0.22em] uppercase font-medium tabular-nums ${
-              isScrapbook ? 'text-[#1E293B]/50' : 'text-[#8B4860]/60'
-            }`}
-            style={{ fontFamily: "'Manrope', sans-serif" }}
-          >
-            {currentIndex + 1} of {pages.length}
-          </span>
+        {/* Centre: page indicator + turn hint + pause/resume */}
+        <div className="flex flex-col items-center gap-0.5 select-none">
+          <div className="flex items-center gap-2">
+            <span
+              className={`text-[11px] sm:text-xs tracking-[0.22em] uppercase font-medium tabular-nums ${
+                isScrapbook ? 'text-[#1E293B]/50' : 'text-[#8B4860]/60'
+              }`}
+              style={{ fontFamily: "'Manrope', sans-serif" }}
+            >
+              {currentIndex + 1} of {pages.length}
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsAutoplayPaused((p) => !p);
+              }}
+              className={`pointer-events-auto text-[9px] sm:text-[10px] tracking-[0.16em] uppercase px-2 py-0.5 rounded-full border transition-all active:scale-95 ${
+                isAutoplayPaused
+                  ? 'border-[#E94B70] text-[#E94B70] bg-[#E94B70]/10 font-semibold'
+                  : 'border-black/10 text-[#8B4860]/60 hover:text-[#8B4860] hover:border-[#8B4860]/30'
+              }`}
+              style={{ fontFamily: "'Manrope', sans-serif" }}
+              aria-label={isAutoplayPaused ? 'Resume auto-play' : 'Pause auto-play'}
+              title={isAutoplayPaused ? 'Resume auto-play' : 'Pause auto-play'}
+            >
+              {isAutoplayPaused ? '▶ Play' : '⏸ Pause'}
+            </button>
+          </div>
 
           <AnimatePresence>
             {canTap && (

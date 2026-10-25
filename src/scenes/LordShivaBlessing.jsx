@@ -48,8 +48,93 @@ export function LordShivaBlessing() {
   const [blessingProgress, setBlessingProgress] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Duplicate-tap guard
+  // Refs
   const actionFiredRef = useRef(false);
+  const blessingTweenRef = useRef(null);
+  const transitionTimeoutRef = useRef(null);
+  const autoBlessingTimerRef = useRef(null);
+  const autoContinueTimerRef = useRef(null);
+
+  // ACT V: Continue to Just You
+  const handleContinue = useCallback(() => {
+    if (actionFiredRef.current) return;
+    actionFiredRef.current = true;
+    if (autoContinueTimerRef.current) clearTimeout(autoContinueTimerRef.current);
+    setIsTransitioning(true);
+
+    // Give a subtle golden wash before next scene
+    if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
+    transitionTimeoutRef.current = setTimeout(() => {
+      transitionTo(SCENES.MEMORY_JOURNEY_SOLO);
+    }, 600);
+  }, [transitionTo]);
+
+  // ACT IV: Receive Blessings (Golden Illumination Bloom)
+  const handleReceiveBlessings = useCallback(() => {
+    let alreadyFired = false;
+    setAct((prevAct) => {
+      if (prevAct === 'blessing' || prevAct === 'complete') {
+        alreadyFired = true;
+        return prevAct;
+      }
+      return 'blessing';
+    });
+    if (alreadyFired) return;
+
+    if (autoBlessingTimerRef.current) clearTimeout(autoBlessingTimerRef.current);
+
+    if (reducedMotion) {
+      setBlessingProgress(1);
+      setAct('complete');
+      if (autoContinueTimerRef.current) clearTimeout(autoContinueTimerRef.current);
+      autoContinueTimerRef.current = setTimeout(() => {
+        handleContinue();
+      }, 3000);
+      return;
+    }
+
+    const stateObj = { blessing: 0 };
+    if (blessingTweenRef.current) blessingTweenRef.current.kill();
+    blessingTweenRef.current = gsap.to(stateObj, {
+      blessing: 1,
+      duration: 2.8,
+      ease: 'power2.out',
+      onUpdate: () => {
+        setBlessingProgress(stateObj.blessing);
+      },
+      onComplete: () => {
+        setAct('complete');
+        // Hold the completed golden blessing for ~3.0s, then transition automatically
+        if (autoContinueTimerRef.current) clearTimeout(autoContinueTimerRef.current);
+        autoContinueTimerRef.current = setTimeout(() => {
+          handleContinue();
+        }, 3000);
+      },
+    });
+  }, [reducedMotion, handleContinue]);
+
+  const handleReceiveBlessingsRef = useRef(handleReceiveBlessings);
+  useEffect(() => {
+    handleReceiveBlessingsRef.current = handleReceiveBlessings;
+  });
+
+  // Cleanup timers & tweens on unmount
+  useEffect(() => {
+    return () => {
+      if (blessingTweenRef.current) {
+        blessingTweenRef.current.kill();
+      }
+      if (autoBlessingTimerRef.current) {
+        clearTimeout(autoBlessingTimerRef.current);
+      }
+      if (autoContinueTimerRef.current) {
+        clearTimeout(autoContinueTimerRef.current);
+      }
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Fade out Dheema and start Deva Deva on entering Lord Shiva's Blessings
   useEffect(() => {
@@ -66,7 +151,12 @@ export function LordShivaBlessing() {
     if (reducedMotion) {
       setAct('reveal');
       setRevealProgress(1);
-      return;
+      autoBlessingTimerRef.current = setTimeout(() => {
+        handleReceiveBlessingsRef.current?.();
+      }, 1800);
+      return () => {
+        if (autoBlessingTimerRef.current) clearTimeout(autoBlessingTimerRef.current);
+      };
     }
 
     const stateObj = { reveal: 0 };
@@ -93,63 +183,17 @@ export function LordShivaBlessing() {
           onUpdate: () => {
             setRevealProgress(stateObj.reveal);
           },
+        })
+
+      // Contemplation pause after reveal (~1.8s)
+        .to({}, { duration: 1.8 })
+        .call(() => {
+          handleReceiveBlessingsRef.current?.();
         });
     });
 
     return () => ctx.revert();
   }, [reducedMotion]);
-
-  // ACT IV: Receive Blessings (Golden Illumination Bloom)
-  const blessingTweenRef = useRef(null);
-  const transitionTimeoutRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (blessingTweenRef.current) {
-        blessingTweenRef.current.kill();
-      }
-      if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const handleReceiveBlessings = useCallback(() => {
-    if (act === 'blessing' || act === 'complete') return;
-    setAct('blessing');
-
-    if (reducedMotion) {
-      setBlessingProgress(1);
-      return;
-    }
-
-    const stateObj = { blessing: 0 };
-    if (blessingTweenRef.current) blessingTweenRef.current.kill();
-    blessingTweenRef.current = gsap.to(stateObj, {
-      blessing: 1,
-      duration: 2.8,
-      ease: 'power2.out',
-      onUpdate: () => {
-        setBlessingProgress(stateObj.blessing);
-      },
-      onComplete: () => {
-        setAct('complete');
-      },
-    });
-  }, [act, reducedMotion]);
-
-  // ACT V: Continue to Just You
-  const handleContinue = useCallback(() => {
-    if (actionFiredRef.current) return;
-    actionFiredRef.current = true;
-    setIsTransitioning(true);
-
-    // Give a subtle golden wash before next scene
-    if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
-    transitionTimeoutRef.current = setTimeout(() => {
-      transitionTo(SCENES.MEMORY_JOURNEY_SOLO);
-    }, 600);
-  }, [transitionTo]);
 
   // Fallback if device has no WebGL support
   if (!hasWebGL) {

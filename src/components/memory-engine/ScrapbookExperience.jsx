@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 
@@ -20,13 +20,34 @@ import { useReducedMotion } from '../../hooks/useReducedMotion';
  */
 
 // ─── Sub-Component: VideoPage (Page C) ────────────────────────────────────────
-function VideoPage({ video }) {
+function VideoPage({ video, onVideoEnded }) {
   const [hasError, setHasError] = useState(false);
   const videoRef = useRef(null);
 
   const stopBubble = (e) => {
     e.stopPropagation();
   };
+
+  // Attempt video playback on mount (respecting browser autoplay policies)
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+    const playPromise = videoEl.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((err) => {
+        console.info('[ScrapbookExperience] Video autoplay was prevented by browser policy:', err);
+      });
+    }
+  }, []);
+
+  const handleEnded = useCallback(() => {
+    if (onVideoEnded) {
+      // Brief 0.4s pause after video finishes before advancing
+      setTimeout(() => {
+        onVideoEnded();
+      }, 400);
+    }
+  }, [onVideoEnded]);
 
   return (
     <div
@@ -71,6 +92,7 @@ function VideoPage({ video }) {
             preload="metadata"
             className="w-full h-full object-contain"
             style={{ maxHeight: '52vh', display: 'block' }}
+            onEnded={handleEnded}
             onError={() => setHasError(true)}
             onClick={stopBubble}
             onPointerDown={stopBubble}
@@ -268,14 +290,39 @@ function GallerySpread({ photos }) {
   );
 }
 
+// ─── Reading Time Calculation ───────────────────────────────────────────────
+function getScrapbookPageDuration(pageDef, note) {
+  if (!pageDef) return 6000;
+  switch (pageDef.type) {
+    case 'intro':
+      return 4800; // Time to absorb "Different places. One day in the same frame."
+    case 'hero':
+      return 7000; // Ample time to view the central portrait and caption
+    case 'video':
+      return null; // Video page advances automatically when playback finishes
+    case 'gallery':
+      return 8500; // Time to glance through the shared landscape photos
+    case 'letter': {
+      const text = `${note?.salutation || ''} ${note?.body || ''} ${note?.signoff || ''} ${note?.sender || ''}`;
+      const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+      // ~2.5 words/sec (150 wpm) reading speed + 3.5s reflection buffer, minimum 14 seconds
+      return Math.max(14000, Math.round((wordCount / 2.5) * 1000) + 3500);
+    }
+    default:
+      return 6000;
+  }
+}
+
 // ─── Main ScrapbookExperience Component ───────────────────────────────────────
 export function ScrapbookExperience({ chapterData, onComplete }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [canTap, setCanTap] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
   const completedRef = useRef(false);
   const tapTimerRef = useRef(null);
   const transitionTimerRef = useRef(null);
+  const autoAdvanceTimerRef = useRef(null);
   const reducedMotion = useReducedMotion();
 
   const photos = chapterData?.photos || [];
@@ -284,12 +331,16 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
   const hasVideo = Boolean(video);
   const hasGallery = photos.length > 1;
 
-  const note = chapterData?.personalNote || {
-    salutation: 'To Kutty —',
-    body: "Miles apart across different cities, college routines, and busy days. But that one day we shared in person proved that real friendship doesn't need constant proximity—it just picks up right where it left off without skipping a beat.\n\nEvery memory from that meeting is something I treasure. Thank you for being such an extraordinary friend.",
-    signoff: 'Always in your corner,',
-    sender: 'Your Best Friend',
-  };
+  const note = useMemo(
+    () =>
+      chapterData?.personalNote || {
+        salutation: 'To Kutty —',
+        body: "Miles apart across different cities, college routines, and busy days. But that one day we shared in person proved that real friendship doesn't need constant proximity—it just picks up right where it left off without skipping a beat.\n\nEvery memory from that meeting is something I treasure. Thank you for being such an extraordinary friend.",
+        signoff: 'Always in your corner,',
+        sender: 'Your Best Friend',
+      },
+    [chapterData?.personalNote]
+  );
 
   // Build the ordered pages array
   const pages = [
@@ -315,10 +366,12 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
     return () => {
       clearTimeout(tapTimerRef.current);
       clearTimeout(transitionTimerRef.current);
+      clearTimeout(autoAdvanceTimerRef.current);
     };
   }, []);
 
   const advance = useCallback(() => {
+    clearTimeout(autoAdvanceTimerRef.current);
     if (!canTap || isTransitioning) return;
 
     if (currentPage >= totalPages - 1) {
@@ -340,6 +393,7 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
   const goBack = useCallback(
     (e) => {
       if (e) e.stopPropagation();
+      clearTimeout(autoAdvanceTimerRef.current);
       if (isTransitioning || currentPage <= 0) return;
 
       setIsTransitioning(true);
@@ -351,6 +405,25 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
     },
     [isTransitioning, currentPage]
   );
+
+  // Automatic page progression for ScrapbookExperience
+  useEffect(() => {
+    clearTimeout(autoAdvanceTimerRef.current);
+
+    if (isAutoplayPaused || !canTap || isTransitioning) {
+      return;
+    }
+
+    const duration = getScrapbookPageDuration(currentPageDef, note);
+    // If duration is null (e.g. video page), wait for video onEnded callback or user interaction
+    if (!duration) return;
+
+    autoAdvanceTimerRef.current = setTimeout(() => {
+      advance();
+    }, duration);
+
+    return () => clearTimeout(autoAdvanceTimerRef.current);
+  }, [currentPage, canTap, isTransitioning, isAutoplayPaused, currentPageDef, note, advance]);
 
   // Keyboard navigation — ignore if video or interactive element has focus
   useEffect(() => {
@@ -592,7 +665,7 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
               exit={{ opacity: 0, scale: 1.01, y: -12 }}
               transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
             >
-              <VideoPage video={video} />
+              <VideoPage video={video} onVideoEnded={advance} />
             </motion.div>
           )}
 
@@ -711,14 +784,33 @@ export function ScrapbookExperience({ chapterData, onComplete }) {
           <div className="w-20 sm:w-24" aria-hidden />
         )}
 
-        {/* Center Indicator + Turn Hint */}
+        {/* Center Indicator + Turn Hint + Pause/Resume Toggle */}
         <div className="flex flex-col items-center gap-0.5 select-none pointer-events-none">
-          <span
-            className="text-[11px] sm:text-xs tracking-[0.22em] uppercase font-medium text-[#1E293B]/50 tabular-nums"
-            style={{ fontFamily: "'Manrope', sans-serif" }}
-          >
-            {currentPage + 1} of {totalPages}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className="text-[11px] sm:text-xs tracking-[0.22em] uppercase font-medium text-[#1E293B]/50 tabular-nums"
+              style={{ fontFamily: "'Manrope', sans-serif" }}
+            >
+              {currentPage + 1} of {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsAutoplayPaused((p) => !p);
+              }}
+              className={`pointer-events-auto text-[9px] sm:text-[10px] tracking-[0.16em] uppercase px-2 py-0.5 rounded-full border transition-all active:scale-95 ${
+                isAutoplayPaused
+                  ? 'border-[#E94B70] text-[#E94B70] bg-[#E94B70]/10 font-semibold'
+                  : 'border-[#1E293B]/15 text-[#1E293B]/60 hover:text-[#1E293B] hover:border-[#1E293B]/30'
+              }`}
+              style={{ fontFamily: "'Manrope', sans-serif" }}
+              aria-label={isAutoplayPaused ? 'Resume auto-play' : 'Pause auto-play'}
+              title={isAutoplayPaused ? 'Resume auto-play' : 'Pause auto-play'}
+            >
+              {isAutoplayPaused ? '▶ Play' : '⏸ Pause'}
+            </button>
+          </div>
 
           <AnimatePresence>
             {canTap && (
