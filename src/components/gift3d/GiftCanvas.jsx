@@ -61,6 +61,7 @@ export function GiftCanvas({
     if (isOpening) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
+      if (onOpenStart) onOpenStart();
       const canvasEl = canvasContainerRef.current?.querySelector('canvas');
       if (canvasEl) {
         canvasEl.dispatchEvent(new MouseEvent('click', { bubbles: true }));

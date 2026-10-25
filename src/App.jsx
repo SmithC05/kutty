@@ -13,87 +13,77 @@ import { ArtistChapter } from './scenes/ArtistChapter';
 import { SonicBloomScene } from './scenes/sonicBloom/SonicBloomScene';
 import { WhoIsSheScene } from './scenes/WhoIsSheScene';
 import { FinalBirthdayCelebration } from './scenes/FinalBirthdayCelebration';
-import { Loader } from './components/ui/Loader';
 import { Background } from './components/ui/Background';
-import { useMediaLoading } from './hooks/useMediaLoading';
 import { MagicCursor } from './components/ui/MagicCursor';
-
-// Critical assets to preload before starting (procedural 3D gift requires no pre-rendered image assets)
-const INITIAL_ASSETS = [];
+import { FullscreenToggle } from './components/ui/FullscreenToggle';
 
 function App() {
   const { currentScene, isBackgroundPaused } = useScene();
-  const { progress, isLoaded } = useMediaLoading(INITIAL_ASSETS);
 
   return (
     <>
       <MagicCursor />
+      <FullscreenToggle />
       <Background isPaused={isBackgroundPaused} />
-      
-      <AnimatePresence mode="wait">
-        {!isLoaded && (
-          <Loader key="loader" progress={progress} />
-        )}
-      </AnimatePresence>
 
       <AnimatePresence mode="wait">
         {/* 1. Advance Journey (Pre-birthday countdown scene) */}
-        {isLoaded && currentScene === SCENES.ADVANCE_JOURNEY && (
+        {currentScene === SCENES.ADVANCE_JOURNEY && (
           <AdvanceJourney key="advance-journey" />
         )}
 
         {/* 2. Opening 3D Gift Box */}
-        {isLoaded && currentScene === SCENES.LOADING && (
+        {currentScene === SCENES.LOADING && (
           <OpeningScene key="opening" />
         )}
         
         {/* 2. Handwriting Reveal ("For..." -> "Kutty") */}
-        {isLoaded && currentScene === SCENES.HANDWRITING && (
+        {currentScene === SCENES.HANDWRITING && (
           <HandwritingReveal key="handwriting" />
         )}
         
         {/* 2. Birthday Reveal ("Happy Birthday," -> Keerthana) */}
-        {isLoaded && (currentScene === SCENES.BIRTHDAY_REVEAL || currentScene === SCENES.DATE_AWARE) && (
+        {(currentScene === SCENES.BIRTHDAY_REVEAL || currentScene === SCENES.DATE_AWARE) && (
           <BirthdayJourney key="birthday-reveal" />
         )}
 
         {/* 3. Secret Vault PIN Unlock */}
-        {isLoaded && currentScene === SCENES.SECRET_VAULT && (
+        {currentScene === SCENES.SECRET_VAULT && (
           <SecretVault key="secret-vault" />
         )}
 
         {/* 3. Lord Shiva's Blessings */}
-        {isLoaded && currentScene === SCENES.LORD_SHIVA_BLESSING && (
+        {currentScene === SCENES.LORD_SHIVA_BLESSING && (
           <LordShivaBlessing key="lord-shiva-blessing" />
         )}
 
         {/* 4. Just You — Solo Photos (Memory Journey Chapter 1) */}
-        {isLoaded && currentScene === SCENES.MEMORY_JOURNEY_SOLO && (
+        {currentScene === SCENES.MEMORY_JOURNEY_SOLO && (
           <MemoryJourney key="memory-solo" chapterIndex={0} />
         )}
 
         {/* 5. The Artist's Hand — Pencil Portrait Reveal */}
-        {isLoaded && currentScene === SCENES.ARTIST_CHAPTER && (
+        {currentScene === SCENES.ARTIST_CHAPTER && (
           <ArtistChapter key="artist-chapter" />
         )}
 
         {/* 6. Sonic Bloom — Six Songs, the Way I See You */}
-        {isLoaded && currentScene === SCENES.SONIC_BLOOM && (
+        {currentScene === SCENES.SONIC_BLOOM && (
           <SonicBloomScene key="sonic-bloom" />
         )}
 
         {/* 7. Us — Shared Memories (Memory Journey Chapter 2) */}
-        {isLoaded && currentScene === SCENES.MEMORY_JOURNEY_TOGETHER && (
+        {currentScene === SCENES.MEMORY_JOURNEY_TOGETHER && (
           <MemoryJourney key="memory-together" chapterIndex={1} />
         )}
 
         {/* 8. Who Is She to Me? */}
-        {isLoaded && currentScene === SCENES.WHO_IS_SHE_TO_ME && (
+        {currentScene === SCENES.WHO_IS_SHE_TO_ME && (
           <WhoIsSheScene key="who-is-she-to-me" />
         )}
 
         {/* 9. Grand Finale — Celebration Climax */}
-        {isLoaded && currentScene === SCENES.FINAL_MESSAGE && (
+        {currentScene === SCENES.FINAL_MESSAGE && (
           <FinalBirthdayCelebration key="final-birthday-celebration" />
         )}
       </AnimatePresence>

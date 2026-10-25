@@ -3,6 +3,7 @@ import {
   Check,
   Heart,
   Maximize2,
+  Minimize2,
   Music2,
   Pause,
   Play,
@@ -14,6 +15,7 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react';
+import { useFullscreen } from '../../context';
 
 function formatTime(seconds) {
   const safe = Number.isFinite(Number(seconds)) ? Math.max(0, Number(seconds)) : 0;
@@ -49,6 +51,7 @@ export function AudioPlayerShell({
   const [isRepeat, setIsRepeat] = useState(false);
 
   const primary = activeTrack?.colors?.primary || '#f59e0b';
+  const { isFullscreen, toggleFullscreen, isSupported } = useFullscreen();
   const totalDuration = duration || activeTrack?.audio?.duration || 103;
   const safeCurrentTime = Math.min(totalDuration, Math.max(0, Number(currentTime) || 0));
   const progress = totalDuration > 0 ? (safeCurrentTime / totalDuration) * 100 : 0;
@@ -257,22 +260,17 @@ export function AudioPlayerShell({
               <Check className="h-3.5 w-3.5" />
               Finish
             </button>
-          ) : (
+          ) : isSupported ? (
             <button
               type="button"
-              aria-label="Toggle Fullscreen"
-              onClick={() => {
-                if (!document.fullscreenElement) {
-                  document.documentElement.requestFullscreen?.().catch(() => {});
-                } else {
-                  document.exitFullscreen?.().catch(() => {});
-                }
-              }}
-              className="grid h-7 w-7 place-items-center text-slate-400 hover:text-white transition"
+              aria-label={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+              title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+              onClick={() => toggleFullscreen()}
+              className="grid h-7 w-7 place-items-center text-slate-400 hover:text-white transition cursor-pointer"
             >
-              <Maximize2 className="h-4 w-4" />
+              {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
             </button>
-          )}
+          ) : null}
         </div>
       </div>
     </footer>

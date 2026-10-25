@@ -29,6 +29,6 @@ export const themeConfig = {
 
 export const devMode = {
   enabled: true,
-  startScene: 'WHO_IS_SHE_TO_ME',
+  startScene: null,
   bypassDate: false,
 };

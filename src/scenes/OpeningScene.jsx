@@ -1,25 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useAudio, useScene, useTime } from '../context';
+import { useAudio, useScene, useTime, useFullscreen, usePreload } from '../context';
 import { SCENES } from '../constants';
 import { devMode } from '../config';
 import { GiftBox } from '../components/ui/GiftBox';
-import { Typography } from '../components/core/Typography';
+import { PreloadProgress } from '../components/ui/PreloadProgress';
 
 /**
  * Opening Scene
  * The cinematic entrance to the birthday experience.
  * Features a full-screen procedural 3D gift assembly, continuous 21s rotation,
- * background freeze on interaction, and cinematic unwrapping into the handwriting reveal.
+ * background freeze on interaction, genuine asset preloading in parallel,
+ * and cinematic unwrapping into the handwriting reveal only once all required
+ * assets are verified and ready.
  */
 export function OpeningScene() {
   const { playTrack, playSfx } = useAudio();
   const { transitionTo, setIsBackgroundPaused, isDevUnlocked } = useScene();
+  const { enterFullscreen } = useFullscreen();
+  const { isReady } = usePreload();
   const timeState = useTime();
 
   const [isOpening, setIsOpening] = useState(false);
   const [isAliveState, setIsAliveState] = useState(false);
 
   const sceneRef = useRef(null);
+  const hasCompletedAnimationRef = useRef(false);
+  const hasTransitionedRef = useRef(false);
 
   const isBirthdayUnlocked = Boolean(
     timeState?.isUnlocked || isDevUnlocked || (devMode.enabled && devMode.bypassDate)
@@ -41,6 +47,9 @@ export function OpeningScene() {
   const handleOpenStart = () => {
     if (isOpening) return;
     setIsOpening(true);
+
+    // Request true fullscreen directly within this initial deliberate user interaction
+    enterFullscreen();
   };
 
   const handleFreezeStart = () => {
@@ -61,12 +70,33 @@ export function OpeningScene() {
   };
 
   const handleOpenComplete = () => {
-    // Proceed to Handwriting sequence
-    transitionTo(SCENES.HANDWRITING);
+    hasCompletedAnimationRef.current = true;
+    // Strict Gate: Do not proceed into the handwriting sequence until all assets are ready
+    if (isReady && !hasTransitionedRef.current) {
+      hasTransitionedRef.current = true;
+      transitionTo(SCENES.HANDWRITING);
+    }
   };
 
+  // If the user opened the gift before preloading finished, transition automatically as soon as ready
+  useEffect(() => {
+    if (isReady && hasCompletedAnimationRef.current && !hasTransitionedRef.current) {
+      hasTransitionedRef.current = true;
+      transitionTo(SCENES.HANDWRITING);
+    }
+  }, [isReady, transitionTo]);
+
   return (
-    <div ref={sceneRef} className="fixed inset-0 w-full h-[100dvh] overflow-hidden select-none z-10">
+    <div 
+      ref={sceneRef} 
+      className="fixed inset-0 w-full h-[100dvh] overflow-hidden select-none z-10"
+      style={{
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingRight: 'env(safe-area-inset-right, 0px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        paddingLeft: 'env(safe-area-inset-left, 0px)',
+      }}
+    >
       {/* Genuinely Full-Screen 3D Gift Canvas */}
       <GiftBox 
         isIdleAnimating={isAliveState} 
@@ -77,12 +107,8 @@ export function OpeningScene() {
         onOpenComplete={handleOpenComplete}
       />
       
-      {/* Subtle hint text positioned cleanly at the bottom */}
-      <div className={`absolute bottom-10 sm:bottom-14 left-0 right-0 flex justify-center pointer-events-none z-20 transition-opacity duration-1000 ${isOpening ? 'opacity-0' : 'opacity-100'}`}>
-        <Typography variant="caption" className="animate-pulse opacity-75 tracking-wider normal-case text-xs sm:text-sm text-blue-200/90 font-medium">
-          Your surprise is waiting, Kutty. 💝
-        </Typography>
-      </div>
+      {/* Restrained preload progress and readiness hint */}
+      <PreloadProgress isOpening={isOpening} />
     </div>
   );
 }
