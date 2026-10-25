@@ -26,7 +26,7 @@ const KINETIC_PHRASES = [
   // ── Wave 1: 2.8s – 8.0s (The Foundation of Close Friendship) ────────────────
   {
     id: 'phrase-1',
-    text: 'My best friend',
+    text: 'My best friend 💛',
     startTime: 2.8,
     fontClass: "font-['Outfit',sans-serif] font-extrabold text-xl sm:text-2xl lg:text-3xl tracking-tight",
     colorClass: 'text-[#fdfbf7] drop-shadow-[0_0_20px_rgba(253,251,247,0.35)]',
@@ -36,7 +36,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-2',
-    text: 'My safe place',
+    text: 'My safe place 🏡',
     startTime: 4.0,
     fontClass: "font-['Playfair_Display',serif] italic font-semibold text-lg sm:text-xl lg:text-2xl tracking-normal",
     colorClass: 'text-violet-200 drop-shadow-[0_0_20px_rgba(196,181,253,0.35)]',
@@ -46,7 +46,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-3',
-    text: 'COMFORT',
+    text: 'COMFORT ☁️',
     startTime: 5.2,
     fontClass: "font-['Outfit',sans-serif] font-black text-2xl sm:text-3xl lg:text-4xl tracking-widest uppercase",
     colorClass: 'text-violet-300 drop-shadow-[0_0_24px_rgba(196,181,253,0.45)]',
@@ -56,7 +56,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-4',
-    text: 'My courage',
+    text: 'My courage 🦁',
     startTime: 6.4,
     fontClass: "font-['Outfit',sans-serif] font-bold text-lg sm:text-xl lg:text-2xl tracking-tight",
     colorClass: 'text-stone-200 drop-shadow-[0_0_18px_rgba(231,229,228,0.3)]',
@@ -66,7 +66,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-5',
-    text: 'Unfiltered laughter',
+    text: 'Azhagiii ✨',
     startTime: 7.6,
     fontClass: "font-['Dancing_Script',cursive] font-bold text-xl sm:text-2xl lg:text-3xl tracking-wide",
     colorClass: 'text-[#fdfbf7] drop-shadow-[0_0_22px_rgba(253,251,247,0.4)]',
@@ -78,7 +78,7 @@ const KINETIC_PHRASES = [
   // ── Wave 2: 8.8s – 14.5s (Peace, Strength & Motivation) ─────────────────────
   {
     id: 'phrase-6',
-    text: 'My peace',
+    text: 'My peace 🕊️',
     startTime: 8.8,
     fontClass: "font-['Playfair_Display',serif] italic font-semibold text-xl sm:text-2xl lg:text-3xl tracking-normal",
     colorClass: 'text-violet-200 drop-shadow-[0_0_20px_rgba(196,181,253,0.35)]',
@@ -88,7 +88,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-7',
-    text: 'My motivation',
+    text: 'My motivation 🔥',
     startTime: 10.0,
     fontClass: "font-['Outfit',sans-serif] font-bold text-lg sm:text-xl lg:text-2xl tracking-tight",
     colorClass: 'text-stone-300 drop-shadow-[0_0_18px_rgba(214,211,209,0.3)]',
@@ -98,7 +98,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-8',
-    text: 'MY STRENGTH',
+    text: 'MY STRENGTH ⚡',
     startTime: 11.2,
     fontClass: "font-['Outfit',sans-serif] font-black text-xl sm:text-2xl lg:text-3xl tracking-wider uppercase",
     colorClass: 'text-violet-300 drop-shadow-[0_0_22px_rgba(196,181,253,0.4)]',
@@ -108,7 +108,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-9',
-    text: 'The one who understands me',
+    text: 'The one who understands me 🤍',
     startTime: 12.5,
     fontClass: "font-['DM_Sans',sans-serif] font-medium text-sm sm:text-base lg:text-lg tracking-tight",
     colorClass: 'text-stone-300 drop-shadow-[0_0_16px_rgba(214,211,209,0.3)]',
@@ -118,7 +118,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-10',
-    text: 'Someone who believes in me',
+    text: 'Someone who believes in me 🌟',
     startTime: 13.8,
     fontClass: "font-['DM_Sans',sans-serif] font-medium text-sm sm:text-base lg:text-lg tracking-tight",
     colorClass: 'text-stone-300 drop-shadow-[0_0_16px_rgba(214,211,209,0.3)]',
@@ -130,7 +130,7 @@ const KINETIC_PHRASES = [
   // ── Wave 3: 15.0s – 19.5s (Supporter, Constant & Happiness) ─────────────────
   {
     id: 'phrase-11',
-    text: 'My biggest supporter',
+    text: 'My biggest supporter 💖',
     startTime: 15.0,
     fontClass: "font-['Outfit',sans-serif] font-extrabold text-lg sm:text-xl lg:text-2xl tracking-tight",
     colorClass: 'text-[#fdfbf7] drop-shadow-[0_0_20px_rgba(253,251,247,0.35)]',
@@ -140,7 +140,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-12',
-    text: 'My happiness',
+    text: 'My happiness 🌻',
     startTime: 16.2,
     fontClass: "font-['Dancing_Script',cursive] font-bold text-xl sm:text-2xl lg:text-3xl tracking-wide",
     colorClass: 'text-violet-300 drop-shadow-[0_0_22px_rgba(196,181,253,0.4)]',
@@ -150,7 +150,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-13',
-    text: 'MY CONSTANT',
+    text: 'MY CONSTANT ♾️',
     startTime: 17.5,
     fontClass: "font-['Outfit',sans-serif] font-black text-xl sm:text-2xl lg:text-3xl tracking-widest uppercase",
     colorClass: 'text-[#fdfbf7] drop-shadow-[0_0_22px_rgba(253,251,247,0.4)]',
@@ -160,7 +160,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-14',
-    text: 'My inspiration',
+    text: 'Everything 💫',
     startTime: 18.8,
     fontClass: "font-['Playfair_Display',serif] italic font-semibold text-lg sm:text-xl lg:text-2xl tracking-normal",
     colorClass: 'text-violet-200 drop-shadow-[0_0_18px_rgba(196,181,253,0.35)]',
@@ -172,7 +172,7 @@ const KINETIC_PHRASES = [
   // ── Wave 4: 20.0s – 23.5s (Chosen Family, Warmth & Peace) ───────────────────
   {
     id: 'phrase-15',
-    text: 'My chosen family',
+    text: 'My chosen family 🫂',
     startTime: 20.0,
     fontClass: "font-['Dancing_Script',cursive] font-bold text-xl sm:text-2xl lg:text-3xl tracking-wide",
     colorClass: 'text-[#fdfbf7] drop-shadow-[0_0_22px_rgba(253,251,247,0.4)]',
@@ -182,7 +182,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-16',
-    text: 'Someone I can lean on',
+    text: 'Someone I can lean on 🤝',
     startTime: 21.2,
     fontClass: "font-['DM_Sans',sans-serif] font-normal text-xs sm:text-sm lg:text-base tracking-tight",
     colorClass: 'text-stone-300 drop-shadow-[0_0_16px_rgba(214,211,209,0.3)]',
@@ -192,7 +192,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-17',
-    text: 'Pure warmth',
+    text: 'Gem 💎',
     startTime: 22.4,
     fontClass: "font-['Playfair_Display',serif] italic font-semibold text-base sm:text-lg lg:text-xl tracking-normal",
     colorClass: 'text-violet-200 drop-shadow-[0_0_18px_rgba(196,181,253,0.35)]',
@@ -202,7 +202,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-18',
-    text: 'My calm in the chaos',
+    text: 'My Mini World 🌍',
     startTime: 23.4,
     fontClass: "font-['Outfit',sans-serif] font-bold text-sm sm:text-base lg:text-lg tracking-tight",
     colorClass: 'text-stone-300 drop-shadow-[0_0_16px_rgba(214,211,209,0.3)]',
@@ -212,7 +212,7 @@ const KINETIC_PHRASES = [
   },
   {
     id: 'phrase-19',
-    text: 'A part of my happiest memories',
+    text: 'Paasa Malar 🌸',
     startTime: 24.2,
     fontClass: "font-['DM_Sans',sans-serif] font-medium text-[11px] sm:text-xs lg:text-sm tracking-widest uppercase",
     colorClass: 'text-stone-400 drop-shadow-[0_0_14px_rgba(168,162,158,0.25)]',
