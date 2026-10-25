@@ -110,8 +110,7 @@ function ConcertAtmosphereComponent({
               ${col2}${beamFaintHex} 16%,
               transparent 42%
             )`,
-            animation: `sb-beam-2 ${mood.beamSpeed2} ease-in-out infinite`,
-            animationDelay: '-8s',
+            animation: `sb-beam-2 ${mood.beamSpeed2} ease-in-out -8s infinite`,
             transition,
             filter: 'blur(3px)',
           }}
@@ -134,8 +133,7 @@ function ConcertAtmosphereComponent({
               ${col3}08 25%,
               transparent 60%
             )`,
-            animation: `sb-beam-3 ${mood.beamSpeed3} ease-in-out infinite`,
-            animationDelay: '-14s',
+            animation: `sb-beam-3 ${mood.beamSpeed3} ease-in-out -14s infinite`,
             transition,
             filter: 'blur(4px)',
           }}
@@ -166,8 +164,7 @@ function ConcertAtmosphereComponent({
           right: '0%',
           bottom: '10%',
           background: `radial-gradient(ellipse at center, ${col2}${hazeAlphaHex} 0%, ${col2}06 40%, transparent 70%)`,
-          animation: 'sb-haze-b 30s ease-in-out infinite',
-          animationDelay: '-10s',
+          animation: 'sb-haze-b 30s ease-in-out -10s infinite',
           transition,
           filter: 'blur(1px)',
         }}

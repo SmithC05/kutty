@@ -110,18 +110,17 @@ export function Background({ className, showParticles = true, isPaused = false }
       {/* GPU-accelerated atmospheric aurora lights with zero main-thread CPU cost */}
       <div className="absolute inset-0 opacity-40 mix-blend-screen pointer-events-none overflow-hidden" aria-hidden="true">
         <div
-          className="absolute -top-1/4 -left-1/4 h-[80vw] w-[80vw] rounded-full blur-[90px] animate-pulse"
+          className="absolute -top-1/4 -left-1/4 h-[80vw] w-[80vw] rounded-full blur-[90px]"
           style={{
             background: 'radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, transparent 65%)',
-            animationDuration: '14s',
+            animation: 'pulse 14s cubic-bezier(0.4, 0, 0.6, 1) infinite',
           }}
         />
         <div
-          className="absolute -bottom-1/4 -right-1/4 h-[80vw] w-[80vw] rounded-full blur-[100px] animate-pulse"
+          className="absolute -bottom-1/4 -right-1/4 h-[80vw] w-[80vw] rounded-full blur-[100px]"
           style={{
             background: 'radial-gradient(circle, rgba(191, 219, 254, 0.14) 0%, transparent 70%)',
-            animationDuration: '18s',
-            animationDelay: '4s',
+            animation: 'pulse 18s cubic-bezier(0.4, 0, 0.6, 1) 4s infinite',
           }}
         />
       </div>

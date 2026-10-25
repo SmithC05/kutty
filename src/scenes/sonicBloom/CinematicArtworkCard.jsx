@@ -128,12 +128,12 @@ function CinematicArtworkCardComponent({
             {isPlaying && !reducedMotion && (
               <div className="absolute top-1/3 right-1/4 pointer-events-none">
                 <span
-                  className="absolute -translate-x-1/2 -translate-y-1/2 h-20 w-20 rounded-full border border-purple-300/30 animate-ping opacity-20"
-                  style={{ animationDuration: '4.5s' }}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 h-20 w-20 rounded-full border border-purple-300/30 opacity-20"
+                  style={{ animation: 'ping 4.5s cubic-bezier(0, 0, 0.2, 1) infinite' }}
                 />
                 <span
-                  className="absolute -translate-x-1/2 -translate-y-1/2 h-36 w-36 rounded-full border border-purple-200/20 animate-ping opacity-15"
-                  style={{ animationDuration: '6.5s', animationDelay: '1.8s' }}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 h-36 w-36 rounded-full border border-purple-200/20 opacity-15"
+                  style={{ animation: 'ping 6.5s cubic-bezier(0, 0, 0.2, 1) 1.8s infinite' }}
                 />
               </div>
             )}
@@ -149,12 +149,11 @@ function CinematicArtworkCardComponent({
                 ].map((p, i) => (
                   <span
                     key={i}
-                    className="absolute h-1 w-1 rounded-full bg-[#fde68a] opacity-60 blur-[0.5px] animate-pulse"
+                    className="absolute h-1 w-1 rounded-full bg-[#fde68a] opacity-60 blur-[0.5px]"
                     style={{
                       left: p.left,
                       top: p.top,
-                      animationDuration: p.dur,
-                      animationDelay: p.delay,
+                      animation: `pulse ${p.dur} cubic-bezier(0.4, 0, 0.6, 1) ${p.delay} infinite`,
                       boxShadow: '0 0 6px rgba(253, 230, 138, 0.8)',
                     }}
                   />
@@ -202,12 +201,11 @@ function CinematicArtworkCardComponent({
                 ].map((p, i) => (
                   <span
                     key={i}
-                    className="absolute h-1.5 w-1.5 rounded-full bg-[#fda4af] opacity-50 blur-[0.4px] animate-pulse"
+                    className="absolute h-1.5 w-1.5 rounded-full bg-[#fda4af] opacity-50 blur-[0.4px]"
                     style={{
                       left: p.left,
                       top: p.top,
-                      animationDuration: p.dur,
-                      animationDelay: p.delay,
+                      animation: `pulse ${p.dur} cubic-bezier(0.4, 0, 0.6, 1) ${p.delay} infinite`,
                       boxShadow: '0 0 6px rgba(244, 114, 182, 0.7)',
                     }}
                   />
@@ -227,12 +225,10 @@ function CinematicArtworkCardComponent({
           >
             {/* Soft moonlight glow halo around the moon in upper-left sky */}
             <div
-              className={`absolute -top-10 left-[18%] h-52 w-52 rounded-full blur-[65px] transition-all duration-1000 ${
-                isPlaying && !reducedMotion ? 'animate-pulse' : ''
-              }`}
+              className="absolute -top-10 left-[18%] h-52 w-52 rounded-full blur-[65px] transition-all duration-1000"
               style={{
                 background: 'radial-gradient(circle, rgba(203, 213, 225, 0.28) 0%, rgba(129, 140, 248, 0.14) 45%, transparent 70%)',
-                animationDuration: '8s',
+                animation: isPlaying && !reducedMotion ? 'pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none',
               }}
             />
 
@@ -256,14 +252,13 @@ function CinematicArtworkCardComponent({
                 ].map((s, i) => (
                   <span
                     key={i}
-                    className="absolute rounded-full bg-slate-100 opacity-60 animate-pulse"
+                    className="absolute rounded-full bg-slate-100 opacity-60"
                     style={{
                       left: s.left,
                       top: s.top,
                       width: s.size,
                       height: s.size,
-                      animationDuration: s.dur,
-                      animationDelay: s.delay,
+                      animation: `pulse ${s.dur} cubic-bezier(0.4, 0, 0.6, 1) ${s.delay} infinite`,
                       boxShadow: '0 0 4px rgba(226, 232, 240, 0.9)',
                     }}
                   />
@@ -283,12 +278,10 @@ function CinematicArtworkCardComponent({
           >
             {/* Soft natural sunlight drifting through the window on the left */}
             <div
-              className={`absolute -top-12 -left-8 h-64 w-64 rounded-full blur-[70px] transition-all duration-1000 ${
-                isPlaying && !reducedMotion ? 'animate-pulse' : ''
-              }`}
+              className="absolute -top-12 -left-8 h-64 w-64 rounded-full blur-[70px] transition-all duration-1000"
               style={{
                 background: 'radial-gradient(circle, rgba(254, 250, 224, 0.26) 0%, rgba(134, 239, 172, 0.12) 45%, transparent 70%)',
-                animationDuration: '7s',
+                animation: isPlaying && !reducedMotion ? 'pulse 7s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none',
               }}
             />
 
@@ -312,12 +305,11 @@ function CinematicArtworkCardComponent({
                 ].map((m, i) => (
                   <span
                     key={i}
-                    className="absolute h-1 w-1 rounded-full bg-[#fefae0] opacity-55 blur-[0.3px] animate-pulse"
+                    className="absolute h-1 w-1 rounded-full bg-[#fefae0] opacity-55 blur-[0.3px]"
                     style={{
                       left: m.left,
                       top: m.top,
-                      animationDuration: m.dur,
-                      animationDelay: m.delay,
+                      animation: `pulse ${m.dur} cubic-bezier(0.4, 0, 0.6, 1) ${m.delay} infinite`,
                       boxShadow: '0 0 5px rgba(254, 250, 224, 0.8)',
                     }}
                   />

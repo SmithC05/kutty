@@ -176,9 +176,9 @@ function TrackSelectorComponent({
               <span className="flex shrink-0 items-center justify-end pr-1 text-right">
                 {isActive && isPlaying ? (
                   <span className="flex h-4 w-4 items-end justify-center gap-0.5" aria-label="Playing">
-                    <span className="w-0.5 rounded-full animate-pulse h-3" style={{ backgroundColor: trackAccent }} />
-                    <span className="w-0.5 rounded-full animate-pulse h-4" style={{ backgroundColor: trackAccent, animationDelay: '0.2s' }} />
-                    <span className="w-0.5 rounded-full animate-pulse h-2" style={{ backgroundColor: trackAccent, animationDelay: '0.4s' }} />
+                    <span className="w-0.5 rounded-full h-3" style={{ backgroundColor: trackAccent, animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
+                    <span className="w-0.5 rounded-full h-4" style={{ backgroundColor: trackAccent, animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) 0.2s infinite' }} />
+                    <span className="w-0.5 rounded-full h-2" style={{ backgroundColor: trackAccent, animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) 0.4s infinite' }} />
                   </span>
                 ) : isActive ? (
                   <span className="flex h-4 w-4 items-end justify-center gap-0.5" aria-label="Selected">

@@ -177,6 +177,7 @@ export class SonicBloomAudioEngine {
     let lowFreq = 0;
     let midFreq = 0;
     let highFreq = 0;
+    let amplitude = 0;
     const rawBands = this.rawBands;
     rawBands.fill(0.06);
 
