@@ -1,6 +1,6 @@
 export const siteConfig = {
-  title: "Keerthana's Birthday",
-  description: "A cinematic interactive experience.",
+  title: "For Kutty ❤️",
+  description: "A little birthday surprise made just for you. ❤️",
   author: "Founding Frontend Engineer",
 };
 
@@ -10,7 +10,7 @@ export const birthdayConfig = {
 };
 
 export const vaultConfig = {
-  secretPin: "3010",
+  secretPin: "1030",
 };
 
 export const animationTimings = {

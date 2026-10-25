@@ -1,32 +1,30 @@
 import React, { useEffect, useRef } from 'react';
 
 /**
- * Cinematic Magic Cursor
- * Desktop only: replaces the native cursor with a soft blue orb/ring
- * and a lightweight particle trail, all rendered in one Canvas.
+ * Cinematic Stardust Magic Cursor Trail
+ * Desktop only: emits delicate stardust particles that float upward
+ * and slowly fade out over ~1 second as you move or hover.
+ * No static dots, circles, or permanent indicators on screen.
  */
 export function MagicCursor() {
   const canvasRef = useRef(null);
-  
+
   useEffect(() => {
-    if (window.matchMedia("(hover: none), (pointer: coarse)").matches) return;
+    // Only enable on non-touch devices (desktop)
+    if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
+
     let particles = [];
-    let animationFrameId;
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let cursorX = mouseX;
-    let cursorY = mouseY;
-    let previousX = mouseX;
-    let previousY = mouseY;
-    let isInside = false;
-    let pressed = false;
+    let animationFrameId = null;
+    let mouseX = -100;
+    let mouseY = -100;
+    let previousX = -100;
+    let previousY = -100;
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -36,138 +34,115 @@ export function MagicCursor() {
       canvas.style.height = '100vh';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
-    
-    const handleMouseEnter = () => {
-      isInside = true;
-    };
 
-    const handleMouseLeave = () => {
-      isInside = false;
-    };
-
-    const handleMouseMove = (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-
-      const distance = Math.hypot(mouseX - previousX, mouseY - previousY);
-      const count = Math.min(4, Math.max(2, Math.ceil(distance / 12)));
-
-      for (let i = 0; i < count; i++) {
-        particles.push(
-          new Particle(
-            mouseX + (Math.random() - 0.5) * 4,
-            mouseY + (Math.random() - 0.5) * 4
-          )
-        );
+    const ensureRenderRunning = () => {
+      if (!animationFrameId) {
+        animationFrameId = requestAnimationFrame(render);
       }
-
-      previousX = mouseX;
-      previousY = mouseY;
-    };
-
-    const handleMouseDown = () => {
-      pressed = true;
-    };
-
-    const handleMouseUp = () => {
-      pressed = false;
     };
 
     class Particle {
       constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.size = Math.random() * 2 + 0.5;
-        this.speedX = Math.random() * 1 - 0.5;
-        this.speedY = Math.random() * 1 + 0.5;
+        this.size = Math.random() * 2.2 + 0.6;
+        this.speedX = Math.random() * 1.0 - 0.5;
+        this.speedY = Math.random() * 0.9 + 0.4; // float upwards gently
         this.life = 1.0;
+        this.decay = Math.random() * 0.005 + 0.014; // ~60-70 frames = ~1.0-1.2s slow fade
+        // Celestial theme palette: soft baby blue, stardust white, gentle gold
+        const colors = [
+          '191, 219, 254', // soft blue
+          '219, 234, 254', // ice blue
+          '255, 255, 255', // stardust white
+          '254, 243, 199', // soft champagne shimmer
+        ];
+        this.rgb = colors[Math.floor(Math.random() * colors.length)];
       }
-      
+
       update() {
         this.x += this.speedX;
-        this.y -= this.speedY;
-        this.life -= 0.025;
+        this.y -= this.speedY; // move upwards like ethereal fairy dust
+        this.life -= this.decay;
+        this.size *= 0.985; // very gradual shrink
       }
-      
+
       draw() {
-        ctx.fillStyle = `rgba(191, 219, 254, ${this.life * 0.9})`;
+        if (this.life <= 0) return;
+        ctx.fillStyle = `rgba(${this.rgb}, ${Math.max(0, this.life * 0.88)})`;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, Math.max(0.3, this.size), 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    const renderCursor = () => {
-      const follow = 0.18;
-      cursorX += (mouseX - cursorX) * follow;
-      cursorY += (mouseY - cursorY) * follow;
+    const handleMouseMove = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
 
-      if (isInside) {
-        const pulse = 1 + Math.sin(performance.now() * 0.006) * 0.08;
-        const outerRadius = (pressed ? 15 : 12) * pulse;
-
-        // Soft atmospheric halo
-        const halo = ctx.createRadialGradient(
-          cursorX, cursorY, 0,
-          cursorX, cursorY, outerRadius * 3
-        );
-        halo.addColorStop(0, 'rgba(147, 197, 253, 0.24)');
-        halo.addColorStop(0.45, 'rgba(59, 130, 246, 0.10)');
-        halo.addColorStop(1, 'rgba(59, 130, 246, 0)');
-        ctx.fillStyle = halo;
-        ctx.beginPath();
-        ctx.arc(cursorX, cursorY, outerRadius * 3, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Blue outer ring
-        ctx.strokeStyle = pressed
-          ? 'rgba(191, 219, 254, 0.95)'
-          : 'rgba(147, 197, 253, 0.78)';
-        ctx.lineWidth = pressed ? 1.8 : 1.2;
-        ctx.beginPath();
-        ctx.arc(cursorX, cursorY, outerRadius, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // Inner light core
-        ctx.fillStyle = 'rgba(219, 234, 254, 0.95)';
-        ctx.beginPath();
-        ctx.arc(cursorX, cursorY, pressed ? 3.2 : 2.4, 0, Math.PI * 2);
-        ctx.fill();
+      if (previousX < 0 || previousY < 0) {
+        previousX = mouseX;
+        previousY = mouseY;
+        return;
       }
+
+      const dx = mouseX - previousX;
+      const dy = mouseY - previousY;
+      const distance = Math.hypot(dx, dy);
+
+      if (distance > 1) {
+        // Interpolate along motion path so fast movements have a continuous, extended trail
+        const steps = Math.min(6, Math.max(2, Math.ceil(distance / 8)));
+        for (let i = 0; i < steps; i++) {
+          if (particles.length < 120) {
+            const t = i / steps;
+            particles.push(
+              new Particle(
+                previousX + dx * t + (Math.random() - 0.5) * 4,
+                previousY + dy * t + (Math.random() - 0.5) * 4
+              )
+            );
+          }
+        }
+        ensureRenderRunning();
+      }
+
+      previousX = mouseX;
+      previousY = mouseY;
+    };
+
+    const handleMouseLeave = () => {
+      previousX = -100;
+      previousY = -100;
     };
 
     const render = () => {
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      particles.forEach((particle) => {
-        particle.update();
-        particle.draw();
-      });
-
-      particles = particles.filter((particle) => particle.life > 0);
-      renderCursor();
-
-      animationFrameId = requestAnimationFrame(render);
+      if (particles.length > 0) {
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update();
+          particles[i].draw();
+        }
+        particles = particles.filter((p) => p.life > 0);
+        animationFrameId = requestAnimationFrame(render);
+      } else {
+        // Sleep when all particles have dissolved
+        animationFrameId = null;
+      }
     };
 
-    window.addEventListener('resize', resize);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseenter', handleMouseEnter);
-    window.addEventListener('mouseleave', handleMouseLeave);
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('resize', resize, { passive: true });
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mouseleave', handleMouseLeave, { passive: true });
 
     resize();
-    render();
 
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseenter', handleMouseEnter);
       window.removeEventListener('mouseleave', handleMouseLeave);
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mouseup', handleMouseUp);
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
   }, []);
 

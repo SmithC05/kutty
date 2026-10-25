@@ -1,47 +1,281 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useScene } from '../context/SceneContext';
-import { memoryChapters } from '../data/memories';
+import { useScene, useAudio } from '../context';
+import { SCENES } from '../constants';
+import { chapter1Data, chapter2Data } from '../data/memories';
 import { MemoryBook } from '../components/memory-engine/MemoryBook';
+import { ScrapbookExperience } from '../components/memory-engine/ScrapbookExperience';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Chapter Title Card
+// Chapter One Cover Card — "Just You"  (redesigned editorial full-screen cover)
+// Warm ivory base, blush accents, muted rose, restrained champagne, paper grain.
+// Deliberately art-directed: large display title, four-corner hairlines,
+// animated horizontal rule, three-stage identity, explicit Enter button.
+// Automates entrance into photo journey after ~3.5s reading time.
 // ─────────────────────────────────────────────────────────────────────────────
-function ChapterCard({ chapter, onDismiss }) {
-  useEffect(() => {
-    const t = setTimeout(onDismiss, 3500);
-    return () => clearTimeout(t);
+function JournalCoverCard({ onDismiss }) {
+  const reducedMotion = useReducedMotion();
+  const dismissedRef = useRef(false);
+
+  const handleDismiss = useCallback(() => {
+    if (dismissedRef.current) return;
+    dismissedRef.current = true;
+    onDismiss();
   }, [onDismiss]);
+
+  // Automatic progression after reading time (~3.5 seconds)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleDismiss();
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, [handleDismiss]);
+
+  // Stagger for the sequential text reveals
+  const stagger = reducedMotion ? 0 : 1;
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center pointer-events-none bg-[#050505]"
+      className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center select-none cursor-pointer"
+      style={{
+        background:
+          'radial-gradient(ellipse 110% 90% at 55% 25%, #FFFDFB 0%, #FAF7F2 55%, #F2EBE5 100%)',
+      }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 1.5 }}
+      exit={{ opacity: 0, scale: reducedMotion ? 1 : 1.015 }}
+      transition={{ duration: reducedMotion ? 0.3 : 0.9, ease: [0.22, 1, 0.36, 1] }}
+      onClick={handleDismiss}
     >
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: -20, opacity: 0 }}
-        transition={{ duration: 1.2, delay: 0.3 }}
-        className="text-center px-8"
-      >
-        <p className="text-white/30 text-xs tracking-[0.4em] uppercase mb-3">Chapter</p>
-        <p className="text-5xl mb-4">{chapter.emoji}</p>
-        <h2
-          className="text-white/90 text-3xl font-light italic"
-          style={{ fontFamily: "'Playfair Display', serif" }}
+      {/* Paper grain */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.032] mix-blend-multiply"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      {/* Warm top-left atmospheric blush glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse 70% 50% at 10% 8%, rgba(245,184,168,0.11) 0%, transparent 70%)',
+        }}
+      />
+
+      {/* Champagne bottom-right warmth */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse 60% 45% at 92% 95%, rgba(243,217,162,0.09) 0%, transparent 65%)',
+        }}
+      />
+
+      {/* ── Four-corner hairline frame ── */}
+      {/* Outer border rectangle — visible inset */}
+      <div className="absolute inset-5 sm:inset-8 lg:inset-12 border border-[#F5B8A8]/28 pointer-events-none" />
+      {/* Corner accent marks — small L-shapes at each corner */}
+      {/* Top-left */}
+      <div className="absolute top-5 left-5 sm:top-8 sm:left-8 lg:top-12 lg:left-12 w-6 h-6 sm:w-8 sm:h-8 border-t border-l border-[#F5B8A8]/55 pointer-events-none" />
+      {/* Top-right */}
+      <div className="absolute top-5 right-5 sm:top-8 sm:right-8 lg:top-12 lg:right-12 w-6 h-6 sm:w-8 sm:h-8 border-t border-r border-[#F5B8A8]/55 pointer-events-none" />
+      {/* Bottom-left */}
+      <div className="absolute bottom-5 left-5 sm:bottom-8 sm:left-8 lg:bottom-12 lg:left-12 w-6 h-6 sm:w-8 sm:h-8 border-b border-l border-[#F5B8A8]/55 pointer-events-none" />
+      {/* Bottom-right */}
+      <div className="absolute bottom-5 right-5 sm:bottom-8 sm:right-8 lg:bottom-12 lg:right-12 w-6 h-6 sm:w-8 sm:h-8 border-b border-r border-[#F5B8A8]/55 pointer-events-none" />
+
+      {/* ── Central Content ── */}
+      <div className="relative z-10 flex flex-col items-center text-center px-6 sm:px-10 lg:px-16 max-w-3xl w-full">
+
+        {/* Large display title */}
+        <motion.h1
+          className="text-[#45152D] font-normal italic leading-tight tracking-tight mb-5 sm:mb-6"
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 'clamp(2.2rem, 5.5vw, 4.2rem)',
+          }}
+          initial={{ opacity: 0, y: reducedMotion ? 0 : 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.0, delay: 0.28 * stagger, ease: [0.22, 1, 0.36, 1] }}
         >
-          {chapter.title}
-        </h2>
+          This one&apos;s all about you, Keerthana.
+        </motion.h1>
+
+        {/* Animated horizontal rule */}
         <motion.div
-          className="mt-5 w-12 h-px bg-white/30 mx-auto"
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1, delay: 1 }}
+          className="h-px bg-gradient-to-r from-transparent via-[#F5B8A8] to-transparent mb-5 sm:mb-6"
+          style={{ width: 'clamp(48px, 10vw, 96px)' }}
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          transition={{ duration: 1.0, delay: 0.42 * stagger, ease: [0.22, 1, 0.36, 1] }}
         />
+
+        {/* Subtitle */}
+        <motion.p
+          className="text-[#8B4860]/80 text-sm sm:text-base lg:text-lg font-light leading-relaxed tracking-wide max-w-xs sm:max-w-sm lg:max-w-md mb-5 sm:mb-7"
+          style={{ fontFamily: "'Manrope', sans-serif" }}
+          initial={{ opacity: 0, y: reducedMotion ? 0 : 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.85, delay: 0.54 * stagger, ease: [0.22, 1, 0.36, 1] }}
+        >
+          A few moments of you, brought together just for you. ❤️
+        </motion.p>
+
+        {/* Three-stage identity pills */}
+        <motion.div
+          className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-9 sm:mb-11"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.66 * stagger }}
+        >
+          {['Little You', 'Growing Up', 'You Today'].map((stage, i) => (
+            <React.Fragment key={stage}>
+              <span
+                className="text-[10px] sm:text-[11px] uppercase tracking-[0.28em] text-[#8B4860]/55 font-medium"
+                style={{ fontFamily: "'Manrope', sans-serif" }}
+              >
+                {stage}
+              </span>
+              {i < 2 && (
+                <span className="block w-1 h-1 rounded-full bg-[#F5B8A8]/60" />
+              )}
+            </React.Fragment>
+          ))}
+        </motion.div>
+
+        {/* Enter button — explicit action, no auto-dismiss */}
+        <motion.button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDismiss();
+          }}
+          className="group relative px-7 sm:px-9 py-3 sm:py-3.5 rounded-full border border-[#45152D]/25 text-[#45152D] text-[11px] sm:text-xs uppercase tracking-[0.28em] font-medium hover:bg-[#45152D] hover:text-[#FFFDF9] active:scale-95 transition-all duration-300 shadow-[0_2px_12px_rgba(69,21,45,0.08)]"
+          style={{ fontFamily: "'Manrope', sans-serif" }}
+          initial={{ opacity: 0, y: reducedMotion ? 0 : 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 * stagger, ease: [0.22, 1, 0.36, 1] }}
+        >
+          TAKE A LOOK →
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Meaningful Chapter Transition — "Before our story..."
+//
+// 1. Warm portrait-journal colours transition into sky-blue & cream
+// 2. Handwritten message appears:
+//    "Before our story, there was you. Now, a little piece of our story."
+// 3. Smooth automatic entrance into Chapter Two (Us) after ~3.0s reading time
+// ─────────────────────────────────────────────────────────────────────────────
+function ChapterTransitionScreen({ onContinue }) {
+  const reducedMotion = useReducedMotion();
+  const continuedRef = useRef(false);
+
+  const handleContinue = useCallback(() => {
+    if (continuedRef.current) return;
+    continuedRef.current = true;
+    onContinue();
+  }, [onContinue]);
+
+  // Automatic transition after reading time (~3.0 seconds)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleContinue();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [handleContinue]);
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 text-center select-none cursor-pointer"
+      initial={{
+        background:
+          'radial-gradient(ellipse at 50% 30%, #FFFDFB 0%, #FAF7F2 65%, #F4ECE6 100%)',
+      }}
+      animate={{
+        background:
+          'radial-gradient(ellipse at 50% 20%, #F4F8FC 0%, #EBF3FA 55%, #FAF7EE 100%)',
+      }}
+      exit={{ opacity: 0, scale: reducedMotion ? 1 : 0.98 }}
+      transition={{ duration: reducedMotion ? 0.4 : 1.4, ease: [0.22, 1, 0.36, 1] }}
+      onClick={handleContinue}
+    >
+      {/* Paper grain */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.035] mix-blend-multiply"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      {/* Decorative Washi Tape accent on the transition card */}
+      <div
+        className="absolute top-8 left-1/2 -translate-x-1/2 w-32 h-7 pointer-events-none rounded-sm shadow-sm"
+        style={{
+          background: 'rgba(254, 243, 199, 0.9)',
+          borderLeft: '1px dashed rgba(0,0,0,0.15)',
+          borderRight: '1px dashed rgba(0,0,0,0.15)',
+          transform: 'rotate(-1deg)',
+        }}
+      />
+
+      <motion.div
+        className="relative z-10 max-w-md w-full bg-[#FFFDF9]/95 backdrop-blur-sm rounded-3xl p-8 sm:p-10 shadow-[0_20px_50px_rgba(30,41,59,0.12),0_4px_16px_rgba(0,0,0,0.04)] border border-[#E2E8F0]/80 flex flex-col items-center"
+        initial={{ opacity: 0, y: reducedMotion ? 0 : 24, scale: reducedMotion ? 1 : 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: reducedMotion ? 0 : -16, scale: reducedMotion ? 1 : 1.02 }}
+        transition={{ duration: reducedMotion ? 0.3 : 1.1, delay: reducedMotion ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <span
+          className="text-[#E94B70] text-[11px] uppercase tracking-[0.35em] font-semibold mb-5"
+          style={{ fontFamily: "'Manrope', sans-serif" }}
+        >
+          Now, About Us…
+        </span>
+
+        {/* The Exact Handwritten Transition Message */}
+        <h2
+          className="text-[#1E293B] text-2xl sm:text-3xl sm:leading-snug font-semibold tracking-wide mb-6"
+          style={{
+            fontFamily: "'Dancing Script', cursive",
+            lineHeight: '1.45',
+          }}
+        >
+          "Before our story, there was you.
+          <br />
+          <span className="text-[#E94B70]">
+            Now, a little piece of our story."
+          </span>
+        </h2>
+
+        <div className="w-14 h-px bg-[#CBD5E1] my-1" />
+
+        <p
+          className="text-xs uppercase tracking-[0.25em] text-[#64748B] mt-4 font-medium"
+          style={{ fontFamily: "'Manrope', sans-serif" }}
+        >
+          Us ❤️
+        </p>
+
+        {/* Enter Our Story Button */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleContinue();
+          }}
+          className="mt-8 px-6 py-2.5 rounded-full bg-[#1E293B] text-[#FFFDF9] text-xs uppercase tracking-[0.2em] font-medium shadow-md hover:bg-[#334155] active:scale-95 transition-all flex items-center gap-2"
+          style={{ fontFamily: "'Manrope', sans-serif" }}
+        >
+          Enter Our Story →
+        </button>
       </motion.div>
     </motion.div>
   );
@@ -50,41 +284,94 @@ function ChapterCard({ chapter, onDismiss }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Memory Journey Orchestrator
 // ─────────────────────────────────────────────────────────────────────────────
-export function MemoryJourney() {
-  const { next } = useScene();
-  const [chapterIndex, setChapterIndex] = useState(0);
-  const [showChapterCard, setShowChapterCard] = useState(true);
+export function MemoryJourney({ chapterIndex: propChapterIndex }) {
+  const { transitionTo, currentScene } = useScene();
+  const { playTrack } = useAudio();
 
-  const currentChapter = memoryChapters[chapterIndex];
+  // Resolve active chapter index
+  const activeChapterIndex =
+    propChapterIndex !== undefined
+      ? propChapterIndex
+      : currentScene === SCENES.MEMORY_JOURNEY_TOGETHER
+      ? 1
+      : 0;
 
-  const handleChapterComplete = () => {
-    if (chapterIndex >= memoryChapters.length - 1) {
-      // Journey complete
-      next();
-    } else {
-      // Next chapter
-      setChapterIndex(prev => prev + 1);
-      setShowChapterCard(true);
+  // Chapter 1 states
+  const [showChapter1Cover, setShowChapter1Cover] = useState(activeChapterIndex === 0);
+
+  // Chapter 2 states
+  const [showChapter2Transition, setShowChapter2Transition] = useState(
+    activeChapterIndex === 1
+  );
+
+  // Chapter 1 (Just You): Ensure bus_love is active throughout
+  useEffect(() => {
+    if (activeChapterIndex === 0) {
+      playTrack('bus_love');
     }
+  }, [activeChapterIndex, playTrack]);
+
+  // Chapter 2 (Us): Ensure friendship anthem is active on mount and throughout
+  useEffect(() => {
+    if (activeChapterIndex === 1) {
+      playTrack('friendship');
+    }
+  }, [activeChapterIndex, playTrack]);
+
+  // Handle Chapter 1 completion -> navigate directly to The Artist's Hand (Pencil Portrait)
+  const handleChapter1Complete = () => {
+    transitionTo(SCENES.ARTIST_CHAPTER);
   };
 
-  if (!currentChapter) return null;
+  // Handle Chapter 2 completion -> continue to Who Is She to Me?
+  const handleChapter2Complete = () => {
+    transitionTo(SCENES.WHO_IS_SHE_TO_ME);
+  };
 
+  // Triggered when Keerthana clicks "Enter Our Story →" (or the transition card) to enter Us
+  const handleEnterUs = useCallback(() => {
+    playTrack('friendship');
+    setShowChapter2Transition(false);
+  }, [playTrack]);
+
+  // ── Render Chapter One: "Just You" ──
+  if (activeChapterIndex === 0) {
+    return (
+      <div className="fixed inset-0 w-full h-full">
+        <AnimatePresence mode="wait">
+          {showChapter1Cover ? (
+            <JournalCoverCard
+              key="ch1-cover"
+              onDismiss={() => setShowChapter1Cover(false)}
+            />
+          ) : (
+            <MemoryBook
+              key="book-just-you"
+              photos={chapter1Data.photos}
+              initialChapterData={chapter1Data}
+              theme="journal"
+              onComplete={handleChapter1Complete}
+            />
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
+
+  // ── Render Chapter Two: "Us" ──
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#050505]">
+    <div className="fixed inset-0 w-full h-full">
       <AnimatePresence mode="wait">
-        {showChapterCard ? (
-          <ChapterCard
-            key={`card-${currentChapter.id}`}
-            chapter={currentChapter}
-            onDismiss={() => setShowChapterCard(false)}
+        {showChapter2Transition ? (
+          <ChapterTransitionScreen
+            key="ch2-transition"
+            onContinue={handleEnterUs}
           />
         ) : (
-          <MemoryBook
-            key={`book-${currentChapter.id}`}
-            photos={currentChapter.memories}
-            initialChapterData={currentChapter}
-            onComplete={handleChapterComplete}
+          <ScrapbookExperience
+            key="scrapbook-us"
+            chapterData={chapter2Data}
+            onComplete={handleChapter2Complete}
           />
         )}
       </AnimatePresence>

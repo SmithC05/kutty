@@ -1,5 +1,4 @@
 import React, { useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { cn } from '../../utils/cn';
 
 /**
@@ -9,18 +8,31 @@ import { cn } from '../../utils/cn';
 export function Background({ className, showParticles = true, isPaused = false }) {
   const canvasRef = useRef(null);
   const isPausedRef = useRef(isPaused);
+  const showParticlesRef = useRef(showParticles);
+
+  const animRef = useRef(null);
 
   useEffect(() => {
     isPausedRef.current = isPaused;
+    if (isPaused) {
+      if (animRef.current) {
+        cancelAnimationFrame(animRef.current);
+        animRef.current = null;
+      }
+    }
   }, [isPaused]);
+
+  useEffect(() => {
+    showParticlesRef.current = showParticles;
+  }, [showParticles]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     
     let particles = [];
-    let animationFrameId;
     
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -57,25 +69,37 @@ export function Background({ className, showParticles = true, isPaused = false }
 
     const init = () => {
       particles = [];
-      const particleCount = window.innerWidth < 768 ? 30 : 60;
+      const particleCount = window.innerWidth < 768 ? 24 : 48;
       for (let i = 0; i < particleCount; i++) particles.push(new Particle());
     };
 
     const animate = () => {
+      if (isPausedRef.current) {
+        animRef.current = null;
+        return;
+      }
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        if (!isPausedRef.current) p.update();
-        p.draw();
-      });
-      animationFrameId = requestAnimationFrame(animate);
+      if (showParticlesRef.current) {
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+      }
+      animRef.current = requestAnimationFrame(animate);
     };
 
     init();
-    animate();
+    if (!isPausedRef.current) {
+      animRef.current = requestAnimationFrame(animate);
+    }
 
     return () => {
       window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animationFrameId);
+      if (animRef.current) {
+        cancelAnimationFrame(animRef.current);
+        animRef.current = null;
+      }
     };
   }, []);
 
@@ -83,22 +107,23 @@ export function Background({ className, showParticles = true, isPaused = false }
     <div className={cn("fixed inset-0 pointer-events-none -z-10", className)}>
       <div className="absolute inset-0 bg-background" />
 
-      <motion.div 
-        className="absolute inset-0 opacity-40 mix-blend-screen"
-        animate={{
-          background: [
-            "radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.15) 0%, transparent 50%)",
-            "radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.2) 0%, transparent 60%)",
-            "radial-gradient(circle at 50% 50%, rgba(191, 219, 254, 0.1) 0%, transparent 70%)",
-            "radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.15) 0%, transparent 50%)"
-          ]
-        }}
-        transition={{
-          duration: 20,
-          ease: "easeInOut",
-          repeat: Infinity,
-        }}
-      />
+      {/* GPU-accelerated atmospheric aurora lights with zero main-thread CPU cost */}
+      <div className="absolute inset-0 opacity-40 mix-blend-screen pointer-events-none overflow-hidden" aria-hidden="true">
+        <div
+          className="absolute -top-1/4 -left-1/4 h-[80vw] w-[80vw] rounded-full blur-[90px]"
+          style={{
+            background: 'radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, transparent 65%)',
+            animation: 'pulse 14s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }}
+        />
+        <div
+          className="absolute -bottom-1/4 -right-1/4 h-[80vw] w-[80vw] rounded-full blur-[100px]"
+          style={{
+            background: 'radial-gradient(circle, rgba(191, 219, 254, 0.14) 0%, transparent 70%)',
+            animation: 'pulse 18s cubic-bezier(0.4, 0, 0.6, 1) 4s infinite',
+          }}
+        />
+      </div>
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)]" />
 

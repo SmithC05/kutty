@@ -1,33 +1,75 @@
 import { templates } from './templates';
 
 /**
- * Intelligently chunks photos and assigns the best template for each chunk.
+ * Intelligently generates pages for the memory book.
  * 
- * @param {Array} photos - The pre-analyzed photos.
- * @returns {Array} An array of page objects: { photos, template }
+ * If photos define `pageGroup`, it honors the manually curated storytelling sequence.
+ * Otherwise, it uses scoring and rhythm to chunk photos dynamically.
+ * 
+ * @param {Array} photos - Analyzed photos
+ * @param {string} theme - 'journal' | 'scrapbook'
+ * @returns {Array} An array of page objects: { id, photos, template, theme, stageTitle }
  */
-export function generatePages(photos) {
-  // A curated cinematic rhythm for number of photos per page.
-  // We want to mix single hero shots with collages to create a breathing pace.
-  const rhythm = [1, 2, 1, 3, 1, 2, 4];
-  
+export function generatePages(photos, theme = 'journal') {
+  if (!photos || photos.length === 0) return [];
+
+  // Check if photos contain manual pageGroup assignments
+  const hasPageGroups = photos.some((p) => p.pageGroup !== undefined);
+
+  if (hasPageGroups) {
+    const groupMap = new Map();
+    photos.forEach((photo) => {
+      const g = photo.pageGroup || 1;
+      if (!groupMap.has(g)) groupMap.set(g, []);
+      groupMap.get(g).push(photo);
+    });
+
+    const sortedGroups = Array.from(groupMap.entries()).sort(([a], [b]) => a - b);
+
+    return sortedGroups.map(([, chunk], index) => {
+      // Find the best template for this chunk
+      let bestTemplate = null;
+      let highestScore = -Infinity;
+
+      for (const t of templates) {
+        const score = t.score(chunk);
+        if (score > highestScore) {
+          highestScore = score;
+          bestTemplate = t;
+        }
+      }
+
+      if (!bestTemplate) {
+        bestTemplate =
+          templates.find((t) => t.maxPhotos === chunk.length) || templates[0];
+      }
+
+      return {
+        id: `page-${index + 1}`,
+        pageNumber: index + 1,
+        photos: chunk,
+        template: bestTemplate,
+        theme,
+        stage: chunk[0]?.stage,
+        stageTitle: chunk[0]?.stageTitle,
+      };
+    });
+  }
+
+  // Dynamic chunking fallback
+  const rhythm = [1, 2, 2, 3, 2];
   const pages = [];
   let currentIndex = 0;
   let rhythmIndex = 0;
 
   while (currentIndex < photos.length) {
-    // Determine how many photos to take for this page
     let chunkSize = rhythm[rhythmIndex % rhythm.length];
-    
-    // If we're near the end, we might not have enough photos to fulfill the chunk
     if (currentIndex + chunkSize > photos.length) {
       chunkSize = photos.length - currentIndex;
     }
 
-    // Extract the chunk
     const chunk = photos.slice(currentIndex, currentIndex + chunkSize);
-    
-    // Score all available templates for this chunk size
+
     let bestTemplate = null;
     let highestScore = -Infinity;
 
@@ -39,15 +81,19 @@ export function generatePages(photos) {
       }
     }
 
-    // Fallback if no template scored well (shouldn't happen with our robust templates)
     if (!bestTemplate) {
-      bestTemplate = templates.find(t => t.maxPhotos === chunk.length) || templates[0];
+      bestTemplate =
+        templates.find((t) => t.maxPhotos === chunk.length) || templates[0];
     }
 
     pages.push({
-      id: `page-${pages.length}`,
+      id: `page-${pages.length + 1}`,
+      pageNumber: pages.length + 1,
       photos: chunk,
       template: bestTemplate,
+      theme,
+      stage: chunk[0]?.stage,
+      stageTitle: chunk[0]?.stageTitle,
     });
 
     currentIndex += chunkSize;

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Typography } from '../components/core/Typography';
 import { Screen } from '../components/core/Screen';
 import { Countdown } from '../components/ui/Countdown';
-import { useDateLock } from '../hooks/useDateLock';
+import { useTime, useAudio } from '../context';
 import { fadeIn, easeCinematic } from '../animations/presets';
 
 /**
@@ -11,14 +11,20 @@ import { fadeIn, easeCinematic } from '../animations/presets';
  * Sequence: Messages -> Live Countdown -> Advance Wish
  */
 export function AdvanceJourney() {
-  const timeState = useDateLock();
+  const timeState = useTime();
+  const { playTrack } = useAudio();
   const [step, setStep] = useState(0);
 
   const messages = [
     "Good things take time...",
     "Anticipation is a gift in itself.",
-    "Advance Happy Birthday, Kutty."
+    "Advance happy birthday, my Kutty! ❤️"
   ];
+
+  // Keep intro.mp3 playing continuously through all messages and the live countdown
+  useEffect(() => {
+    playTrack('intro');
+  }, [playTrack]);
 
   useEffect(() => {
     // Sequence the text messages

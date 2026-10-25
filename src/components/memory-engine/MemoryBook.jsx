@@ -1,82 +1,233 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { analyzeImages } from './ImageAnalyzer';
 import { generatePages } from './LayoutEngine';
 import { MemoryPage } from './MemoryPage';
+import { useReducedMotion } from '../../hooks/useReducedMotion';
 
-export function MemoryBook({ photos, onComplete, initialChapterData }) {
-  const [isAnalyzing, setIsAnalyzing] = useState(true);
-  const [pages, setPages] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [canTap, setCanTap] = useState(false);
-  const [showDissolve, setShowDissolve] = useState(false);
+/**
+ * MemoryBook — Chapter One: "Just You"
+ *
+ * Orchestrates the editorial portrait journal experience.
+ * Renders a full-screen, page-turning book with:
+ *  - Keyboard navigation (←/→ / Space / Enter)
+ *  - Paced tap lock (prevents rapid-fire page skipping)
+ *  - Clean bottom navigation bar that never overlaps photo content
+ *  - onComplete fires exactly once via ref guard
+ *  - All timeouts cleaned up on unmount
+ */
+/**
+ * Calculate comfortable reading/viewing duration based on content
+ */
+function getPageDuration(page, isLastPage) {
+  if (!page) return 5500;
+  if (isLastPage) return 8500; // longer hold for final memory page
 
-  useEffect(() => {
-    let isMounted = true;
-    
-    async function load() {
-      setIsAnalyzing(true);
-      const analyzed = await analyzeImages(photos);
-      const layoutPages = generatePages(analyzed);
-      
-      if (isMounted) {
-        setPages(layoutPages);
-        setIsAnalyzing(false);
-      }
+  const photoCount = page.photos?.length || 1;
+  let textLength = 0;
+  page.photos?.forEach((p) => {
+    if (p.caption) textLength += p.caption.length;
+    if (p.title) textLength += p.title.length;
+    if (p.stageTitle) textLength += p.stageTitle.length;
+  });
+
+  // Multiple photos or captions: ~7-9s
+  if (photoCount > 1 || textLength >= 40) {
+    if (textLength > 100) {
+      return Math.min(11000, 7500 + Math.floor((textLength - 100) * 35));
     }
-    
-    load();
-    
-    return () => { isMounted = false; };
-  }, [photos]);
+    return 7500;
+  }
+  // Simple portrait or photograph: ~5-6s
+  return 5500;
+}
 
+export function MemoryBook({
+  photos = [],
+  onComplete,
+  theme = 'journal',
+}) {
+  const [isAnalyzing, setIsAnalyzing]       = useState(true);
+  const [pages, setPages]                   = useState([]);
+  const [currentIndex, setCurrentIndex]     = useState(0);
+  const [canTap, setCanTap]                 = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [pageTurnFeedback, setPageTurnFeedback] = useState(false);
+  const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
+  const reducedMotion = useReducedMotion();
+
+  const isScrapbook         = theme === 'scrapbook';
+  const lockTimerRef        = useRef(null);
+  const transitionRef       = useRef(null);
+  const feedbackRef         = useRef(null);
+  const autoAdvanceTimerRef = useRef(null);
+  const completedRef        = useRef(false); // guard: onComplete fires once only
+
+  // 1. Analyze photos → generate layout pages
+  useEffect(() => {
+    let alive = true;
+    setIsAnalyzing(true);
+    setCurrentIndex(0);
+    completedRef.current = false;
+
+    analyzeImages(photos).then((analyzed) => {
+      if (!alive) return;
+      // Pass total page count into each page object so MemoryPage can render "02 / 06"
+      const raw = generatePages(analyzed, theme);
+      const withTotal = raw.map((pg, idx) => ({
+        ...pg,
+        pageNumber: idx + 1,
+        pageTotal:  raw.length,
+      }));
+      setPages(withTotal);
+      setIsAnalyzing(false);
+    });
+
+    return () => { alive = false; };
+  }, [photos, theme]);
+
+  // 2. Re-lock tap after every page change (allow animation to settle)
   useEffect(() => {
     if (isAnalyzing) return;
-    
     setCanTap(false);
-    const t = setTimeout(() => {
-      setCanTap(true);
-    }, 4000);
-    
-    return () => clearTimeout(t);
+    clearTimeout(lockTimerRef.current);
+    lockTimerRef.current = setTimeout(() => setCanTap(true), 1500);
+    return () => clearTimeout(lockTimerRef.current);
   }, [currentIndex, isAnalyzing]);
 
-  const advance = () => {
-    if (!canTap || isAnalyzing) return;
-    
-    setShowDissolve(true);
-    setTimeout(() => setShowDissolve(false), 700);
+  // 3. Cleanup all timers on unmount
+  useEffect(() => {
+    return () => {
+      clearTimeout(lockTimerRef.current);
+      clearTimeout(transitionRef.current);
+      clearTimeout(feedbackRef.current);
+      clearTimeout(autoAdvanceTimerRef.current);
+    };
+  }, []);
+
+  // 4. Advance to next page (or fire onComplete on the last page)
+  const advance = useCallback(() => {
+    if (!canTap || isTransitioning || isAnalyzing) return;
+    clearTimeout(autoAdvanceTimerRef.current);
+
+    setIsTransitioning(true);
+    setPageTurnFeedback(true);
+    clearTimeout(feedbackRef.current);
+    feedbackRef.current = setTimeout(() => setPageTurnFeedback(false), 500);
 
     if (currentIndex >= pages.length - 1) {
-      setTimeout(() => {
-        if (onComplete) onComplete();
-      }, 600);
+      // Last page — fire completion exactly once
+      clearTimeout(transitionRef.current);
+      transitionRef.current = setTimeout(() => {
+        setIsTransitioning(false);
+        if (!completedRef.current) {
+          completedRef.current = true;
+          if (onComplete) onComplete();
+        }
+      }, 500);
       return;
     }
 
-    setTimeout(() => setCurrentIndex(prev => prev + 1), 500);
-  };
+    clearTimeout(transitionRef.current);
+    transitionRef.current = setTimeout(() => {
+      setCurrentIndex((prev) => prev + 1);
+      setIsTransitioning(false);
+    }, 420);
+  }, [canTap, isTransitioning, isAnalyzing, currentIndex, pages.length, onComplete]);
 
+  // 5. Go back one page
+  const goBack = useCallback(
+    (e) => {
+      if (e) e.stopPropagation();
+      if (isTransitioning || isAnalyzing || currentIndex <= 0) return;
+      clearTimeout(autoAdvanceTimerRef.current);
+
+      setIsTransitioning(true);
+      clearTimeout(transitionRef.current);
+      transitionRef.current = setTimeout(() => {
+        setCurrentIndex((prev) => prev - 1);
+        setIsTransitioning(false);
+      }, 420);
+    },
+    [isTransitioning, isAnalyzing, currentIndex]
+  );
+
+  // 6. Autoplay loop — advances automatically based on content viewing duration
+  useEffect(() => {
+    if (isAnalyzing || isTransitioning || !canTap || isAutoplayPaused || pages.length === 0) {
+      return;
+    }
+
+    const isLast = currentIndex >= pages.length - 1;
+    const duration = getPageDuration(pages[currentIndex], isLast);
+
+    clearTimeout(autoAdvanceTimerRef.current);
+    autoAdvanceTimerRef.current = setTimeout(() => {
+      advance();
+    }, duration);
+
+    return () => {
+      clearTimeout(autoAdvanceTimerRef.current);
+    };
+  }, [currentIndex, canTap, isAutoplayPaused, pages, isTransitioning, isAnalyzing, advance]);
+
+  // 6. Keyboard navigation — skip if focus is on an interactive element
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'video') return;
+
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        advance();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goBack();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [advance, goBack]);
+
+  // 7. Outer-container click — ignore clicks that originate from buttons or links
+  const handleContainerClick = useCallback(
+    (e) => {
+      const tag = e.target?.tagName?.toLowerCase();
+      if (tag === 'button' || tag === 'a') return;
+      if (e.target?.closest('button') || e.target?.closest('a')) return;
+      advance();
+    },
+    [advance]
+  );
+
+  // ── Loading state ──────────────────────────────────────────────────────────
   if (isAnalyzing) {
     return (
-      <motion.div 
-        className="fixed inset-0 flex flex-col items-center justify-center bg-[#050505] z-50"
+      <motion.div
+        className={`fixed inset-0 flex flex-col items-center justify-center z-40 ${
+          isScrapbook ? 'bg-[#EBF3FA]' : 'bg-[#FAF7F2]'
+        }`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        <motion.div 
-          className="w-16 h-px bg-white/20 relative overflow-hidden"
-        >
-          <motion.div 
-            className="absolute inset-y-0 left-0 bg-white/60"
-            initial={{ width: "0%" }}
-            animate={{ width: "100%" }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+        <motion.div className="w-16 h-0.5 bg-black/10 relative overflow-hidden rounded-full">
+          <motion.div
+            className={`absolute inset-y-0 left-0 ${
+              isScrapbook ? 'bg-[#93C5FD]' : 'bg-[#F5B8A8]'
+            }`}
+            initial={{ width: '0%' }}
+            animate={{ width: '100%' }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
           />
         </motion.div>
-        <p className="text-white/30 text-xs tracking-[0.4em] uppercase mt-6">
-          Gathering Memories
+        <p
+          className={`text-xs tracking-[0.35em] uppercase mt-5 ${
+            isScrapbook ? 'text-[#1E293B]/60' : 'text-[#8B4860]/70'
+          }`}
+          style={{ fontFamily: "'Manrope', sans-serif" }}
+        >
+          Getting things ready… ❤️
         </p>
       </motion.div>
     );
@@ -84,58 +235,193 @@ export function MemoryBook({ photos, onComplete, initialChapterData }) {
 
   if (pages.length === 0) return null;
 
-  const currentChapterTint = initialChapterData?.backgroundTint || 'rgba(0,0,0,0)';
-
+  // ── Main Book Render ───────────────────────────────────────────────────────
   return (
     <motion.div
-      className="fixed inset-0 w-full h-full overflow-hidden cursor-pointer bg-[#050505]"
+      className="fixed inset-0 w-full h-full overflow-hidden select-none"
+      style={{
+        background: isScrapbook
+          ? 'radial-gradient(ellipse at 50% 20%, #F8FBFE 0%, #EBF3FA 60%, #FAF6EE 100%)'
+          : 'radial-gradient(ellipse at 60% 20%, #FFFDFB 0%, #FAF7F2 60%, #F4ECE6 100%)',
+      }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 2 }}
-      onClick={advance}
+      transition={{ duration: 0.7 }}
+      onClick={handleContainerClick}
     >
-      <motion.div
-        className="absolute inset-0 z-0 pointer-events-none"
-        animate={{ background: currentChapterTint }}
-        transition={{ duration: 3 }}
+      {/* Subtle paper grain texture */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-multiply"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+        }}
       />
 
-      <div className="absolute inset-0 z-10">
-        {pages.map((page, idx) => (
+      {/* Atmospheric top-left warm vignette — journal only */}
+      {!isScrapbook && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(ellipse 80% 60% at 15% 10%, rgba(245,184,168,0.08) 0%, transparent 70%)',
+          }}
+        />
+      )}
+
+      {/* Pages — each absolutely positioned, shown/hidden via AnimatePresence inside MemoryPage */}
+      <div className="absolute inset-0">
+        {pages.map((page) => (
           <MemoryPage
             key={page.id}
             pageData={page}
-            isVisible={currentIndex === idx}
+            isVisible={pages[currentIndex]?.id === page.id}
           />
         ))}
       </div>
 
-      <AnimatePresence>
-        {canTap && (
-          <motion.p
-            className="absolute bottom-8 left-0 right-0 text-center text-white/25 text-xs tracking-[0.4em] uppercase z-30 pointer-events-none select-none"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5 }}
+      {/* ── Bottom Navigation Bar ─────────────────────────────────────────── */}
+      {/*
+        Fixed at the bottom. Always visible; never overlaps photo content
+        because MemoryPage reserves 64px of paddingBottom.
+      */}
+      <div
+        className={`
+          absolute bottom-0 left-0 right-0 z-30
+          flex items-center justify-between
+          px-5 sm:px-8 lg:px-12 xl:px-16
+          py-3 sm:py-4
+          pointer-events-none
+        `}
+        style={{
+          background: isScrapbook
+            ? 'linear-gradient(to top, rgba(235,243,250,0.92) 0%, transparent 100%)'
+            : 'linear-gradient(to top, rgba(250,247,242,0.94) 0%, transparent 100%)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
+        }}
+      >
+        {/* Previous */}
+        {currentIndex > 0 ? (
+          <button
+            type="button"
+            onClick={goBack}
+            className={`
+              pointer-events-auto
+              flex items-center gap-1.5
+              px-3.5 py-2 sm:px-4 sm:py-2.5
+              rounded-full text-[11px] sm:text-xs tracking-[0.18em] uppercase font-medium
+              border transition-all active:scale-95
+              ${isScrapbook
+                ? 'bg-white/80 border-[#CBD5E1]/60 text-[#1E293B]/70 hover:bg-white shadow-sm'
+                : 'bg-[#FAF7F2]/90 border-[#F5B8A8]/50 text-[#8B4860] hover:bg-[#FAF7F2] shadow-sm'
+              }
+            `}
+            style={{ fontFamily: "'Manrope', sans-serif" }}
           >
-            Turn Page
-          </motion.p>
+            ← Back
+          </button>
+        ) : (
+          <div className="w-20 sm:w-24" aria-hidden />
         )}
-      </AnimatePresence>
 
-      {/* Blue particle visual feedback on tap */}
+        {/* Centre: page indicator + turn hint + pause/resume */}
+        <div className="flex flex-col items-center gap-0.5 select-none">
+          <div className="flex items-center gap-2">
+            <span
+              className={`text-[11px] sm:text-xs tracking-[0.22em] uppercase font-medium tabular-nums ${
+                isScrapbook ? 'text-[#1E293B]/50' : 'text-[#8B4860]/60'
+              }`}
+              style={{ fontFamily: "'Manrope', sans-serif" }}
+            >
+              {currentIndex + 1} of {pages.length}
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsAutoplayPaused((p) => !p);
+              }}
+              className={`pointer-events-auto text-[9px] sm:text-[10px] tracking-[0.16em] uppercase px-2 py-0.5 rounded-full border transition-all active:scale-95 ${
+                isAutoplayPaused
+                  ? 'border-[#E94B70] text-[#E94B70] bg-[#E94B70]/10 font-semibold'
+                  : 'border-black/10 text-[#8B4860]/60 hover:text-[#8B4860] hover:border-[#8B4860]/30'
+              }`}
+              style={{ fontFamily: "'Manrope', sans-serif" }}
+              aria-label={isAutoplayPaused ? 'Resume auto-play' : 'Pause auto-play'}
+              title={isAutoplayPaused ? 'Resume auto-play' : 'Pause auto-play'}
+            >
+              {isAutoplayPaused ? '▶ Play' : '⏸ Pause'}
+            </button>
+          </div>
+
+          <AnimatePresence>
+            {canTap && (
+              <motion.span
+                className={`text-[10px] sm:text-[11px] tracking-[0.2em] uppercase font-semibold ${
+                  isScrapbook ? 'text-[#E94B70]' : 'text-[#45152D]/70'
+                }`}
+                style={{ fontFamily: "'Manrope', sans-serif" }}
+                initial={{ opacity: 0, y: 4 }}
+                animate={
+                  reducedMotion
+                    ? { opacity: 0.85 }
+                    : { opacity: [0.5, 0.95, 0.5], y: [0, -1, 0] }
+                }
+                exit={{ opacity: 0 }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                {currentIndex >= pages.length - 1 ? 'On to Our Memories →' : 'Keep exploring →'}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Next */}
+        <div className="w-20 sm:w-24 flex justify-end">
+          {currentIndex < pages.length - 1 ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                advance();
+              }}
+              disabled={!canTap || isTransitioning}
+              className={`
+                pointer-events-auto
+                flex items-center gap-1.5
+                px-3.5 py-2 sm:px-4 sm:py-2.5
+                rounded-full text-[11px] sm:text-xs tracking-[0.18em] uppercase font-medium
+                border transition-all active:scale-95 disabled:opacity-40
+                ${isScrapbook
+                  ? 'bg-white/80 border-[#CBD5E1]/60 text-[#1E293B]/70 hover:bg-white shadow-sm'
+                  : 'bg-[#FAF7F2]/90 border-[#F5B8A8]/50 text-[#8B4860] hover:bg-[#FAF7F2] shadow-sm'
+                }
+              `}
+              style={{ fontFamily: "'Manrope', sans-serif" }}
+            >
+              Next →
+            </button>
+          ) : (
+            <div className="w-20 sm:w-24" aria-hidden />
+          )}
+        </div>
+      </div>
+
+      {/* Gentle page-turn flash feedback */}
       <AnimatePresence>
-        {showDissolve && (
-          <motion.div 
-            className="absolute inset-0 z-40 pointer-events-none mix-blend-screen"
+        {pageTurnFeedback && (
+          <motion.div
+            className="absolute inset-0 z-40 pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: 0.35 }}
             style={{
-              background: 'radial-gradient(circle at center, rgba(59,130,246,0.12) 0%, transparent 60%)'
+              background: isScrapbook
+                ? 'radial-gradient(circle at center, rgba(147,197,253,0.15) 0%, transparent 70%)'
+                : 'radial-gradient(circle at center, rgba(245,184,168,0.15) 0%, transparent 70%)',
             }}
           />
         )}

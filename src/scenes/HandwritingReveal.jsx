@@ -1,26 +1,40 @@
 import React, { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { Typography } from '../components/core/Typography';
 import { useScene } from '../context/SceneContext';
+import { useTime } from '../context/TimeContext';
 import { SCENES } from '../constants';
+import { devMode } from '../config';
 
 /**
  * Handwritten Cinematic Reveal
- * Plays directly after the gift opens, before the countdown.
+ * Plays directly after the gift opens, before the birthday reveal or advance journey.
  */
 export function HandwritingReveal() {
-  const { next } = useScene();
+  const { transitionTo, isDevUnlocked } = useScene();
+  const timeState = useTime();
   const containerRef = useRef(null);
   const dearRef = useRef(null);
   const kuttyRef = useRef(null);
+
+  const isUnlocked = Boolean(
+    timeState?.isUnlocked || isDevUnlocked || (devMode.enabled && devMode.bypassDate)
+  );
+  const isUnlockedRef = useRef(isUnlocked);
+  useEffect(() => {
+    isUnlockedRef.current = isUnlocked;
+  }, [isUnlocked]);
 
   useEffect(() => {
     // Use gsap.context to ensure cleanup and scoping in React Strict Mode
     let ctx = gsap.context(() => {
       const tl = gsap.timeline({
         onComplete: () => {
-          next();
+          if (isUnlockedRef.current) {
+            transitionTo(SCENES.BIRTHDAY_REVEAL);
+          } else {
+            transitionTo(SCENES.ADVANCE_JOURNEY);
+          }
         }
       });
 
@@ -56,7 +70,7 @@ export function HandwritingReveal() {
     }, containerRef);
 
     return () => ctx.revert(); // Cleanup on unmount
-  }, [next]);
+  }, [transitionTo]);
 
   return (
     <div ref={containerRef} className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">

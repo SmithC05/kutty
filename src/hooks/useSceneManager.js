@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { SCENES } from '../constants';
 import { devMode } from '../config';
 
@@ -7,7 +7,28 @@ import { devMode } from '../config';
  * Orchestrates the cinematic scene flow without traditional routing.
  */
 export function useSceneManager() {
-  const [currentScene, setCurrentScene] = useState(devMode.enabled && devMode.startScene ? devMode.startScene : SCENES.LOADING);
+  const getInitialScene = () => {
+    if (devMode.enabled && devMode.startScene) {
+      return devMode.startScene;
+    }
+    // Initial entrance is always the 3D Gift Box for both Advance Journey and Birthday Journey
+    return SCENES.LOADING;
+  };
+
+  const [currentScene, setCurrentScene] = useState(getInitialScene);
+  const [isDevUnlocked, setIsDevUnlocked] = useState(false);
+  const [isBackgroundPaused, setIsBackgroundPaused] = useState(false);
+  const [hasCompletedCelebrationIntro, setHasCompletedCelebrationIntro] = useState(false);
+
+  // Developer unlock listener: when unlocked in Advance Journey, restart from the gift box
+  useEffect(() => {
+    const handleUnlock = () => {
+      setIsDevUnlocked(true);
+      setCurrentScene(SCENES.LOADING);
+    };
+    window.addEventListener('developer-unlock', handleUnlock);
+    return () => window.removeEventListener('developer-unlock', handleUnlock);
+  }, []);
 
   const transitionTo = useCallback((newScene) => {
     // Allows us to intercept GSAP page transitions before React unmounts
@@ -23,20 +44,34 @@ export function useSceneManager() {
     const order = [
       SCENES.LOADING, 
       SCENES.HANDWRITING,
-      SCENES.DATE_AWARE,
+      SCENES.BIRTHDAY_REVEAL,
       SCENES.SECRET_VAULT,
+      SCENES.LORD_SHIVA_BLESSING,
       SCENES.MEMORY_JOURNEY_SOLO,
-      SCENES.MEMORY_JOURNEY_TOGETHER,
-      SCENES.INTERACTIVE_WISHES,
       SCENES.ARTIST_CHAPTER,
+      SCENES.SONIC_BLOOM,
+      SCENES.MEMORY_JOURNEY_TOGETHER,
+      SCENES.WHO_IS_SHE_TO_ME,
       SCENES.FINAL_MESSAGE
     ];
-    const currentIndex = order.indexOf(currentScene);
+    // Normalize aliases like DATE_AWARE
+    const activeScene = currentScene === SCENES.DATE_AWARE ? SCENES.BIRTHDAY_REVEAL : currentScene;
+    const currentIndex = order.indexOf(activeScene);
     if (currentIndex >= 0 && currentIndex < order.length - 1) {
+      const nextScene = order[currentIndex + 1];
       preloadNext();
-      transitionTo(order[currentIndex + 1]);
+      transitionTo(nextScene);
     }
   }, [currentScene, transitionTo, preloadNext]);
 
-  return { currentScene, transitionTo, next };
+  return { 
+    currentScene, 
+    transitionTo, 
+    next, 
+    isBackgroundPaused, 
+    setIsBackgroundPaused,
+    hasCompletedCelebrationIntro,
+    setHasCompletedCelebrationIntro,
+    isDevUnlocked
+  };
 }

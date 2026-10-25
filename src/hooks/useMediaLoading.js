@@ -9,32 +9,51 @@ export function useMediaLoading(assetList = []) {
   const [progress, setProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Use a serialized key of asset URLs to prevent re-triggering when array reference changes
+  const assetKey = Array.isArray(assetList) ? assetList.join('|') : '';
+
   useEffect(() => {
-    if (assetList.length === 0) {
+    const assets = assetKey ? assetKey.split('|').filter(Boolean) : [];
+    if (assets.length === 0) {
       setIsLoaded(true);
       setProgress(100);
       return;
     }
     
     let loadedCount = 0;
-    const total = assetList.length;
+    let isCancelled = false;
+    const total = assets.length;
 
-    assetList.forEach((src) => {
+    // Safety timeout: ensure loader never hangs if an asset stalls
+    const safetyTimeout = setTimeout(() => {
+      if (!isCancelled) {
+        setIsLoaded(true);
+        setProgress(100);
+      }
+    }, 3500);
+
+    const onAssetComplete = () => {
+      if (isCancelled) return;
+      loadedCount++;
+      setProgress(Math.round((loadedCount / total) * 100));
+      if (loadedCount >= total) {
+        clearTimeout(safetyTimeout);
+        setIsLoaded(true);
+      }
+    };
+
+    assets.forEach((src) => {
       const img = new Image();
+      img.onload = onAssetComplete;
+      img.onerror = onAssetComplete;
       img.src = src;
-      img.onload = () => {
-        loadedCount++;
-        setProgress(Math.round((loadedCount / total) * 100));
-        if (loadedCount === total) setIsLoaded(true);
-      };
-      img.onerror = () => {
-        // If one fails, still increment so we don't hang the loader forever
-        loadedCount++;
-        setProgress(Math.round((loadedCount / total) * 100));
-        if (loadedCount === total) setIsLoaded(true);
-      };
     });
-  }, [assetList]);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(safetyTimeout);
+    };
+  }, [assetKey]);
 
   return { progress, isLoaded };
 }
