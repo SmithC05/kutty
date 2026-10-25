@@ -38,7 +38,7 @@
   }
 }
 
-/* Desktop cinematic cursor: the native pointer is replaced by MagicCursor. */
+/* Desktop cinematic cursor: native pointer hidden, trails only appear during movement */
 @media (hover: hover) and (pointer: fine) {
   html,
   body,
