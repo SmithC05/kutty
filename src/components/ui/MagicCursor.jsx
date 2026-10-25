@@ -1,16 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 
 /**
- * Cinematic Stardust Cursor Trail
- * Desktop only: renders a soft, ethereal trail ONLY when the mouse is moving.
- * No persistent dots, circles, or static indicators on screen.
- * Shuts down the animation loop when idle for zero CPU/GPU overhead.
+ * Cinematic Stardust Magic Cursor Trail
+ * Desktop only: emits delicate stardust particles that float upward
+ * and slowly fade out over ~1 second as you move or hover.
+ * No static dots, circles, or permanent indicators on screen.
  */
 export function MagicCursor() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    // Disable on touch devices
+    // Only enable on non-touch devices (desktop)
     if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
 
     const canvas = canvasRef.current;
@@ -42,34 +42,34 @@ export function MagicCursor() {
     };
 
     class Particle {
-      constructor(x, y, vx, vy) {
+      constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.size = Math.random() * 2.2 + 0.8;
-        this.speedX = vx || (Math.random() - 0.5) * 0.8;
-        this.speedY = vy || (Math.random() - 0.5) * 0.8;
+        this.size = Math.random() * 2.2 + 0.6;
+        this.speedX = Math.random() * 1.0 - 0.5;
+        this.speedY = Math.random() * 0.9 + 0.4; // float upwards gently
         this.life = 1.0;
-        this.decay = Math.random() * 0.035 + 0.03; // ~25-35 frames (0.4-0.5s fade out)
-        const palettes = [
-          '255, 255, 255', // pure stardust
-          '219, 234, 254', // soft ice blue
-          '254, 243, 199', // warm golden shimmer
-          '191, 219, 254', // celestial sky
+        this.decay = Math.random() * 0.005 + 0.014; // ~60-70 frames = ~1.0-1.2s slow fade
+        // Celestial theme palette: soft baby blue, stardust white, gentle gold
+        const colors = [
+          '191, 219, 254', // soft blue
+          '219, 234, 254', // ice blue
+          '255, 255, 255', // stardust white
+          '254, 243, 199', // soft champagne shimmer
         ];
-        this.color = palettes[Math.floor(Math.random() * palettes.length)];
+        this.rgb = colors[Math.floor(Math.random() * colors.length)];
       }
 
       update() {
         this.x += this.speedX;
-        this.y += this.speedY;
+        this.y -= this.speedY; // move upwards like ethereal fairy dust
         this.life -= this.decay;
-        this.size *= 0.96;
+        this.size *= 0.985; // very gradual shrink
       }
 
       draw() {
         if (this.life <= 0) return;
-        const alpha = Math.max(0, this.life * 0.85);
-        ctx.fillStyle = `rgba(${this.color}, ${alpha})`;
+        ctx.fillStyle = `rgba(${this.rgb}, ${Math.max(0, this.life * 0.88)})`;
         ctx.beginPath();
         ctx.arc(this.x, this.y, Math.max(0.3, this.size), 0, Math.PI * 2);
         ctx.fill();
@@ -90,19 +90,19 @@ export function MagicCursor() {
       const dy = mouseY - previousY;
       const distance = Math.hypot(dx, dy);
 
-      // Only spawn particles if mouse actually moved
-      if (distance > 2) {
-        const steps = Math.min(5, Math.max(1, Math.floor(distance / 10)));
-        for (let s = 0; s < steps; s++) {
-          if (particles.length >= 65) break;
-          const t = s / steps;
-          const interpX = previousX + dx * t;
-          const interpY = previousY + dy * t;
-          const jitterX = (Math.random() - 0.5) * 3;
-          const jitterY = (Math.random() - 0.5) * 3;
-          const vx = (Math.random() - 0.5) * 0.6 - dx * 0.04;
-          const vy = (Math.random() - 0.5) * 0.6 - dy * 0.04;
-          particles.push(new Particle(interpX + jitterX, interpY + jitterY, vx, vy));
+      if (distance > 1) {
+        // Interpolate along motion path so fast movements have a continuous, extended trail
+        const steps = Math.min(6, Math.max(2, Math.ceil(distance / 8)));
+        for (let i = 0; i < steps; i++) {
+          if (particles.length < 120) {
+            const t = i / steps;
+            particles.push(
+              new Particle(
+                previousX + dx * t + (Math.random() - 0.5) * 4,
+                previousY + dy * t + (Math.random() - 0.5) * 4
+              )
+            );
+          }
         }
         ensureRenderRunning();
       }
@@ -127,7 +127,7 @@ export function MagicCursor() {
         particles = particles.filter((p) => p.life > 0);
         animationFrameId = requestAnimationFrame(render);
       } else {
-        // All particles have faded away: sleep until next movement
+        // Sleep when all particles have dissolved
         animationFrameId = null;
       }
     };
