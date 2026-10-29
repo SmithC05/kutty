@@ -5,7 +5,7 @@ export const siteConfig = {
 };
 
 export const birthdayConfig = {
-  targetDate: "2026-10-30T00:00:00Z",
+  targetDate: "2026-10-30T00:00:00+05:30", // Midnight IST (Indian Standard Time)
   nickname: "Kutty",
 };
 
